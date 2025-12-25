@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud Quest: Pixel Escape</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --g-blue: #4285F4;
+            --g-red: #EA4335;
+            --g-yellow: #FBBC05;
+            --g-green: #34A853;
+            --pixel-size: 4px;
+        }
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #0c0c0c;
+            color: #ffffff;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.5;
+        }
+        .mono-font {
+            font-family: 'VT323', monospace;
+        }
+
+        /* Retro CRT Effect */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .crt-flicker {
+            animation: flicker 0.15s infinite;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 16, 16, 0.03);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.27; }
+            50% { opacity: 0.32; }
+            100% { opacity: 0.27; }
+        }
+
+        /* Pixel Borders - High Contrast Retro Style */
+        .pixel-box {
+            background: #1a1a1a;
+            border: var(--pixel-size) solid #fff;
+            box-shadow: 
+                inset calc(var(--pixel-size) * -1) calc(var(--pixel-size) * -1) 0px #000,
+                inset var(--pixel-size) var(--pixel-size) 0px #555,
+                8px 8px 0px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .pixel-box-blue {
+            background: #003366;
+            border-color: #4285F4;
+            box-shadow: 
+                inset calc(var(--pixel-size) * -1) calc(var(--pixel-size) * -1) 0px #001122,
+                inset var(--pixel-size) var(--pixel-size) 0px #66AAFF,
+                8px 8px 0px rgba(0, 0, 0, 0.8);
+        }
+
+        .pixel-button {
+            background: #333;
+            border: var(--pixel-size) solid #fff;
+            box-shadow: 
+                inset calc(var(--pixel-size) * -1) calc(var(--pixel-size) * -1) 0px #000,
+                inset var(--pixel-size) var(--pixel-size) 0px #777,
+                6px 6px 0px #000;
+            transition: all 0.05s steps(2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pixel-button:hover {
+            background: #444;
+            transform: translate(2px, 2px);
+            box-shadow: 
+                inset calc(var(--pixel-size) * -1) calc(var(--pixel-size) * -1) 0px #000,
+                inset var(--pixel-size) var(--pixel-size) 0px #888,
+                4px 4px 0px #000;
+        }
+
+        .pixel-button:active {
+            transform: translate(6px, 6px);
+            box-shadow: 
+                inset calc(var(--pixel-size) * -1) calc(var(--pixel-size) * -1) 0px #000,
+                inset var(--pixel-size) var(--pixel-size) 0px #555,
+                0px 0px 0px #000;
+        }
+
+        .pixel-button-primary {
+            background: #4285F4;
+            border-color: #fff;
+            color: #fff;
+            box-shadow: 
+                inset -4px -4px 0px #0044aa, 
+                inset 4px 4px 0px #88ccff, 
+                6px 6px 0px #000;
+        }
+
+        .pixel-button-primary:hover {
+            background: #3367D6;
+        }
+
+        /* Pixel Cloud Animation */
+        @keyframes float-pixel {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-pixel-float {
+            animation: float-pixel 2.5s steps(4) infinite;
+        }
+
+        /* Background Data Stream (Pixelated) */
+        .pixel-grid {
+            background-image: 
+                linear-gradient(to right, #ffffff0a 2px, transparent 2px),
+                linear-gradient(to bottom, #ffffff0a 2px, transparent 2px);
+            background-size: 32px 32px;
+        }
+
+        .scanline-move {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05), transparent);
+            pointer-events: none;
+            z-index: 1001;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { top: -100px; }
+            100% { top: 100%; }
+        }
+
+        /* Retro Progress Bar */
+        .pixel-progress-container {
+            height: 24px;
+            background: #000;
+            border: 4px solid #fff;
+            position: relative;
+        }
+        .pixel-progress-bar {
+            height: 100%;
+            background: #34A853;
+            box-shadow: inset -4px -4px 0px #1a5e20, inset 4px 4px 0px #81c784;
+            transition: width 0.3s steps(8);
+        }
+
+        .pixel-hr {
+            border: none;
+            height: 8px;
+            background: repeating-linear-gradient(90deg, #fff 0px, #fff 8px, transparent 8px, transparent 16px);
+            margin: 2rem 0;
+        }
+
+        /* Sprite Animation Simulator */
+        .pixel-sprite {
+            display: inline-block;
+            image-rendering: pixelated;
+        }
+
+        .blinking {
+            animation: blink 0.5s steps(2) infinite;
+        }
+        @keyframes blink {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "recharts": "https://esm.sh/recharts@^3.6.0"
+  }
+}
+</script>
+</head>
+<body>
+    <div class="crt-overlay"></div>
+    <div class="crt-flicker"></div>
+    <div class="scanline-move"></div>
+    <div id="root"></div>
+</body>
+</html>
