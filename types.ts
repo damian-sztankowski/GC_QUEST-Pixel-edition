@@ -13,12 +13,15 @@ export enum CloudRole {
   DIGITAL_LEADER = 'Cloud Digital Leader'
 }
 
+export type PuzzleType = 'CATCHER' | 'SORTER' | 'DEFENDER';
+
 export interface Level {
   id: number;
   title: string;
   description: string;
   topic: string;
   difficulty: 'Foundational';
+  puzzleType: PuzzleType;
 }
 
 export interface Question {

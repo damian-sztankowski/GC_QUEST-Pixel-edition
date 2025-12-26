@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { CloudRole, Level, Question, GameState } from '../types';
-import { generateQuestion, getGeminiFeedback } from '../services/geminiService';
+import { generateQuestion, getGeminiFeedback, generateHint } from '../services/geminiService';
 import { LEVELS } from '../constants';
 import Avatar from './Avatar';
 import { soundService } from '../services/soundService';
@@ -13,6 +13,7 @@ interface GameSessionUIProps {
 }
 
 const QUESTIONS_PER_LEVEL = 10;
+const HINT_COST = 25;
 
 const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
@@ -20,6 +21,8 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
+  const [isHintLoading, setIsHintLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(1200); 
@@ -48,6 +51,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
   const loadNewQuestion = async () => {
     setLoading(true);
     setFeedback(null);
+    setHint(null);
     setSelectedOption(null);
     try {
       const q = await generateQuestion(role, level);
@@ -56,6 +60,24 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRequestHint = async () => {
+    if (score < HINT_COST || hint || isHintLoading || selectedOption !== null) return;
+    
+    soundService.playClick();
+    setIsHintLoading(true);
+    setScore(prev => prev - HINT_COST);
+    
+    try {
+      const clue = await generateHint(question?.text || '', level.topic);
+      setHint(clue);
+      soundService.playPowerUp();
+    } catch (err) {
+      setHint("SYSTEM_ERROR: CLUE_FILE_CORRUPTED.");
+    } finally {
+      setIsHintLoading(false);
     }
   };
 
@@ -88,7 +110,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
     if (currentQuestionInLevel < QUESTIONS_PER_LEVEL) {
       setCurrentQuestionInLevel(prev => prev + 1);
     } else {
-      // Trigger Puzzle Mode instead of direct next chapter
       setMode('PUZZLE');
     }
   };
@@ -115,9 +136,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
 
   if (loading && mode === 'QUESTION') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] pixel-font">
+      <div className="flex flex-col items-center justify-center min-h-[400px] pixel-font text-center p-10">
         <div className="w-20 h-20 border-8 border-white border-t-blue-500 animate-spin mb-10 shadow-[8px_8px_0_#000]"></div>
-        <p className="text-xl animate-pulse text-white uppercase">Syncing_Chapter_Data...</p>
+        <p className="text-xl animate-pulse text-white uppercase font-black">Syncing_Chapter_Data...</p>
+        <p className="text-[10px] text-slate-500 mt-4 uppercase font-black">Consulting_Gemini_Cloud_Oracle</p>
       </div>
     );
   }
@@ -186,16 +208,42 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
                <div className="absolute -top-3 left-6 px-3 bg-black text-white pixel-font text-[10px] z-10 border-2 border-white font-black">
                   SYS_QUEST_{currentQuestionInLevel}
                </div>
-               <div className="p-8 border-4 border-white bg-[#111] text-2xl leading-relaxed text-white mono-font flex items-start space-x-6 min-h-[140px]">
-                  <span className="text-blue-500 shrink-0 select-none animate-pulse">>>></span>
-                  <p className="text-white uppercase">{question?.text}</p>
+               
+               {/* Hint Trigger */}
+               <div className="absolute -top-3 right-6 z-10">
+                 <button 
+                   onClick={handleRequestHint}
+                   disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
+                   className={`pixel-button px-3 py-1 text-[8px] pixel-font transition-all ${
+                     hint || selectedOption !== null 
+                      ? 'bg-slate-800 text-slate-500 opacity-50' 
+                      : 'bg-purple-900 text-white hover:scale-105'
+                   }`}
+                 >
+                   {isHintLoading ? 'FETCHING...' : hint ? 'HINT_ACTIVE' : `[HINT_COST: ${HINT_COST}_PTS]`}
+                 </button>
+               </div>
+
+               <div className="p-8 border-4 border-white bg-[#111] text-2xl leading-relaxed text-white mono-font flex flex-col space-y-4 min-h-[140px]">
+                  <div className="flex items-start space-x-6">
+                    <span className="text-blue-500 shrink-0 select-none animate-pulse">>>></span>
+                    <p className="text-white uppercase font-black">{question?.text}</p>
+                  </div>
+                  
+                  {/* Hint Display */}
+                  {hint && (
+                    <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-4 animate-in slide-in-from-top-2 duration-300">
+                      <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black">DEBUG_CLUE_FOUND:</div>
+                      <p className="text-purple-300 text-lg uppercase italic font-bold">"{hint}"</p>
+                    </div>
+                  )}
                </div>
             </div>
 
             {/* Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {question?.options.map((opt, idx) => {
-                let btnClass = "pixel-button p-8 pixel-font text-left flex items-start space-x-6 ";
+                let btnClass = "pixel-button p-8 pixel-font text-left flex items-start space-x-6 h-full ";
                 
                 if (selectedOption === null) {
                   btnClass += "text-white";

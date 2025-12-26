@@ -17,42 +17,48 @@ export const LEVELS: Level[] = [
     title: 'Digital Transformation', 
     description: '1.1 Business Transformation drivers, 1.2 Cloud concepts (CapEx/OpEx, TCO), 1.3 Computing Models (IaaS, PaaS, SaaS) and Shared Responsibility.', 
     topic: 'Section 1: Digital Transformation with Google Cloud', 
-    difficulty: 'Foundational' 
+    difficulty: 'Foundational',
+    puzzleType: 'CATCHER'
   },
   { 
     id: 2, 
     title: 'Data Transformation', 
     description: '2.1 Value of Data (Databases vs Warehouses vs Lakes), 2.2 Solutions (SQL, Spanner, Bigtable, BigQuery), 2.3 Analytics (Looker, Pub/Sub, Dataflow).', 
     topic: 'Section 2: Exploring Data Transformation with Google Cloud', 
-    difficulty: 'Foundational' 
+    difficulty: 'Foundational',
+    puzzleType: 'SORTER'
   },
   { 
     id: 3, 
     title: 'AI & Machine Learning', 
     description: '3.1 AI/ML Fundamentals, 3.2 Solution Selection (Pre-trained vs AutoML vs Custom), 3.3 Building (Vertex AI, BigQuery ML, TPUs).', 
     topic: 'Section 3: Innovating with Google Cloud Artificial Intelligence', 
-    difficulty: 'Foundational' 
+    difficulty: 'Foundational',
+    puzzleType: 'DEFENDER'
   },
   { 
     id: 4, 
     title: 'Modernizing Infrastructure', 
     description: '4.1 Migration (Lift/Shift, Refactor), 4.2 Compute (VMs, GKE, Serverless), 4.3 App Modernization (Cloud Run, Anthos/GKE Enterprise), 4.5 APIs (Apigee).', 
     topic: 'Section 4: Modernize Infrastructure and Applications with Google Cloud', 
-    difficulty: 'Foundational' 
+    difficulty: 'Foundational',
+    puzzleType: 'CATCHER'
   },
   { 
     id: 5, 
     title: 'Trust and Security', 
     description: '5.1 Cloud Security concepts, 5.2 Google Trusted Infrastructure (IAM, Encryption, Cloud Armor), 5.3 Compliance and Trust Principles.', 
     topic: 'Section 5: Trust and Security with Google Cloud', 
-    difficulty: 'Foundational' 
+    difficulty: 'Foundational',
+    puzzleType: 'SORTER'
   },
   { 
     id: 6, 
     title: 'Scaling & Operations', 
     description: '6.1 Financial Governance (Cost Mgmt, Budgets), 6.2 Operational Excellence (SRE, DevOps, SRE terms), 6.3 Sustainability goals.', 
     topic: 'Section 6: Scaling with Google Cloud Operations', 
-    difficulty: 'Foundational' 
+    difficulty: 'Foundational',
+    puzzleType: 'DEFENDER'
   }
 ];
 

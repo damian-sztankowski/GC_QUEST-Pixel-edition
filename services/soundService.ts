@@ -6,8 +6,9 @@ class SoundService {
   private bgmInterval: number | null = null;
   private currentStep: number = 0;
 
-  // Simple retro melody: C4, E4, G4, B3, A3, C4, D4, G3
+  // Retro chords and melodies
   private melody = [261.63, 329.63, 392.00, 246.94, 220.00, 261.63, 293.66, 196.00];
+  private bassline = [65.41, 65.41, 82.41, 98.00, 55.00, 55.00, 65.41, 49.00];
 
   private initContext() {
     if (!this.ctx) {
@@ -58,32 +59,57 @@ class SoundService {
     osc.stop(this.ctx.currentTime + duration);
   }
 
+  private playNoise(duration: number, volume: number = 0.05) {
+    if (!this.enabled || !this.ctx) return;
+    const bufferSize = this.ctx.sampleRate * duration;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+    noise.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start();
+  }
+
   private startBGM() {
     if (this.bgmInterval) return;
     this.initContext();
     
-    // Low pass filter for BGM to keep it subtle
     this.bgmInterval = window.setInterval(() => {
       if (!this.enabled || !this.bgmEnabled || !this.ctx) return;
       
-      const freq = this.melody[this.currentStep % this.melody.length];
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+      const step = this.currentStep % 16;
       
-      osc.type = 'triangle'; // Softer retro sound for BGM
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      
-      gain.gain.setValueAtTime(0.02, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.4);
-      
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.4);
+      // Melody (every 2 steps)
+      if (step % 2 === 0) {
+        const freq = this.melody[(step / 2) % this.melody.length];
+        this.playTone(freq, 'triangle', 0.4, 0.02);
+      }
+
+      // Bassline (on every beat)
+      if (step % 4 === 0) {
+        const bFreq = this.bassline[(step / 4) % this.bassline.length];
+        this.playTone(bFreq, 'sawtooth', 0.2, 0.03);
+      }
+
+      // High Hat (every off-beat)
+      if (step % 2 !== 0) {
+        this.playNoise(0.05, 0.01);
+      }
+
+      // Snare (on 4 and 12)
+      if (step === 4 || step === 12) {
+        this.playNoise(0.1, 0.03);
+      }
       
       this.currentStep++;
-    }, 500); // 120 BPM
+    }, 150); // High energy tempo
   }
 
   private stopBGM() {
@@ -104,27 +130,27 @@ class SoundService {
   }
 
   public playIncorrect() {
-    this.playTone(200, 'sawtooth', 0.4, 0.1, 50);
+    this.playTone(150, 'sawtooth', 0.5, 0.1, 40);
   }
 
   public playLevelComplete() {
-    const notes = [523.25, 523.25, 523.25, 698.46, 783.99, 1046.50];
+    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
     notes.forEach((f, i) => {
-      setTimeout(() => this.playTone(f, 'square', 0.2, 0.1), i * 120);
+      setTimeout(() => this.playTone(f, 'square', 0.15, 0.1), i * 100);
     });
   }
 
   public playPowerUp() {
-    this.playTone(100, 'square', 0.5, 0.1, 1000);
+    this.playTone(100, 'square', 0.5, 0.1, 1500);
   }
 
   public playSiren() {
-    this.playTone(440, 'triangle', 0.5, 0.05, 880);
-    setTimeout(() => this.playTone(880, 'triangle', 0.5, 0.05, 440), 500);
+    this.playTone(300, 'triangle', 0.4, 0.05, 600);
+    setTimeout(() => this.playTone(600, 'triangle', 0.4, 0.05, 300), 400);
   }
 
   public playBlip() {
-    this.playTone(1200, 'sine', 0.05, 0.03);
+    this.playTone(1500, 'sine', 0.05, 0.05);
   }
 }
 

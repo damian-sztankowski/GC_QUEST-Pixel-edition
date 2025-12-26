@@ -2,7 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { CloudRole, Level, Question } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Fix: Strictly use process.env.API_KEY for initialization as per guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateQuestion = async (role: CloudRole, level: Level): Promise<Question> => {
   const prompt = `Generate a Google Cloud certification-style question for a ${role} exam candidate.
@@ -50,6 +51,21 @@ export const getGeminiFeedback = async (role: CloudRole, question: string, userA
   Result: ${isCorrect ? 'Correct' : 'Incorrect'}.
   
   Provide a professional, concise feedback snippet (1-2 sentences). Explain the technical logic based on the CDL syllabus. Keep the tone slightly "retro gamer" but educational.`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
+  });
+
+  return response.text;
+};
+
+export const generateHint = async (question: string, topic: string): Promise<string> => {
+  const prompt = `The user is stuck on a Google Cloud question regarding "${topic}".
+  Question: "${question}"
+  
+  Provide a subtle hint that points them towards the right concept without revealing the answer.
+  Use a "Retro AI System" or "Debug Console" persona. Keep it under 20 words.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
