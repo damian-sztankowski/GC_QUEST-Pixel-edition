@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CloudRole } from '../types';
 import { ROLES } from '../constants';
+import { soundService } from '../services/soundService';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const roleConfig = ROLES.find(r => r.type === activeRole);
   const themeColor = roleConfig?.color || 'blue';
 
@@ -19,8 +21,23 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
 
   const currentAccent = themeColors[themeColor] || themeColors.blue;
 
+  useEffect(() => {
+    soundService.setEnabled(soundEnabled);
+  }, [soundEnabled]);
+
+  const toggleSound = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSoundEnabled(!soundEnabled);
+    if (!soundEnabled) {
+      soundService.playClick();
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0c0c0c] flex flex-col items-center relative overflow-hidden pixel-grid">
+    <div 
+      className="min-h-screen bg-[#0c0c0c] flex flex-col items-center relative overflow-hidden pixel-grid"
+      onClick={() => soundEnabled && soundService.playClick()}
+    >
       <header className="w-full max-w-7xl px-6 py-4 flex justify-between items-center border-b-8 border-white bg-[#1a1a1a] shadow-[0_8px_0_#000] relative z-10">
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2 border-4 border-white p-2 bg-black">
@@ -34,10 +51,19 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
           </h1>
         </div>
         
-        <div className="flex flex-col items-end pixel-font">
-          <div className="text-[10px] text-yellow-500 mb-1">FOUNDATIONAL_MODE</div>
-          <div className="text-xs text-white bg-black px-2 border-2 border-white">
-            {activeRole ? `SYS: ${activeRole.replace('Cloud ', '').toUpperCase()}` : 'STATUS: STBY'}
+        <div className="flex items-center space-x-6">
+          <button 
+            onClick={toggleSound}
+            className={`pixel-button px-4 py-2 text-xs pixel-font ${soundEnabled ? 'bg-green-800 text-white' : 'bg-red-900 text-slate-400 grayscale'}`}
+          >
+            {soundEnabled ? 'SOUND: ON' : 'SOUND: OFF'}
+          </button>
+
+          <div className="hidden md:flex flex-col items-end pixel-font">
+            <div className="text-[10px] text-yellow-500 mb-1 font-black">FOUNDATIONAL_MODE</div>
+            <div className="text-xs text-white bg-black px-2 border-2 border-white">
+              {activeRole ? `SYS: ${activeRole.replace('Cloud ', '').toUpperCase()}` : 'STATUS: STBY'}
+            </div>
           </div>
         </div>
       </header>

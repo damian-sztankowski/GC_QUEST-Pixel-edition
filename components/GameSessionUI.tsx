@@ -2,33 +2,38 @@
 import React, { useState, useEffect } from 'react';
 import { CloudRole, Level, Question } from '../types';
 import { generateQuestion, getGeminiFeedback } from '../services/geminiService';
-import { LEVELS, ROLES } from '../constants';
+import { LEVELS } from '../constants';
 import Avatar from './Avatar';
+import { soundService } from '../services/soundService';
 
 interface GameSessionUIProps {
   role: CloudRole;
   onGameEnd: (score: number) => void;
 }
 
+const QUESTIONS_PER_LEVEL = 10;
+
 const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
+  const [currentQuestionInLevel, setCurrentQuestionInLevel] = useState(1);
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(1200); // 20 minutes total for 60 questions
   const [isAnswering, setIsAnswering] = useState(false);
 
   const level = LEVELS[currentLevelIdx];
-  const maxTime = 300;
+  const maxTime = 1200;
 
   useEffect(() => {
     loadNewQuestion();
-  }, [currentLevelIdx]);
+  }, [currentLevelIdx, currentQuestionInLevel]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
+      soundService.playIncorrect();
       onGameEnd(score);
       return;
     }
@@ -59,6 +64,9 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
     
     if (correct) {
       setScore(prev => prev + 100);
+      soundService.playCorrect();
+    } else {
+      soundService.playIncorrect();
     }
 
     try {
@@ -71,11 +79,20 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
     }
   };
 
-  const nextLevel = () => {
-    if (currentLevelIdx < LEVELS.length - 1) {
-      setCurrentLevelIdx(prev => prev + 1);
+  const nextStep = () => {
+    soundService.playClick();
+    if (currentQuestionInLevel < QUESTIONS_PER_LEVEL) {
+      setCurrentQuestionInLevel(prev => prev + 1);
     } else {
-      onGameEnd(score + Math.floor(timeLeft * 2)); 
+      // Move to next chapter
+      soundService.playLevelComplete();
+      if (currentLevelIdx < LEVELS.length - 1) {
+        setCurrentLevelIdx(prev => prev + 1);
+        setCurrentQuestionInLevel(1);
+      } else {
+        // Game Complete
+        onGameEnd(score + Math.floor(timeLeft * 2)); 
+      }
     }
   };
 
@@ -86,48 +103,54 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
   };
 
   const timePercentage = (timeLeft / maxTime) * 100;
+  const stageProgressPercentage = (currentQuestionInLevel / QUESTIONS_PER_LEVEL) * 100;
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] pixel-font">
         <div className="w-20 h-20 border-8 border-white border-t-blue-500 animate-spin mb-10 shadow-[8px_8px_0_#000]"></div>
-        <p className="text-xl animate-pulse text-white">GENERATING_ZONE...</p>
+        <p className="text-xl animate-pulse text-white uppercase">Syncing_Chapter_Data...</p>
       </div>
     );
   }
 
   return (
     <div className="w-full max-w-5xl space-y-10 animate-in fade-in duration-500 pb-12">
-      {/* HUD 2.0 */}
+      {/* HUD */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="pixel-box p-4 flex items-center space-x-4 bg-[#111]">
           <Avatar role={role} size="sm" animate={false} />
           <div className="pixel-font">
-            <div className="text-[10px] text-slate-400">PLAYER</div>
-            <div className="text-sm text-blue-400">CDL_HERO</div>
+            <div className="text-[10px] text-slate-400 font-black">PLAYER</div>
+            <div className="text-sm text-blue-400">CDL_QUESTER</div>
           </div>
         </div>
         
         <div className="pixel-box p-4 pixel-font bg-[#111]">
-          <div className="text-[10px] text-slate-400">STAGE</div>
-          <div className="text-sm text-white">WORLD_{currentLevelIdx + 1}-{LEVELS.length}</div>
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-[10px] text-slate-400 font-black">CHAPTER_{currentLevelIdx + 1}</div>
+            <div className="text-[10px] text-white">{currentQuestionInLevel}/{QUESTIONS_PER_LEVEL}</div>
+          </div>
+          <div className="pixel-progress-container h-4 border-2">
+            <div className="pixel-progress-bar bg-blue-500" style={{ width: `${stageProgressPercentage}%` }} />
+          </div>
         </div>
 
         <div className="pixel-box p-4 pixel-font bg-[#200] border-red-500 col-span-1">
           <div className="flex justify-between items-center mb-2">
-            <div className="text-[10px] text-red-300">STABILITY</div>
+            <div className="text-[10px] text-red-300 font-black">STABILITY</div>
             <div className="text-[10px] text-white">{formatTime(timeLeft)}</div>
           </div>
           <div className="pixel-progress-container border-2">
             <div 
-              className={`pixel-progress-bar ${timeLeft < 60 ? 'bg-red-500' : 'bg-green-500'}`} 
+              className={`pixel-progress-bar ${timeLeft < 240 ? 'bg-red-500' : 'bg-green-500'}`} 
               style={{ width: `${timePercentage}%` }} 
             />
           </div>
         </div>
 
         <div className="pixel-box p-4 pixel-font bg-[#002] border-blue-500">
-          <div className="text-[10px] text-blue-300">HI-SCORE</div>
+          <div className="text-[10px] text-blue-300 font-black">HI-SCORE</div>
           <div className="text-sm text-white">{score.toString().padStart(6, '0')}</div>
         </div>
       </div>
@@ -137,27 +160,27 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
         {/* Stage Banner */}
         <div className="bg-white text-black p-5 pixel-font flex justify-between items-center border-b-4 border-black">
           <div className="flex items-center space-x-4">
-             <span className="w-4 h-4 bg-blue-500 border-2 border-black"></span>
-             <span className="text-sm uppercase">{level.title}</span>
+             <span className="w-4 h-4 bg-blue-500 border-2 border-black blinking"></span>
+             <span className="text-sm uppercase font-black">{level.title}</span>
           </div>
-          <span className="text-[10px] bg-black text-white px-3 py-1 border-2 border-black">
+          <span className="text-[10px] bg-black text-white px-3 py-1 border-2 border-black max-w-[50%] truncate font-black">
              {level.topic.toUpperCase()}
           </span>
         </div>
 
         <div className="p-10 space-y-10">
-          {/* Question Dialog Area */}
+          {/* Question Area */}
           <div className="relative">
-             <div className="absolute -top-3 left-6 px-3 bg-black text-white pixel-font text-[10px] z-10 border-2 border-white">
-                SYS_INQUIRY
+             <div className="absolute -top-3 left-6 px-3 bg-black text-white pixel-font text-[10px] z-10 border-2 border-white font-black">
+                SYS_QUEST_{currentQuestionInLevel}
              </div>
              <div className="p-8 border-4 border-white bg-[#111] text-2xl leading-relaxed text-white mono-font flex items-start space-x-6 min-h-[140px]">
                 <span className="text-blue-500 shrink-0 select-none animate-pulse">>>></span>
-                <p className="text-white">{question?.text}</p>
+                <p className="text-white uppercase">{question?.text}</p>
              </div>
           </div>
 
-          {/* Answer Grid */}
+          {/* Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {question?.options.map((opt, idx) => {
               let btnClass = "pixel-button p-8 pixel-font text-left flex items-start space-x-6 ";
@@ -176,17 +199,17 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
                 <button 
                   key={idx}
                   disabled={selectedOption !== null}
-                  onClick={() => handleAnswer(idx)}
+                  onClick={(e) => { e.stopPropagation(); handleAnswer(idx); }}
                   className={btnClass}
                 >
-                  <span className="shrink-0 text-sm text-yellow-500">[{String.fromCharCode(65 + idx)}]</span>
-                  <span className="text-sm leading-6 uppercase">{opt}</span>
+                  <span className="shrink-0 text-sm text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
+                  <span className="text-sm leading-6 uppercase font-black">{opt}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* Dynamic NPC / Feedback Area */}
+          {/* Feedback Area */}
           <div className="min-h-[120px]">
             {feedback && (
               <div className={`p-8 border-4 flex items-center space-x-8 animate-in slide-in-from-bottom-4 duration-300 bg-black shadow-[8px_8px_0_#000] ${
@@ -197,9 +220,9 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
                 </div>
                 <div className="pixel-font flex-1">
                   <div className={`text-[10px] mb-3 font-black ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
-                     COMM_LINK_RECEIVED:
+                     AI_INSTRUCTOR_RESPONSE:
                   </div>
-                  <div className="text-xs text-white leading-6 uppercase">
+                  <div className="text-xs text-white leading-6 uppercase font-black">
                     {feedback}
                   </div>
                 </div>
@@ -211,10 +234,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
           {selectedOption !== null && !isAnswering && (
             <div className="flex justify-center pt-6 pb-4">
               <button 
-                onClick={nextLevel}
-                className="pixel-button bg-yellow-500 text-black px-16 py-6 pixel-font text-sm hover:scale-110 active:scale-95 transition-all shadow-[8px_8px_0_#000]"
+                onClick={(e) => { e.stopPropagation(); nextStep(); }}
+                className="pixel-button bg-yellow-500 text-black px-16 py-6 pixel-font text-sm hover:scale-110 active:scale-95 transition-all shadow-[8px_8px_0_#000] font-black"
               >
-                {currentLevelIdx < LEVELS.length - 1 ? "PRESS_A_FOR_NEXT_STAGE" : "FINISH_LEVEL_FINAL"}
+                {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "CONTINUE_IN_CHAPTER" : "CHAPTER_BOSS_DEFEATED"}
               </button>
             </div>
           )}

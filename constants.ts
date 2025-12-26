@@ -15,42 +15,42 @@ export const LEVELS: Level[] = [
   { 
     id: 1, 
     title: 'Digital Transformation', 
-    description: 'Cloud concepts, business value of the cloud, and the shared responsibility model.', 
+    description: '1.1 Business Transformation drivers, 1.2 Cloud concepts (CapEx/OpEx, TCO), 1.3 Computing Models (IaaS, PaaS, SaaS) and Shared Responsibility.', 
     topic: 'Section 1: Digital Transformation with Google Cloud', 
     difficulty: 'Foundational' 
   },
   { 
     id: 2, 
-    title: 'Exploring Data Transformation', 
-    description: 'Value of data, data migration, databases (SQL, Spanner, Bigtable), and data warehousing (BigQuery).', 
+    title: 'Data Transformation', 
+    description: '2.1 Value of Data (Databases vs Warehouses vs Lakes), 2.2 Solutions (SQL, Spanner, Bigtable, BigQuery), 2.3 Analytics (Looker, Pub/Sub, Dataflow).', 
     topic: 'Section 2: Exploring Data Transformation with Google Cloud', 
     difficulty: 'Foundational' 
   },
   { 
     id: 3, 
-    title: 'Innovating with AI', 
-    description: 'Artificial Intelligence, Machine Learning, Generative AI, and Vertex AI foundational concepts.', 
+    title: 'AI & Machine Learning', 
+    description: '3.1 AI/ML Fundamentals, 3.2 Solution Selection (Pre-trained vs AutoML vs Custom), 3.3 Building (Vertex AI, BigQuery ML, TPUs).', 
     topic: 'Section 3: Innovating with Google Cloud Artificial Intelligence', 
     difficulty: 'Foundational' 
   },
   { 
     id: 4, 
     title: 'Modernizing Infrastructure', 
-    description: 'Compute solutions (GCE, GKE, App Engine, Cloud Run), networking, and storage.', 
+    description: '4.1 Migration (Lift/Shift, Refactor), 4.2 Compute (VMs, GKE, Serverless), 4.3 App Modernization (Cloud Run, Anthos/GKE Enterprise), 4.5 APIs (Apigee).', 
     topic: 'Section 4: Modernize Infrastructure and Applications with Google Cloud', 
     difficulty: 'Foundational' 
   },
   { 
     id: 5, 
     title: 'Trust and Security', 
-    description: 'Identity and Access Management (IAM), data security, and compliance foundations.', 
+    description: '5.1 Cloud Security concepts, 5.2 Google Trusted Infrastructure (IAM, Encryption, Cloud Armor), 5.3 Compliance and Trust Principles.', 
     topic: 'Section 5: Trust and Security with Google Cloud', 
     difficulty: 'Foundational' 
   },
   { 
     id: 6, 
-    title: 'Operations and Scaling', 
-    description: 'Site Reliability Engineering (SRE), monitoring (Cloud Operations Suite), and cost management.', 
+    title: 'Scaling & Operations', 
+    description: '6.1 Financial Governance (Cost Mgmt, Budgets), 6.2 Operational Excellence (SRE, DevOps, SRE terms), 6.3 Sustainability goals.', 
     topic: 'Section 6: Scaling with Google Cloud Operations', 
     difficulty: 'Foundational' 
   }

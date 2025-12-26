@@ -6,20 +6,19 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 export const generateQuestion = async (role: CloudRole, level: Level): Promise<Question> => {
   const prompt = `Generate a Google Cloud certification-style question for a ${role} exam candidate.
-  The question must be strictly derived from the material described in the official Cloud Digital Leader Exam Guide.
+  The question MUST be strictly derived from the official Cloud Digital Leader Exam Guide.
   
-  Current Level: "${level.title}"
-  Section Objective: "${level.topic}"
-  Context: "${level.description}"
-  
-  Scenario Context: The user is in an escape room environment. Frame the question as a "System Security Gate" or "Production Logic Puzzle".
+  CURRENT CHAPTER: "${level.topic}"
+  SYLLABUS FOCUS: "${level.description}"
   
   Requirements:
-  1. Focus on foundational business and technical knowledge.
-  2. Use correct terminology (e.g., Anthos, BigQuery, VPC, Cloud Run).
-  3. Ensure the explanation references Google Cloud best practices.
+  1. Target foundational knowledge (Cloud Digital Leader level).
+  2. Use official terminology: Anthos, BigQuery, VPC, Cloud Run, CapEx, OpEx, TCO, SRE, Vertex AI.
+  3. Frame the question for an escape room context (e.g., "The system requires a security configuration..." or "The business needs to migrate...").
+  4. Ensure the explanation mentions the specific Google Cloud concept/best practice.
+  5. The question must cover one of the sub-points mentioned in the focus text.
   
-  Return the question in JSON format with properties: text, options (4 options), correctIndex (0-3), and explanation.`;
+  Return JSON: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
@@ -46,12 +45,11 @@ export const generateQuestion = async (role: CloudRole, level: Level): Promise<Q
 };
 
 export const getGeminiFeedback = async (role: CloudRole, question: string, userAnswer: string, isCorrect: boolean): Promise<string> => {
-  const prompt = `Act as an expert Cloud Digital Leader Instructor. The user just answered an exam-style question.
-  Question: "${question}"
-  User Answer: "${userAnswer}"
+  const prompt = `Act as an expert Cloud Digital Leader Instructor in a retro 8-bit game.
+  The user just answered: "${userAnswer}" to the question: "${question}".
   Result: ${isCorrect ? 'Correct' : 'Incorrect'}.
   
-  Give a professional, concise feedback snippet (2 sentences). Explain the technical reasoning based specifically on the Google Cloud CDL syllabus.`;
+  Provide a professional, concise feedback snippet (1-2 sentences). Explain the technical logic based on the CDL syllabus. Keep the tone slightly "retro gamer" but educational.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
