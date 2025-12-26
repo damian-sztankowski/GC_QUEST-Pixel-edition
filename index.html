@@ -21,6 +21,8 @@
             color: #ffffff;
             overflow-x: hidden;
             image-rendering: pixelated;
+            /* Ensure smooth scrolling for long sections */
+            scroll-behavior: smooth;
         }
         .pixel-font {
             font-family: 'Press Start 2P', cursive;
@@ -193,6 +195,24 @@
         @keyframes blink {
             from { opacity: 1; }
             to { opacity: 0; }
+        }
+
+        /* Utility for scaling */
+        .scale-down-content {
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4285F4 #1a1a1a;
+        }
+        .scale-down-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scale-down-content::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        .scale-down-content::-webkit-scrollbar-thumb {
+            background-color: #4285F4;
+            border: 2px solid #1a1a1a;
         }
     </style>
 <script type="importmap">

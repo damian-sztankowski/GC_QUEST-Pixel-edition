@@ -150,48 +150,48 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
 
   if (loading && mode === 'QUESTION') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] pixel-font text-center p-10">
-        <div className="w-20 h-20 border-8 border-white border-t-blue-500 animate-spin mb-10 shadow-[8px_8px_0_#000]"></div>
-        <p className="text-xl animate-pulse text-white uppercase font-black">Syncing_Chapter_Data...</p>
-        <p className="text-[10px] text-slate-500 mt-4 uppercase font-black">Consulting_Gemini_Cloud_Oracle</p>
+      <div className="flex flex-col items-center justify-center min-h-[300px] pixel-font text-center p-6">
+        <div className="w-16 h-16 border-8 border-white border-t-blue-500 animate-spin mb-8 shadow-[6px_6px_0_#000]"></div>
+        <p className="text-lg animate-pulse text-white uppercase font-black">Syncing_Chapter_Data...</p>
+        <p className="text-[8px] text-slate-500 mt-2 uppercase font-black">Consulting_Gemini_Cloud_Oracle</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl space-y-10 animate-in fade-in duration-500 pb-12">
+    <div className="w-full max-w-5xl space-y-6 animate-in fade-in duration-500 pb-12 scale-down-content px-2">
       {/* HUD */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="pixel-box p-4 flex items-center space-x-4 bg-[#111]">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="pixel-box p-2 md:p-3 flex items-center space-x-3 bg-[#111] shadow-[4px_4px_0_#000]">
           <Avatar role={role} size="sm" animate={false} />
-          <div className="pixel-font">
-            <div className="text-[10px] text-slate-400 font-black">PLAYER</div>
-            <div className="text-sm text-blue-400">CDL_QUESTER</div>
+          <div className="pixel-font leading-none">
+            <div className="text-[8px] text-slate-400 font-black uppercase">PLAYER</div>
+            <div className="text-[10px] text-blue-400 font-bold">QUESTER</div>
           </div>
         </div>
         
         <button 
           onClick={() => setMode(mode === 'MAP' ? 'QUESTION' : 'MAP')}
-          className={`pixel-box p-4 pixel-font transition-all ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
+          className={`pixel-box p-2 md:p-3 pixel-font transition-all shadow-[4px_4px_0_#000] text-left ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
         >
-          <div className="flex flex-col mb-3 text-left">
-            <div className="text-[10px] text-slate-400 font-black mb-1">CHAPTER_{currentLevelIdx + 1}</div>
+          <div className="flex flex-col mb-1.5 leading-none">
+            <div className="text-[8px] text-slate-400 font-black mb-0.5 uppercase">CH_{currentLevelIdx + 1}</div>
             <div className="text-[9px] text-white font-bold leading-tight uppercase flex justify-between">
-              <span>PROGRESS:</span> 
+              <span>PROG:</span> 
               <span>{currentQuestionInLevel}/{QUESTIONS_PER_LEVEL}</span>
             </div>
           </div>
-          <div className="pixel-progress-container h-4 border-2">
+          <div className="pixel-progress-container h-2.5 border-2">
             <div className="pixel-progress-bar bg-blue-500" style={{ width: `${stageProgressPercentage}%` }} />
           </div>
         </button>
 
-        <div className="pixel-box p-4 pixel-font bg-[#200] border-red-500 col-span-1">
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-[10px] text-red-300 font-black">STABILITY</div>
+        <div className="pixel-box p-2 md:p-3 pixel-font bg-[#200] border-red-500 shadow-[4px_4px_0_#000] leading-none">
+          <div className="flex justify-between items-center mb-1.5">
+            <div className="text-[8px] text-red-300 font-black uppercase">STABILITY</div>
             <div className="text-[10px] text-white font-bold">{formatTime(timeLeft)}</div>
           </div>
-          <div className="pixel-progress-container border-2">
+          <div className="pixel-progress-container h-2.5 border-2">
             <div 
               className={`pixel-progress-bar ${timeLeft < 240 ? 'bg-red-500' : 'bg-green-500'}`} 
               style={{ width: `${timePercentage}%` }} 
@@ -199,21 +199,21 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
           </div>
         </div>
 
-        <div className="pixel-box p-4 pixel-font bg-[#002] border-blue-500">
-          <div className="text-[10px] text-blue-300 font-black">HI-SCORE</div>
-          <div className="text-sm text-white font-bold">{score.toString().padStart(6, '0')}</div>
+        <div className="pixel-box p-2 md:p-3 pixel-font bg-[#002] border-blue-500 shadow-[4px_4px_0_#000] leading-none">
+          <div className="text-[8px] text-blue-300 font-black mb-1.5 uppercase">HI-SCORE</div>
+          <div className="text-lg text-white font-bold">{score.toString().padStart(6, '0')}</div>
         </div>
       </div>
 
       {mode === 'MAP' ? (
-        <div className="animate-in zoom-in duration-300 space-y-10">
-           <div className="pixel-box border-8 p-10 bg-black">
-              <h2 className="text-4xl pixel-font text-white mb-10 text-center font-black">CLOUD_INFRASTRUCTURE_MAP</h2>
+        <div className="animate-in zoom-in duration-300 space-y-6">
+           <div className="pixel-box border-4 md:border-8 p-6 md:p-10 bg-black shadow-[8px_8px_0_#000]">
+              <h2 className="text-2xl md:text-4xl pixel-font text-white mb-8 text-center font-black">CLOUD_MAP</h2>
               <ChapterMap currentLevelIdx={currentLevelIdx} />
-              <div className="mt-12 flex justify-center">
+              <div className="mt-8 flex justify-center">
                  <button 
                    onClick={() => setMode('QUESTION')}
-                   className="pixel-button bg-blue-600 text-white px-12 py-6 pixel-font font-black"
+                   className="pixel-button bg-blue-600 text-white px-10 py-5 pixel-font text-xs font-black shadow-[6px_6px_0_#000]"
                  >
                    RESUME_QUEST
                  </button>
@@ -225,81 +225,81 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
           <PuzzleStage levelId={level.id} onComplete={handlePuzzleComplete} />
         </div>
       ) : (
-        <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] shadow-[0_16px_0_#000]">
+        <div className="pixel-box border-4 md:border-8 p-0 overflow-hidden bg-[#0c0c0c] shadow-[0_12px_0_#000]">
           {/* Stage Banner */}
-          <div className="bg-white text-black p-5 pixel-font flex justify-between items-center border-b-4 border-black">
-            <div className="flex items-center space-x-4">
-               <span className="w-4 h-4 bg-blue-500 border-2 border-black blinking"></span>
-               <span className="text-sm uppercase font-black">{level.title}</span>
+          <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black">
+            <div className="flex items-center space-x-3">
+               <span className="w-3 h-3 bg-blue-500 border-2 border-black blinking"></span>
+               <span className="text-xs uppercase font-black truncate max-w-[150px] md:max-w-none">{level.title}</span>
             </div>
-            <span className="text-[10px] bg-black text-white px-3 py-1 border-2 border-black max-w-[50%] truncate font-black">
-               {level.topic.toUpperCase()}
+            <span className="text-[8px] bg-black text-white px-2 py-0.5 border-2 border-black max-w-[40%] truncate font-black uppercase">
+               {level.topic.split(':')[0]}
             </span>
           </div>
 
-          <div className="p-10 space-y-10">
+          <div className="p-4 md:p-8 space-y-6">
             {/* Question Area */}
             <div className="relative">
-               <div className="absolute -top-3 left-6 px-3 bg-black text-white pixel-font text-[10px] z-10 border-2 border-white font-black">
-                  SYS_QUEST_{currentQuestionInLevel}
+               <div className="absolute -top-3 left-4 px-2 bg-black text-white pixel-font text-[8px] z-10 border-2 border-white font-black uppercase">
+                  QUEST_{currentQuestionInLevel}
                </div>
                
                {/* Controls Trigger */}
-               <div className="absolute -top-4 right-6 z-10 flex space-x-4">
+               <div className="absolute -top-4 right-4 z-10 flex space-x-2">
                  <button 
                    onClick={handleRequestHint}
                    disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
-                   className={`pixel-button px-4 py-2 text-[9px] pixel-font transition-all border-4 border-white font-bold shadow-[6px_6px_0_#000] min-w-[110px] ${
+                   className={`pixel-button px-3 py-1 text-[8px] pixel-font transition-all border-2 border-white font-bold shadow-[4px_4px_0_#000] ${
                      hint || selectedOption !== null || score < HINT_COST
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80 border-slate-500' 
-                      : 'bg-purple-600 text-white hover:bg-purple-500 hover:-translate-y-1 active:translate-y-1'
+                      : 'bg-purple-600 text-white hover:bg-purple-500'
                    }`}
                  >
-                   {isHintLoading ? 'FETCHING...' : hint ? 'HINT_ACTIVE' : `HINT: -${HINT_COST} PTS`}
+                   {isHintLoading ? 'WAIT...' : hint ? 'HINT_ON' : `HINT: -${HINT_COST}`}
                  </button>
 
                  <button 
                    onClick={handleSkipQuestion}
                    disabled={score < SKIP_COST || selectedOption !== null}
-                   className={`pixel-button px-4 py-2 text-[9px] pixel-font transition-all border-4 border-white font-bold shadow-[6px_6px_0_#000] min-w-[110px] ${
+                   className={`pixel-button px-3 py-1 text-[8px] pixel-font transition-all border-2 border-white font-bold shadow-[4px_4px_0_#000] ${
                      selectedOption !== null || score < SKIP_COST
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80 border-slate-500' 
-                      : 'bg-red-600 text-white hover:bg-red-500 hover:-translate-y-1 active:translate-y-1'
+                      : 'bg-red-600 text-white hover:bg-red-500'
                    }`}
                  >
-                   SKIP: -${SKIP_COST} PTS
+                   SKIP: -${SKIP_COST}
                  </button>
                </div>
 
-               <div className="p-8 border-4 border-white bg-[#111] text-2xl leading-relaxed text-white mono-font flex flex-col space-y-4 min-h-[140px]">
-                  <div className="flex items-start space-x-6">
+               <div className="p-5 md:p-7 border-4 border-white bg-[#111] text-xl md:text-2xl leading-relaxed text-white mono-font flex flex-col space-y-3 min-h-[100px]">
+                  <div className="flex items-start space-x-4">
                     <span className="text-blue-500 shrink-0 select-none animate-pulse">>>></span>
-                    <p className="text-white uppercase font-black">{question?.text}</p>
+                    <p className="text-white uppercase font-black text-lg md:text-xl">{question?.text}</p>
                   </div>
                   
                   {/* Hint Display */}
                   {hint && (
-                    <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-4 animate-in slide-in-from-top-2 duration-300">
-                      <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black">DEBUG_CLUE_FOUND:</div>
-                      <p className="text-purple-300 text-lg uppercase italic font-bold">"{hint}"</p>
+                    <div className="border-t-2 border-dashed border-purple-500/50 pt-3 mt-2 animate-in slide-in-from-top-2 duration-300">
+                      <div className="pixel-font text-[7px] text-purple-400 mb-1 font-black uppercase">DEBUG_CLUE:</div>
+                      <p className="text-purple-300 text-base md:text-lg uppercase italic font-bold">"{hint}"</p>
                     </div>
                   )}
                </div>
             </div>
 
             {/* Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {question?.options.map((opt, idx) => {
-                let btnClass = "pixel-button p-8 pixel-font text-left flex items-start space-x-6 h-full ";
+                let btnClass = "pixel-button p-4 md:p-6 pixel-font text-left flex items-start space-x-4 h-full border-4 ";
                 
                 if (selectedOption === null) {
-                  btnClass += "text-white";
+                  btnClass += "text-white bg-[#222] border-white hover:bg-[#333]";
                 } else if (idx === question.correctIndex) {
-                  btnClass += "bg-green-800 border-green-400 text-white scale-[1.05] z-10 shadow-[12px_12px_0_#000]";
+                  btnClass += "bg-green-800 border-green-400 text-white scale-[1.02] z-10 shadow-[6px_6px_0_#000]";
                 } else if (idx === selectedOption) {
                   btnClass += "bg-red-800 border-red-400 text-white";
                 } else {
-                  btnClass += "bg-black opacity-30 text-slate-600 grayscale";
+                  btnClass += "bg-black opacity-30 text-slate-600 grayscale border-slate-800";
                 }
 
                 return (
@@ -309,27 +309,27 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
                     onClick={(e) => { e.stopPropagation(); handleAnswer(idx); }}
                     className={btnClass}
                   >
-                    <span className="shrink-0 text-sm text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
-                    <span className="text-sm leading-6 uppercase font-black">{opt}</span>
+                    <span className="shrink-0 text-xs text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
+                    <span className="text-[10px] md:text-xs leading-5 uppercase font-black">{opt}</span>
                   </button>
                 );
               })}
             </div>
 
             {/* Feedback Area */}
-            <div className="min-h-[120px]">
+            <div className="min-h-[100px]">
               {feedback && (
-                <div className={`p-8 border-4 flex items-center space-x-8 animate-in slide-in-from-bottom-4 duration-300 bg-black shadow-[8px_8px_0_#000] ${
+                <div className={`p-4 md:p-6 border-4 flex items-center space-x-6 animate-in slide-in-from-bottom-4 duration-300 bg-black shadow-[6px_6px_0_#000] ${
                   selectedOption === question?.correctIndex ? 'border-green-500' : 'border-red-500'
                 }`}>
-                  <div className="text-5xl animate-pixel-float shrink-0 select-none">
+                  <div className="text-4xl animate-pixel-float shrink-0 select-none hidden md:block">
                      {selectedOption === question?.correctIndex ? '😎' : '👾'}
                   </div>
                   <div className="pixel-font flex-1">
-                    <div className={`text-[10px] mb-3 font-black ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
-                       :: ANALYZER_FEEDBACK_LOG ::
+                    <div className={`text-[8px] mb-2 font-black uppercase ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
+                       [ ANALYZER_REPORT ]
                     </div>
-                    <div className="text-xs text-white leading-6 uppercase font-black">
+                    <div className="text-[10px] md:text-xs text-white leading-relaxed uppercase font-black">
                       {feedback}
                     </div>
                   </div>
@@ -339,12 +339,12 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
 
             {/* Action Footer */}
             {selectedOption !== null && !isAnswering && (
-              <div className="flex justify-center pt-6 pb-4">
+              <div className="flex justify-center pt-2">
                 <button 
                   onClick={(e) => { e.stopPropagation(); nextStep(); }}
-                  className="pixel-button bg-yellow-500 text-black px-16 py-6 pixel-font text-sm hover:scale-110 active:scale-95 transition-all shadow-[8px_8px_0_#000] font-black"
+                  className="pixel-button bg-yellow-500 text-black px-12 py-5 pixel-font text-xs hover:scale-105 active:scale-95 transition-all shadow-[6px_6px_0_#000] font-black uppercase"
                 >
-                  {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "CONTINUE_IN_CHAPTER" : "HACK_CHAPTER_EXIT"}
+                  {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "NEXT_NODE" : "CHAPTER_CLEAR"}
                 </button>
               </div>
             )}

@@ -124,28 +124,28 @@ const App: React.FC = () => {
   return (
     <Layout activeRole={selectedRole}>
       {gameState === GameState.HOME && (
-        <div className="relative w-full min-h-[75vh] flex flex-col items-center justify-center py-12 px-6">
-          <div className="relative z-10 flex flex-col items-center text-center">
+        <div className="relative w-full flex flex-col items-center justify-center py-4 px-6 overflow-y-auto max-h-full">
+          <div className="relative z-10 flex flex-col items-center text-center max-w-5xl">
             
-            <div className="mb-12 border-4 border-white p-2 bg-black animate-in zoom-in duration-500 shadow-[8px_8px_0_#000]">
-               <div className="px-6 py-2 bg-yellow-500 text-black text-xs pixel-font font-black">CREDIT 01</div>
+            <div className="mb-6 border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000]">
+               <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
             </div>
             
-            <div className="mb-16 relative">
-              <div className="absolute -top-16 -left-32 text-6xl opacity-20 animate-pixel-float">☁️</div>
-              <div className="absolute -bottom-8 -right-32 text-6xl opacity-20 animate-pixel-float" style={{ animationDelay: '1s' }}>☁️</div>
+            <div className="mb-8 relative">
+              <div className="absolute -top-10 -left-16 md:-left-32 text-4xl md:text-6xl opacity-20 animate-pixel-float">☁️</div>
+              <div className="absolute -bottom-4 -right-16 md:-right-32 text-4xl md:text-6xl opacity-20 animate-pixel-float" style={{ animationDelay: '1s' }}>☁️</div>
               
-              <h1 className="text-7xl md:text-9xl font-black pixel-font text-white mb-6 drop-shadow-[12px_12px_0_#4285F4]">
+              <h1 className="text-5xl md:text-8xl font-black pixel-font text-white mb-4 drop-shadow-[8px_8px_0_#4285F4] leading-none">
                 CLOUD<br />QUEST
               </h1>
-              <div className="text-2xl pixel-font text-yellow-500 animate-pulse tracking-widest bg-blue-900/40 inline-block px-8 py-2 border-2 border-blue-500 font-black uppercase">
+              <div className="text-lg md:text-xl pixel-font text-yellow-500 animate-pulse tracking-widest bg-blue-900/40 inline-block px-6 py-1.5 border-2 border-blue-500 font-black uppercase">
                 :: PIXEL_EDITION ::
               </div>
             </div>
             
-            <div className="mb-16 max-w-2xl">
-              <div className="pixel-box p-10 bg-black/90 border-4">
-                 <p className="mono-font text-xl md:text-2xl text-slate-200 leading-relaxed uppercase font-black">
+            <div className="mb-8 max-w-xl">
+              <div className="pixel-box p-6 bg-black/90 border-4">
+                 <p className="mono-font text-xl md:text-2xl text-slate-200 leading-tight uppercase font-black">
                    COMPLETE_THE_6_STAGES_OF_CLOUDOM.<br/>
                    MASTER_OFFICIAL_CDL_EXAM_GUIDE.<br/>
                    ESCAPE_THE_BIT_MATRIX_DUNGEON.
@@ -153,15 +153,15 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="mb-16 w-full max-w-5xl">
-               <div className="pixel-font text-[10px] text-blue-400 mb-6 uppercase tracking-widest font-black">STAGE_SELECT_HUD</div>
+            <div className="mb-8 w-full">
+               <div className="pixel-font text-[8px] text-blue-400 mb-4 uppercase tracking-widest font-black">STAGE_SELECT_HUD</div>
                <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-24 w-full max-w-3xl">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 w-full max-w-2xl">
               <button 
                 onClick={handleStartGame}
-                className="pixel-button pixel-button-primary px-20 py-10 pixel-font text-3xl group shadow-[10px_10px_0_#000] font-black"
+                className="pixel-button pixel-button-primary px-12 py-6 md:px-16 md:py-8 pixel-font text-2xl md:text-3xl group shadow-[8px_8px_0_#000] font-black"
               >
                 1P_START
               </button>
@@ -169,29 +169,29 @@ const App: React.FC = () => {
               <div className="flex gap-4">
                 <button 
                   onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-                  className="pixel-button bg-black text-white px-10 py-6 pixel-font text-sm hover:bg-slate-900 font-black"
+                  className="pixel-button bg-black text-white px-8 py-4 pixel-font text-xs hover:bg-slate-900 font-black shadow-[4px_4px_0_#000]"
                 >
                   HI_SCORE
                 </button>
                 <button 
                   onClick={() => { soundService.playClick(); setGameState(GameState.ABOUT); }}
-                  className="pixel-button bg-slate-800 text-white px-10 py-6 pixel-font text-sm hover:bg-slate-700 font-black border-slate-400"
+                  className="pixel-button bg-slate-800 text-white px-8 py-4 pixel-font text-xs hover:bg-slate-700 font-black border-slate-400 shadow-[4px_4px_0_#000]"
                 >
                   ABOUT
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-5xl">
-               <div className="pixel-box p-10 border-4 hover:bg-blue-950 transition-colors group">
-                  <div className="text-5xl mb-6 group-hover:animate-pixel-float">👾</div>
-                  <h3 className="text-2xl pixel-font text-blue-400 mb-4 font-black">EXAM_LOGIC</h3>
-                  <p className="mono-font text-slate-400 text-xl uppercase font-black">All 6 official sections of the CDL Guide included.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl pb-10">
+               <div className="pixel-box p-6 border-4 hover:bg-blue-950 transition-colors group">
+                  <div className="text-4xl mb-4 group-hover:animate-pixel-float">👾</div>
+                  <h3 className="text-xl pixel-font text-blue-400 mb-2 font-black uppercase">Exam Logic</h3>
+                  <p className="mono-font text-slate-400 text-lg uppercase font-black">6 sections of the CDL Guide.</p>
                </div>
-               <div className="pixel-box p-10 border-4 hover:bg-red-950 transition-colors group">
-                  <div className="text-5xl mb-6 group-hover:animate-pixel-float">💣</div>
-                  <h3 className="text-2xl pixel-font text-red-400 mb-4 font-black">ARCADE_SPEED</h3>
-                  <p className="mono-font text-slate-400 text-xl uppercase font-black">Complete the migration before stability drops to 0%.</p>
+               <div className="pixel-box p-6 border-4 hover:bg-red-950 transition-colors group">
+                  <div className="text-4xl mb-4 group-hover:animate-pixel-float">💣</div>
+                  <h3 className="text-xl pixel-font text-red-400 mb-2 font-black uppercase">Arcade Mode</h3>
+                  <p className="mono-font text-slate-400 text-lg uppercase font-black">Beat stability decay.</p>
                </div>
             </div>
           </div>
@@ -199,20 +199,20 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.ROLE_SELECTION && (
-        <div className="w-full animate-in slide-in-from-bottom-8 duration-500 pt-10 px-4 flex flex-col items-center">
-          <div className="text-center mb-16">
-            <h2 className="text-6xl font-black pixel-font text-white mb-6 uppercase">Hero_Select</h2>
-            <div className="pixel-hr w-64 mx-auto mb-6"></div>
-            <p className="text-yellow-500 pixel-font text-sm animate-pulse uppercase tracking-widest font-black">Detecting_User_Biometrics...</p>
+        <div className="w-full animate-in slide-in-from-bottom-8 duration-500 pt-6 px-4 flex flex-col items-center">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl md:text-6xl font-black pixel-font text-white mb-4 uppercase leading-tight">Hero_Select</h2>
+            <div className="pixel-hr w-48 mx-auto mb-4 my-2"></div>
+            <p className="text-yellow-500 pixel-font text-xs animate-pulse uppercase tracking-widest font-black">Detecting_User_Biometrics...</p>
           </div>
           
-          <div className="max-w-2xl mx-auto w-full px-6">
+          <div className="max-w-xl mx-auto w-full px-4">
             {rolesWithAvatars.map((role, idx) => (
               <RoleCard key={idx} role={role} onSelect={handleRoleSelect} index={idx} />
             ))}
           </div>
           
-          <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-20 pixel-button bg-black text-slate-400 px-10 py-5 pixel-font text-xs font-black uppercase">
+          <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-12 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
             [ Exit_To_Title_Screen ]
           </button>
         </div>
@@ -227,40 +227,40 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.GAME_OVER && (
-        <div className="w-full max-w-4xl mx-auto pixel-box border-8 p-8 md:p-12 bg-[#0c0c0c] animate-in zoom-in-95 duration-500 text-center shadow-[16px_16px_0_#000] overflow-y-auto max-h-[85vh]">
-          <div className="text-4xl md:text-5xl pixel-font text-yellow-500 mb-8 animate-pixel-float font-black whitespace-normal break-words max-w-full px-4 leading-tight">MISSION_COMPLETE!</div>
+        <div className="w-full max-w-4xl mx-auto pixel-box border-8 p-6 md:p-8 bg-[#0c0c0c] animate-in zoom-in-95 duration-500 text-center shadow-[16px_16px_0_#000] scale-down-content">
+          <div className="text-3xl md:text-5xl pixel-font text-yellow-500 mb-6 animate-pixel-float font-black whitespace-normal break-words max-w-full px-4 leading-tight">MISSION_COMPLETE!</div>
           
-          <div className="flex flex-col items-center mb-8">
-            <div className="border-4 md:border-8 border-white p-2 md:p-4 bg-slate-900 shadow-[8px_8px_0_#000] mb-6">
+          <div className="flex flex-col items-center mb-6">
+            <div className="border-4 md:border-8 border-white p-1 md:p-2 bg-slate-900 shadow-[6px_6px_0_#000] mb-4">
                <Avatar role={selectedRole!} size="lg" animate={true} />
             </div>
-            <div className="pixel-font text-blue-400 text-xl md:text-2xl uppercase tracking-widest font-black">{selectedRole}</div>
-            <div className="mt-2 text-green-500 pixel-font text-[10px] font-black uppercase tracking-widest animate-pulse">
+            <div className="pixel-font text-blue-400 text-lg md:text-xl uppercase tracking-widest font-black leading-none">{selectedRole}</div>
+            <div className="mt-2 text-green-500 pixel-font text-[8px] font-black uppercase tracking-widest animate-pulse">
                RANK: PLATINUM_FOUNDATIONAL
             </div>
           </div>
 
-          <div className="bg-[#111] p-8 md:p-10 border-4 border-white mb-10 shadow-inner relative overflow-hidden font-black">
+          <div className="bg-[#111] p-6 md:p-8 border-4 border-white mb-8 shadow-inner relative overflow-hidden font-black">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
-            <div className="pixel-font text-slate-500 text-[10px] mb-4 uppercase tracking-widest">FINAL_RECAP_MODULE</div>
-            <div className="pixel-font text-5xl md:text-8xl text-white drop-shadow-[8px_8px_0_#4285F4]">
+            <div className="pixel-font text-slate-500 text-[8px] mb-2 uppercase tracking-widest">FINAL_RECAP_MODULE</div>
+            <div className="pixel-font text-4xl md:text-7xl text-white drop-shadow-[6px_6px_0_#4285F4] leading-none">
                <AnimatedScore score={finalScore} />
             </div>
-            <div className="mt-8 inline-block px-6 py-2 bg-green-900 border-2 border-green-500 text-green-400 pixel-font text-[10px] uppercase">
+            <div className="mt-6 inline-block px-4 py-1.5 bg-green-900 border-2 border-green-500 text-green-400 pixel-font text-[8px] uppercase">
                6_STAGES_CLEARED: CERT_READY
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pb-4">
             <button 
               onClick={resetGame}
-              className="pixel-button pixel-button-primary px-10 py-5 md:px-16 md:py-8 pixel-font text-xl md:text-2xl shadow-[8px_8px_0_#000] font-black"
+              className="pixel-button pixel-button-primary px-10 py-5 md:px-14 md:py-6 pixel-font text-lg md:text-xl shadow-[6px_6px_0_#000] font-black"
             >
               REPLAY?
             </button>
             <button 
               onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-              className="pixel-button bg-slate-800 text-white px-10 py-5 md:px-16 md:py-8 pixel-font text-xl md:text-2xl shadow-[8px_8px_0_#000] font-black"
+              className="pixel-button bg-slate-800 text-white px-10 py-5 md:px-14 md:py-6 pixel-font text-lg md:text-xl shadow-[6px_6px_0_#000] font-black"
             >
               HALL_OF_FAME
             </button>
@@ -269,18 +269,18 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.LEADERBOARD && (
-        <div className="w-full flex flex-col items-center pt-10 px-4 pb-20">
+        <div className="w-full flex flex-col items-center pt-6 px-4 pb-12 overflow-y-auto max-h-full">
            <Leaderboard />
-           <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-16 pixel-button bg-black text-slate-400 px-12 py-6 pixel-font text-sm font-black uppercase">
+           <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-10 pixel-button bg-black text-slate-400 px-10 py-5 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
               [ Return_To_HQ ]
            </button>
         </div>
       )}
 
       {gameState === GameState.ABOUT && (
-        <div className="w-full flex flex-col items-center pt-10 px-4 pb-20">
+        <div className="w-full flex flex-col items-center pt-6 px-4 pb-12 overflow-y-auto max-h-full">
            <AboutSection />
-           <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-16 pixel-button bg-black text-slate-400 px-12 py-6 pixel-font text-sm font-black uppercase">
+           <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-10 pixel-button bg-black text-slate-400 px-10 py-5 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
               [ Back_To_Title ]
            </button>
         </div>
