@@ -5,6 +5,7 @@ class SoundService {
   private bgmEnabled: boolean = true;
   private bgmInterval: number | null = null;
   private currentStep: number = 0;
+  private currentSpeed: number = 150; // Normal tempo
 
   // Retro chords and melodies
   private melody = [261.63, 329.63, 392.00, 246.94, 220.00, 261.63, 293.66, 196.00];
@@ -32,6 +33,17 @@ class SoundService {
       this.startBGM();
     } else {
       this.stopBGM();
+    }
+  }
+
+  public setBGMSpeed(isFast: boolean) {
+    const newSpeed = isFast ? 100 : 150;
+    if (this.currentSpeed !== newSpeed) {
+      this.currentSpeed = newSpeed;
+      if (this.bgmEnabled && this.enabled) {
+        this.stopBGM();
+        this.startBGM();
+      }
     }
   }
 
@@ -85,11 +97,12 @@ class SoundService {
       if (!this.enabled || !this.bgmEnabled || !this.ctx) return;
       
       const step = this.currentStep % 16;
+      const isFastMode = this.currentSpeed < 150;
       
       // Melody (every 2 steps)
       if (step % 2 === 0) {
-        const freq = this.melody[(step / 2) % this.melody.length];
-        this.playTone(freq, 'triangle', 0.4, 0.02);
+        const freq = this.melody[(step / 2) % this.melody.length] * (isFastMode ? 1.5 : 1);
+        this.playTone(freq, 'triangle', isFastMode ? 0.2 : 0.4, 0.02);
       }
 
       // Bassline (on every beat)
@@ -109,7 +122,7 @@ class SoundService {
       }
       
       this.currentStep++;
-    }, 150); // High energy tempo
+    }, this.currentSpeed);
   }
 
   private stopBGM() {
@@ -151,6 +164,10 @@ class SoundService {
 
   public playBlip() {
     this.playTone(1500, 'sine', 0.05, 0.05);
+  }
+
+  public playSkip() {
+    this.playTone(400, 'sawtooth', 0.3, 0.1, 100);
   }
 }
 

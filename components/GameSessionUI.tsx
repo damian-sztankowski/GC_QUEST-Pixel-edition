@@ -6,17 +6,20 @@ import { LEVELS } from '../constants';
 import Avatar from './Avatar';
 import { soundService } from '../services/soundService';
 import PuzzleStage from './PuzzleStage';
+import ChapterMap from './ChapterMap';
 
 interface GameSessionUIProps {
   role: CloudRole;
   onGameEnd: (score: number) => void;
+  initialLevelIdx?: number;
 }
 
 const QUESTIONS_PER_LEVEL = 10;
 const HINT_COST = 25;
+const SKIP_COST = 150;
 
-const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
-  const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
+const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialLevelIdx = 0 }) => {
+  const [currentLevelIdx, setCurrentLevelIdx] = useState(initialLevelIdx);
   const [currentQuestionInLevel, setCurrentQuestionInLevel] = useState(1);
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,14 +30,17 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(1200); 
   const [isAnswering, setIsAnswering] = useState(false);
-  const [mode, setMode] = useState<'QUESTION' | 'PUZZLE'>('QUESTION');
+  const [mode, setMode] = useState<'QUESTION' | 'PUZZLE' | 'MAP'>('QUESTION');
 
   const level = LEVELS[currentLevelIdx];
   const maxTime = 1200;
 
   useEffect(() => {
     if (mode === 'QUESTION') {
+      soundService.setBGMSpeed(false);
       loadNewQuestion();
+    } else if (mode === 'PUZZLE') {
+      soundService.setBGMSpeed(true);
     }
   }, [currentLevelIdx, currentQuestionInLevel, mode]);
 
@@ -79,6 +85,14 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
     } finally {
       setIsHintLoading(false);
     }
+  };
+
+  const handleSkipQuestion = () => {
+    if (score < SKIP_COST || selectedOption !== null) return;
+    
+    soundService.playSkip();
+    setScore(prev => prev - SKIP_COST);
+    nextStep();
   };
 
   const handleAnswer = async (index: number) => {
@@ -156,20 +170,23 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
           </div>
         </div>
         
-        <div className="pixel-box p-4 pixel-font bg-[#111]">
+        <button 
+          onClick={() => setMode(mode === 'MAP' ? 'QUESTION' : 'MAP')}
+          className={`pixel-box p-4 pixel-font transition-all ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
+        >
           <div className="flex justify-between items-center mb-2">
             <div className="text-[10px] text-slate-400 font-black">CHAPTER_{currentLevelIdx + 1}</div>
-            <div className="text-[10px] text-white">{currentQuestionInLevel}/{QUESTIONS_PER_LEVEL}</div>
+            <div className="text-[10px] text-white underline font-bold">QUEST: {currentQuestionInLevel}/{QUESTIONS_PER_LEVEL}</div>
           </div>
           <div className="pixel-progress-container h-4 border-2">
             <div className="pixel-progress-bar bg-blue-500" style={{ width: `${stageProgressPercentage}%` }} />
           </div>
-        </div>
+        </button>
 
         <div className="pixel-box p-4 pixel-font bg-[#200] border-red-500 col-span-1">
           <div className="flex justify-between items-center mb-2">
             <div className="text-[10px] text-red-300 font-black">STABILITY</div>
-            <div className="text-[10px] text-white">{formatTime(timeLeft)}</div>
+            <div className="text-[10px] text-white font-bold">{formatTime(timeLeft)}</div>
           </div>
           <div className="pixel-progress-container border-2">
             <div 
@@ -181,11 +198,26 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
 
         <div className="pixel-box p-4 pixel-font bg-[#002] border-blue-500">
           <div className="text-[10px] text-blue-300 font-black">HI-SCORE</div>
-          <div className="text-sm text-white">{score.toString().padStart(6, '0')}</div>
+          <div className="text-sm text-white font-bold">{score.toString().padStart(6, '0')}</div>
         </div>
       </div>
 
-      {mode === 'PUZZLE' ? (
+      {mode === 'MAP' ? (
+        <div className="animate-in zoom-in duration-300 space-y-10">
+           <div className="pixel-box border-8 p-10 bg-black">
+              <h2 className="text-4xl pixel-font text-white mb-10 text-center font-black">CLOUD_INFRASTRUCTURE_MAP</h2>
+              <ChapterMap currentLevelIdx={currentLevelIdx} />
+              <div className="mt-12 flex justify-center">
+                 <button 
+                   onClick={() => setMode('QUESTION')}
+                   className="pixel-button bg-blue-600 text-white px-12 py-6 pixel-font font-black"
+                 >
+                   RESUME_QUEST
+                 </button>
+              </div>
+           </div>
+        </div>
+      ) : mode === 'PUZZLE' ? (
         <div className="animate-in zoom-in duration-300">
           <PuzzleStage levelId={level.id} onComplete={handlePuzzleComplete} />
         </div>
@@ -209,18 +241,30 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd }) => {
                   SYS_QUEST_{currentQuestionInLevel}
                </div>
                
-               {/* Hint Trigger */}
-               <div className="absolute -top-3 right-6 z-10">
+               {/* Controls Trigger */}
+               <div className="absolute -top-3 right-6 z-10 flex space-x-2">
                  <button 
                    onClick={handleRequestHint}
                    disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
-                   className={`pixel-button px-3 py-1 text-[8px] pixel-font transition-all ${
+                   className={`pixel-button px-4 py-2 text-[10px] pixel-font transition-all border-2 border-white font-bold ${
                      hint || selectedOption !== null 
-                      ? 'bg-slate-800 text-slate-500 opacity-50' 
-                      : 'bg-purple-900 text-white hover:scale-105'
+                      ? 'bg-slate-800 text-slate-500 opacity-50 grayscale' 
+                      : 'bg-purple-700 text-white hover:bg-purple-600 active:translate-y-1 shadow-[4px_4px_0_#000]'
                    }`}
                  >
-                   {isHintLoading ? 'FETCHING...' : hint ? 'HINT_ACTIVE' : `[HINT_COST: ${HINT_COST}_PTS]`}
+                   {isHintLoading ? 'FETCHING...' : hint ? 'HINT_ACTIVE' : `HINT: ${HINT_COST}PTS`}
+                 </button>
+
+                 <button 
+                   onClick={handleSkipQuestion}
+                   disabled={score < SKIP_COST || selectedOption !== null}
+                   className={`pixel-button px-4 py-2 text-[10px] pixel-font transition-all border-2 border-white font-bold ${
+                     selectedOption !== null || score < SKIP_COST
+                      ? 'bg-slate-800 text-slate-500 opacity-50 grayscale' 
+                      : 'bg-red-700 text-white hover:bg-red-600 active:translate-y-1 shadow-[4px_4px_0_#000]'
+                   }`}
+                 >
+                   SKIP: {SKIP_COST}PTS
                  </button>
                </div>
 

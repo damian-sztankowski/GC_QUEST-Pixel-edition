@@ -5,6 +5,7 @@ import RoleCard from './components/RoleCard';
 import Leaderboard from './components/Leaderboard';
 import GameSessionUI from './components/GameSessionUI';
 import Avatar from './components/Avatar';
+import ChapterMap from './components/ChapterMap';
 import { GameState, CloudRole, RoleConfig } from './types';
 import { ROLES, LEVELS } from './constants';
 import { generateAvatar } from './services/geminiService';
@@ -37,6 +38,7 @@ const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.HOME);
   const [selectedRole, setSelectedRole] = useState<CloudRole | null>(null);
+  const [initialLevelIdx, setInitialLevelIdx] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const [rolesWithAvatars, setRolesWithAvatars] = useState<RoleConfig[]>(ROLES);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -95,6 +97,12 @@ const App: React.FC = () => {
     setGameState(GameState.GAME_OVER);
   };
 
+  const handleSelectChapter = (idx: number) => {
+    soundService.playClick();
+    setInitialLevelIdx(idx);
+    setGameState(GameState.ROLE_SELECTION);
+  };
+
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white pixel-font p-6 overflow-hidden">
@@ -142,6 +150,11 @@ const App: React.FC = () => {
                    ESCAPE_THE_BIT_MATRIX_DUNGEON.
                  </p>
               </div>
+            </div>
+
+            <div className="mb-16 w-full max-w-5xl">
+               <div className="pixel-font text-[10px] text-blue-400 mb-6 uppercase tracking-widest font-black">STAGE_SELECT_HUD</div>
+               <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-12 mb-24 w-full max-w-2xl">
@@ -197,7 +210,11 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.PLAYING && selectedRole && (
-        <GameSessionUI role={selectedRole} onGameEnd={handleGameEnd} />
+        <GameSessionUI 
+          role={selectedRole} 
+          onGameEnd={handleGameEnd} 
+          initialLevelIdx={initialLevelIdx}
+        />
       )}
 
       {gameState === GameState.GAME_OVER && (
@@ -257,6 +274,7 @@ const App: React.FC = () => {
     soundService.playClick();
     setGameState(GameState.HOME);
     setSelectedRole(null);
+    setInitialLevelIdx(0);
     setFinalScore(0);
   }
 };
