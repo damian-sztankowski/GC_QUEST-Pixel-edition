@@ -440,13 +440,18 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
 
           {renderGame()}
 
+          {/* Persistent Objective Bar */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 border-2 border-white px-6 py-2 z-20 pixel-font text-[10px] text-yellow-400 font-bold animate-pixel-float shadow-[4px_4px_0_#000]">
+            MISSION: {puzzleType === 'SORTER' ? `CLICK ALL ${targetCategory.toUpperCase()} SERVICES` : puzzleType === 'DEFENDER' ? `BLAST THE ${targetCategory.toUpperCase()} ITEMS` : `CATCH THE ${targetCategory.toUpperCase()} PACKETS`}
+          </div>
+
           <div className="absolute inset-0 pointer-events-none opacity-20">
             <div className="w-full h-1 bg-white animate-[scanline_3s_linear_infinite]" />
           </div>
         </>
       )}
 
-      {/* BREACH FAILED SCREEN - MORE OPAQUE AND PIXEL ART */}
+      {/* BREACH FAILED SCREEN */}
       {gameTime === 0 && !isSuccess && isActive && (
         <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 animate-in fade-in duration-500 p-12">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />

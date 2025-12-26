@@ -218,40 +218,40 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.GAME_OVER && (
-        <div className="w-full max-w-4xl mx-auto pixel-box border-8 p-16 bg-[#0c0c0c] animate-in zoom-in-95 duration-500 text-center shadow-[16px_16px_0_#000]">
-          <div className="text-7xl pixel-font text-yellow-500 mb-10 animate-pixel-float tracking-tighter font-black">MISSION_COMPLETE!</div>
+        <div className="w-full max-w-4xl mx-auto pixel-box border-8 p-8 md:p-12 bg-[#0c0c0c] animate-in zoom-in-95 duration-500 text-center shadow-[16px_16px_0_#000] overflow-y-auto max-h-[85vh]">
+          <div className="text-4xl md:text-6xl pixel-font text-yellow-500 mb-8 animate-pixel-float tracking-tighter font-black">MISSION_COMPLETE!</div>
           
-          <div className="flex flex-col items-center mb-12">
-            <div className="border-8 border-white p-4 bg-slate-900 shadow-[8px_8px_0_#000] mb-8">
-               <Avatar role={selectedRole!} size="xl" animate={true} />
+          <div className="flex flex-col items-center mb-8">
+            <div className="border-4 md:border-8 border-white p-2 md:p-4 bg-slate-900 shadow-[8px_8px_0_#000] mb-6">
+               <Avatar role={selectedRole!} size="lg" animate={true} />
             </div>
-            <div className="pixel-font text-blue-400 text-3xl uppercase tracking-widest font-black">{selectedRole}</div>
-            <div className="mt-4 text-green-500 pixel-font text-xs font-black uppercase tracking-widest animate-pulse">
+            <div className="pixel-font text-blue-400 text-xl md:text-2xl uppercase tracking-widest font-black">{selectedRole}</div>
+            <div className="mt-2 text-green-500 pixel-font text-[10px] font-black uppercase tracking-widest animate-pulse">
                RANK: PLATINUM_FOUNDATIONAL
             </div>
           </div>
 
-          <div className="bg-[#111] p-12 border-4 border-white mb-16 shadow-inner relative overflow-hidden font-black">
+          <div className="bg-[#111] p-8 md:p-10 border-4 border-white mb-10 shadow-inner relative overflow-hidden font-black">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
-            <div className="pixel-font text-slate-500 text-xs mb-6 uppercase tracking-widest">FINAL_RECAP_MODULE</div>
-            <div className="pixel-font text-8xl text-white drop-shadow-[8px_8px_0_#4285F4]">
+            <div className="pixel-font text-slate-500 text-[10px] mb-4 uppercase tracking-widest">FINAL_RECAP_MODULE</div>
+            <div className="pixel-font text-5xl md:text-8xl text-white drop-shadow-[8px_8px_0_#4285F4]">
                <AnimatedScore score={finalScore} />
             </div>
-            <div className="mt-10 inline-block px-8 py-3 bg-green-900 border-2 border-green-500 text-green-400 pixel-font text-[10px] uppercase">
+            <div className="mt-8 inline-block px-6 py-2 bg-green-900 border-2 border-green-500 text-green-400 pixel-font text-[10px] uppercase">
                6_STAGES_CLEARED: CERT_READY
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-10 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <button 
               onClick={resetGame}
-              className="pixel-button pixel-button-primary px-16 py-8 pixel-font text-2xl shadow-[8px_8px_0_#000] font-black"
+              className="pixel-button pixel-button-primary px-10 py-5 md:px-16 md:py-8 pixel-font text-xl md:text-2xl shadow-[8px_8px_0_#000] font-black"
             >
               REPLAY?
             </button>
             <button 
               onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-              className="pixel-button bg-slate-800 text-white px-16 py-8 pixel-font text-2xl shadow-[8px_8px_0_#000] font-black"
+              className="pixel-button bg-slate-800 text-white px-10 py-5 md:px-16 md:py-8 pixel-font text-xl md:text-2xl shadow-[8px_8px_0_#000] font-black"
             >
               HALL_OF_FAME
             </button>
