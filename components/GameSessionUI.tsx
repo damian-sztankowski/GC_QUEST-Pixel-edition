@@ -174,9 +174,12 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
           onClick={() => setMode(mode === 'MAP' ? 'QUESTION' : 'MAP')}
           className={`pixel-box p-4 pixel-font transition-all ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
         >
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-[10px] text-slate-400 font-black">CHAPTER_{currentLevelIdx + 1}</div>
-            <div className="text-[10px] text-white font-bold">REMAINING: {QUESTIONS_PER_LEVEL - currentQuestionInLevel + 1}</div>
+          <div className="flex flex-col mb-3 text-left">
+            <div className="text-[10px] text-slate-400 font-black mb-1">CHAPTER_{currentLevelIdx + 1}</div>
+            <div className="text-[9px] text-white font-bold leading-tight uppercase flex justify-between">
+              <span>PROGRESS:</span> 
+              <span>{currentQuestionInLevel}/{QUESTIONS_PER_LEVEL}</span>
+            </div>
           </div>
           <div className="pixel-progress-container h-4 border-2">
             <div className="pixel-progress-bar bg-blue-500" style={{ width: `${stageProgressPercentage}%` }} />
@@ -242,13 +245,13 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
                </div>
                
                {/* Controls Trigger */}
-               <div className="absolute -top-3 right-6 z-10 flex space-x-4">
+               <div className="absolute -top-4 right-6 z-10 flex space-x-4">
                  <button 
                    onClick={handleRequestHint}
                    disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
-                   className={`pixel-button px-6 py-2 text-[10px] pixel-font transition-all border-4 border-white font-bold shadow-[6px_6px_0_#000] ${
+                   className={`pixel-button px-4 py-2 text-[9px] pixel-font transition-all border-4 border-white font-bold shadow-[6px_6px_0_#000] min-w-[110px] ${
                      hint || selectedOption !== null || score < HINT_COST
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80' 
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80 border-slate-500' 
                       : 'bg-purple-600 text-white hover:bg-purple-500 hover:-translate-y-1 active:translate-y-1'
                    }`}
                  >
@@ -258,9 +261,9 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
                  <button 
                    onClick={handleSkipQuestion}
                    disabled={score < SKIP_COST || selectedOption !== null}
-                   className={`pixel-button px-6 py-2 text-[10px] pixel-font transition-all border-4 border-white font-bold shadow-[6px_6px_0_#000] ${
+                   className={`pixel-button px-4 py-2 text-[9px] pixel-font transition-all border-4 border-white font-bold shadow-[6px_6px_0_#000] min-w-[110px] ${
                      selectedOption !== null || score < SKIP_COST
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80' 
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80 border-slate-500' 
                       : 'bg-red-600 text-white hover:bg-red-500 hover:-translate-y-1 active:translate-y-1'
                    }`}
                  >
@@ -324,7 +327,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
                   </div>
                   <div className="pixel-font flex-1">
                     <div className={`text-[10px] mb-3 font-black ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
-                       SYS_DEBUG_LOG:
+                       :: ANALYZER_FEEDBACK_LOG ::
                     </div>
                     <div className="text-xs text-white leading-6 uppercase font-black">
                       {feedback}

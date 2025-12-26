@@ -6,6 +6,7 @@ import Leaderboard from './components/Leaderboard';
 import GameSessionUI from './components/GameSessionUI';
 import Avatar from './components/Avatar';
 import ChapterMap from './components/ChapterMap';
+import AboutSection from './components/AboutSection';
 import { GameState, CloudRole, RoleConfig } from './types';
 import { ROLES, LEVELS } from './constants';
 import { generateAvatar } from './services/geminiService';
@@ -157,7 +158,7 @@ const App: React.FC = () => {
                <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-12 mb-24 w-full max-w-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-24 w-full max-w-3xl">
               <button 
                 onClick={handleStartGame}
                 className="pixel-button pixel-button-primary px-20 py-10 pixel-font text-3xl group shadow-[10px_10px_0_#000] font-black"
@@ -165,12 +166,20 @@ const App: React.FC = () => {
                 1P_START
               </button>
 
-              <button 
-                onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-                className="pixel-button bg-black text-white px-16 py-8 pixel-font text-xl hover:bg-slate-900 font-black"
-              >
-                HI_SCORE
-              </button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
+                  className="pixel-button bg-black text-white px-10 py-6 pixel-font text-sm hover:bg-slate-900 font-black"
+                >
+                  HI_SCORE
+                </button>
+                <button 
+                  onClick={() => { soundService.playClick(); setGameState(GameState.ABOUT); }}
+                  className="pixel-button bg-slate-800 text-white px-10 py-6 pixel-font text-sm hover:bg-slate-700 font-black border-slate-400"
+                >
+                  ABOUT
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-5xl">
@@ -219,7 +228,7 @@ const App: React.FC = () => {
 
       {gameState === GameState.GAME_OVER && (
         <div className="w-full max-w-4xl mx-auto pixel-box border-8 p-8 md:p-12 bg-[#0c0c0c] animate-in zoom-in-95 duration-500 text-center shadow-[16px_16px_0_#000] overflow-y-auto max-h-[85vh]">
-          <div className="text-4xl md:text-6xl pixel-font text-yellow-500 mb-8 animate-pixel-float tracking-tighter font-black">MISSION_COMPLETE!</div>
+          <div className="text-4xl md:text-5xl pixel-font text-yellow-500 mb-8 animate-pixel-float font-black whitespace-normal break-words max-w-full px-4 leading-tight">MISSION_COMPLETE!</div>
           
           <div className="flex flex-col items-center mb-8">
             <div className="border-4 md:border-8 border-white p-2 md:p-4 bg-slate-900 shadow-[8px_8px_0_#000] mb-6">
@@ -264,6 +273,15 @@ const App: React.FC = () => {
            <Leaderboard />
            <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-16 pixel-button bg-black text-slate-400 px-12 py-6 pixel-font text-sm font-black uppercase">
               [ Return_To_HQ ]
+           </button>
+        </div>
+      )}
+
+      {gameState === GameState.ABOUT && (
+        <div className="w-full flex flex-col items-center pt-10 px-4 pb-20">
+           <AboutSection />
+           <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-16 pixel-button bg-black text-slate-400 px-12 py-6 pixel-font text-sm font-black uppercase">
+              [ Back_To_Title ]
            </button>
         </div>
       )}

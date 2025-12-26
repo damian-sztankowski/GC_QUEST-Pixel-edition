@@ -93,6 +93,9 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
   const config = SYLLABUS_ITEMS[levelId] || SYLLABUS_ITEMS[1];
   const targetCategory = config.categories[0]; 
   const allowedItems = CATEGORY_MAP[targetCategory] || [];
+
+  // Calculate dynamic win threshold for SORTER based on items available
+  const winThreshold = useRef(200);
   
   useEffect(() => {
     targetCategoryRef.current = targetCategory;
@@ -107,9 +110,23 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
       size: Math.random() * 3 + 1
     }));
     setParticles(newParticles);
+
+    // Calculate win threshold for Sorter (it's static initial items)
+    if (puzzleType === 'SORTER') {
+       const correctItems = config.items.filter(label => {
+         let type = 'Noise';
+         for (const [cat, labels] of Object.entries(CATEGORY_MAP)) {
+           if (labels.includes(label)) { type = cat; break; }
+         }
+         return type === targetCategory;
+       });
+       winThreshold.current = correctItems.length * 50;
+    } else {
+       winThreshold.current = 200;
+    }
     
     return () => clearTimeout(startTimeout);
-  }, [targetCategory]);
+  }, [targetCategory, levelId, puzzleType]);
 
   useEffect(() => {
     if (!isActive || isSuccess) return;
@@ -161,7 +178,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
                 scoreRef.current += 50;
                 setScore(scoreRef.current);
                 soundService.playBlip();
-                if (scoreRef.current >= 200) setIsSuccess(true);
+                if (scoreRef.current >= winThreshold.current) setIsSuccess(true);
               } else {
                 scoreRef.current = Math.max(0, scoreRef.current - 25);
                 setScore(scoreRef.current);
@@ -195,7 +212,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
                       scoreRef.current += 50;
                       setScore(scoreRef.current);
                       soundService.playBlip();
-                      if (scoreRef.current >= 200) setIsSuccess(true);
+                      if (scoreRef.current >= winThreshold.current) setIsSuccess(true);
                    } else {
                       scoreRef.current = Math.max(0, scoreRef.current - 20);
                       setScore(scoreRef.current);
@@ -237,14 +254,14 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
        };
     });
     setItems(initialItems);
-  }, [isActive, isSuccess, puzzleType]);
+  }, [isActive, isSuccess, puzzleType, config]);
 
   const handleSorterClick = (item: GameObject) => {
     if (item.type === targetCategory) {
       setScore(s => {
         const ns = s + 50;
         scoreRef.current = ns;
-        if (ns >= 200) setIsSuccess(true);
+        if (ns >= winThreshold.current) setIsSuccess(true);
         return ns;
       });
       soundService.playBlip();
@@ -267,7 +284,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
       const finishTimeout = setTimeout(() => onComplete(scoreRef.current + gameTime * 10), 2000);
       return () => clearTimeout(finishTimeout);
     }
-  }, [isSuccess]);
+  }, [isSuccess, gameTime, onComplete]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!gameRef.current || isSuccess) return;
@@ -328,7 +345,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
               />
             ))}
 
-            {/* PLAYER UNIT */}
             <div 
               className={`absolute bottom-6 h-20 w-32 border-4 border-white ${puzzleType === 'DEFENDER' ? 'bg-red-700' : 'bg-blue-700'} shadow-[0_12px_0_#000] z-10 transition-colors flex items-center justify-center`}
               style={{ left: `${basketX}%`, transform: 'translateX(-50%)' }}
@@ -342,7 +358,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
               {puzzleType === 'DEFENDER' && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-4 h-10 bg-white border-2 border-black" />
               )}
-              {/* Extra pixel detailing */}
               <div className="absolute -left-2 top-2 w-2 h-4 bg-white" />
               <div className="absolute -right-2 top-2 w-2 h-4 bg-white" />
             </div>
@@ -358,7 +373,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
       onClick={handleDefenderClick}
       className={`relative w-full aspect-video pixel-box border-8 bg-[#020202] overflow-hidden ${puzzleType === 'SORTER' ? 'cursor-default' : 'cursor-none'}`}
     >
-      {/* Background Layer */}
       <div className="absolute inset-0 pointer-events-none opacity-40 overflow-hidden">
         {particles.map(p => (
           <div 
@@ -373,7 +387,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
             }} 
           />
         ))}
-        {/* Subtle Scanlines Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent bg-[length:100%_4px] pointer-events-none" />
       </div>
 
@@ -383,7 +396,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
             <div className="pixel-font text-white text-5xl mb-6 animate-pixel-float font-black tracking-tighter">INIT_{puzzleType}</div>
             <div className="pixel-font text-yellow-400 text-[10px] leading-relaxed font-black mb-8 border-l-4 border-yellow-500 pl-4">
               OBJECTIVE: {puzzleType === 'SORTER' ? 'VALIDATE_DATA_NODES' : puzzleType === 'DEFENDER' ? 'INTERCEPT_THREATS' : 'RECOVER_STRAY_PACKETS'}<br/>
-              THRESHOLD: 200_INTEGRITY_REQUIRED
+              THRESHOLD: {winThreshold.current}_INTEGRITY_REQUIRED
             </div>
             <div className="bg-[#111] border-4 border-white p-6 shadow-[8px_8px_0_#000]">
               <div className="text-[10px] text-blue-400 pixel-font mb-3 uppercase">Priority_Target</div>
@@ -430,9 +443,9 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
             <div className="pixel-box bg-black border-4 border-green-500 p-4 shadow-[4px_4px_0_#000]">
               <div className="text-[8px] text-slate-400 pixel-font mb-1 uppercase font-bold">Data_Integrity</div>
               <div className="flex items-center space-x-4">
-                <div className="text-sm text-green-400 pixel-font font-black">{score} / 200</div>
+                <div className="text-sm text-green-400 pixel-font font-black">{score} / {winThreshold.current}</div>
                 <div className="w-24 h-3 bg-slate-900 border-2 border-white">
-                  <div className="h-full bg-green-500 transition-all shadow-[inset_-2px_-2px_0_#1a5e20]" style={{ width: `${(score/200)*100}%` }} />
+                  <div className="h-full bg-green-500 transition-all shadow-[inset_-2px_-2px_0_#1a5e20]" style={{ width: `${(score/winThreshold.current)*100}%` }} />
                 </div>
               </div>
             </div>
@@ -440,7 +453,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
 
           {renderGame()}
 
-          {/* Persistent Objective Bar */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 border-2 border-white px-6 py-2 z-20 pixel-font text-[10px] text-yellow-400 font-bold animate-pixel-float shadow-[4px_4px_0_#000]">
             MISSION: {puzzleType === 'SORTER' ? `CLICK ALL ${targetCategory.toUpperCase()} SERVICES` : puzzleType === 'DEFENDER' ? `BLAST THE ${targetCategory.toUpperCase()} ITEMS` : `CATCH THE ${targetCategory.toUpperCase()} PACKETS`}
           </div>
@@ -451,7 +463,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
         </>
       )}
 
-      {/* BREACH FAILED SCREEN */}
       {gameTime === 0 && !isSuccess && isActive && (
         <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 animate-in fade-in duration-500 p-12">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />

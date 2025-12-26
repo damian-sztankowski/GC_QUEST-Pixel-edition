@@ -6,7 +6,8 @@ export enum GameState {
   PUZZLE = 'PUZZLE',
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',
   GAME_OVER = 'GAME_OVER',
-  LEADERBOARD = 'LEADERBOARD'
+  LEADERBOARD = 'LEADERBOARD',
+  ABOUT = 'ABOUT'
 }
 
 export enum CloudRole {
