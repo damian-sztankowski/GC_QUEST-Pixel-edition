@@ -3,6 +3,7 @@ export enum GameState {
   HOME = 'HOME',
   ROLE_SELECTION = 'ROLE_SELECTION',
   PLAYING = 'PLAYING',
+  PUZZLE = 'PUZZLE',
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',
   GAME_OVER = 'GAME_OVER',
   LEADERBOARD = 'LEADERBOARD'
@@ -41,4 +42,11 @@ export interface RoleConfig {
   color: string;
   avatarPrompt: string;
   avatarBase64?: string;
+}
+
+export interface PuzzleGame {
+  id: string;
+  title: string;
+  instructions: string;
+  type: 'SORTER' | 'CONNECTOR' | 'DEFENDER';
 }

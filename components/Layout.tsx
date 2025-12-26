@@ -11,6 +11,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [bgmEnabled, setBgmEnabled] = useState(true);
   const roleConfig = ROLES.find(r => r.type === activeRole);
   const themeColor = roleConfig?.color || 'blue';
 
@@ -25,10 +26,22 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
     soundService.setEnabled(soundEnabled);
   }, [soundEnabled]);
 
+  useEffect(() => {
+    soundService.setBGMEnabled(bgmEnabled);
+  }, [bgmEnabled, soundEnabled]);
+
   const toggleSound = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSoundEnabled(!soundEnabled);
     if (!soundEnabled) {
+      soundService.playClick();
+    }
+  };
+
+  const toggleBgm = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBgmEnabled(!bgmEnabled);
+    if (!bgmEnabled && soundEnabled) {
       soundService.playClick();
     }
   };
@@ -51,13 +64,21 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
           </h1>
         </div>
         
-        <div className="flex items-center space-x-6">
-          <button 
-            onClick={toggleSound}
-            className={`pixel-button px-4 py-2 text-xs pixel-font ${soundEnabled ? 'bg-green-800 text-white' : 'bg-red-900 text-slate-400 grayscale'}`}
-          >
-            {soundEnabled ? 'SOUND: ON' : 'SOUND: OFF'}
-          </button>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center bg-black border-4 border-white p-1 space-x-2">
+            <button 
+              onClick={toggleSound}
+              className={`pixel-button px-3 py-1 text-[8px] pixel-font ${soundEnabled ? 'bg-blue-600 text-white' : 'bg-red-900 text-slate-400 grayscale'}`}
+            >
+              SFX: {soundEnabled ? 'ON' : 'OFF'}
+            </button>
+            <button 
+              onClick={toggleBgm}
+              className={`pixel-button px-3 py-1 text-[8px] pixel-font ${bgmEnabled ? 'bg-green-600 text-white' : 'bg-red-900 text-slate-400 grayscale'}`}
+            >
+              BGM: {bgmEnabled ? 'ON' : 'OFF'}
+            </button>
+          </div>
 
           <div className="hidden md:flex flex-col items-end pixel-font">
             <div className="text-[10px] text-yellow-500 mb-1 font-black">FOUNDATIONAL_MODE</div>
