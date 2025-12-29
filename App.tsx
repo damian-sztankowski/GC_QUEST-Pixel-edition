@@ -8,8 +8,8 @@ import Avatar from './components/Avatar';
 import ChapterMap from './components/ChapterMap';
 import AboutSection from './components/AboutSection';
 import NotificationSystem from './components/NotificationSystem';
-import { GameState, CloudRole, RoleConfig } from './types';
-import { ROLES, LEVELS } from './constants';
+import { GameState, CloudRole, RoleConfig, DifficultyLevel } from './types';
+import { ROLES, LEVELS, DIFFICULTY_SETTINGS } from './constants';
 import { generateAvatar } from './services/geminiService';
 import { soundService } from './services/soundService';
 import { notificationService } from './services/notificationService';
@@ -41,6 +41,7 @@ const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.HOME);
   const [selectedRole, setSelectedRole] = useState<CloudRole | null>(null);
+  const [difficulty, setDifficulty] = useState<DifficultyLevel>(DifficultyLevel.NORMAL);
   const [initialLevelIdx, setInitialLevelIdx] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const [rolesWithAvatars, setRolesWithAvatars] = useState<RoleConfig[]>(ROLES);
@@ -111,6 +112,16 @@ const App: React.FC = () => {
     setGameState(GameState.GAME_OVER);
   };
 
+  const handleDifficultyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value);
+    soundService.playBlip();
+    if (val === 0) setDifficulty(DifficultyLevel.EASY);
+    else if (val === 1) setDifficulty(DifficultyLevel.NORMAL);
+    else setDifficulty(DifficultyLevel.HARD);
+  };
+
+  const difficultyIndex = difficulty === DifficultyLevel.EASY ? 0 : difficulty === DifficultyLevel.NORMAL ? 1 : 2;
+
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white pixel-font p-6 overflow-hidden">
@@ -159,6 +170,40 @@ const App: React.FC = () => {
                    ESCAPE_THE_BIT_MATRIX_DUNGEON.
                  </p>
               </div>
+            </div>
+
+            {/* Difficulty Settings */}
+            <div className="mb-10 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
+               <div className="flex justify-between items-center mb-4">
+                  <h4 className="pixel-font text-[10px] text-white font-black uppercase tracking-tighter">DIFFICULTY_LEVEL:</h4>
+                  <span className={`pixel-font text-[10px] font-black uppercase ${
+                    difficulty === DifficultyLevel.EASY ? 'text-green-500' : difficulty === DifficultyLevel.NORMAL ? 'text-blue-500' : 'text-red-500'
+                  }`}>
+                    {difficulty} ({DIFFICULTY_SETTINGS[difficulty].label})
+                  </span>
+               </div>
+               <input 
+                 type="range" 
+                 min="0" 
+                 max="2" 
+                 step="1" 
+                 value={difficultyIndex}
+                 onChange={handleDifficultyChange}
+                 className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-blue-500"
+                 style={{ 
+                   imageRendering: 'pixelated',
+                 }}
+               />
+               <div className="flex justify-between mt-2 pixel-font text-[7px] text-slate-500 font-black uppercase">
+                  <span>JUNIOR</span>
+                  <span>ARCHITECT</span>
+                  <span>LEGEND</span>
+               </div>
+               <div className="mt-4 grid grid-cols-3 gap-2 text-[6px] pixel-font text-slate-400 uppercase leading-tight font-black">
+                  <div className="border-r border-slate-700">TIME: {DIFFICULTY_SETTINGS[difficulty].timeMultiplier}x</div>
+                  <div className="border-r border-slate-700">SCORE: {DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}x</div>
+                  <div>SPEED: {DIFFICULTY_SETTINGS[difficulty].speedMultiplier}x</div>
+               </div>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 w-full max-w-2xl">
@@ -242,6 +287,7 @@ const App: React.FC = () => {
       {gameState === GameState.PLAYING && selectedRole && (
         <GameSessionUI 
           role={selectedRole} 
+          difficulty={difficulty}
           onGameEnd={handleGameEnd} 
           initialLevelIdx={initialLevelIdx}
         />
@@ -257,13 +303,13 @@ const App: React.FC = () => {
             </div>
             <div className="pixel-font text-blue-400 text-lg md:text-xl uppercase tracking-widest font-black leading-none">{selectedRole}</div>
             <div className="mt-2 text-green-500 pixel-font text-[8px] font-black uppercase tracking-widest animate-pulse">
-               RANK: PLATINUM_FOUNDATIONAL
+               RANK: {difficulty === DifficultyLevel.HARD ? 'SRE_OVERLORD' : difficulty === DifficultyLevel.NORMAL ? 'CDL_EXPERT' : 'FOUNDATIONAL_CLOUD'}
             </div>
           </div>
 
           <div className="bg-[#111] p-6 md:p-8 border-4 border-white mb-8 shadow-inner relative overflow-hidden font-black">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
-            <div className="pixel-font text-slate-500 text-[8px] mb-2 uppercase tracking-widest">FINAL_RECAP_MODULE</div>
+            <div className="pixel-font text-slate-500 text-[8px] mb-2 uppercase tracking-widest">FINAL_RECAP_MODULE | {difficulty} MODE</div>
             <div className="pixel-font text-4xl md:text-7xl text-white drop-shadow-[6px_6px_0_#4285F4] leading-none">
                <AnimatedScore score={finalScore} />
             </div>

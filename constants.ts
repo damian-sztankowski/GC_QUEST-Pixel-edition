@@ -1,5 +1,5 @@
 
-import { CloudRole, Level, RoleConfig } from './types';
+import { CloudRole, Level, RoleConfig, DifficultyLevel } from './types';
 
 export const ROLES: RoleConfig[] = [
   {
@@ -10,6 +10,27 @@ export const ROLES: RoleConfig[] = [
     avatarPrompt: '16-bit pixel art icon of a blue superhero cloud with a digital cape, solid black background, retro video game style, centered, high contrast, vibrant Google blue colors.'
   }
 ];
+
+export const DIFFICULTY_SETTINGS = {
+  [DifficultyLevel.EASY]: {
+    timeMultiplier: 1.5,
+    scoreMultiplier: 0.75,
+    speedMultiplier: 0.7,
+    label: 'JUNIOR_ADMIN'
+  },
+  [DifficultyLevel.NORMAL]: {
+    timeMultiplier: 1.0,
+    scoreMultiplier: 1.0,
+    speedMultiplier: 1.0,
+    label: 'CLOUD_ARCHITECT'
+  },
+  [DifficultyLevel.HARD]: {
+    timeMultiplier: 0.6,
+    scoreMultiplier: 2.0,
+    speedMultiplier: 1.5,
+    label: 'SRE_LEGEND'
+  }
+};
 
 export const LEVELS: Level[] = [
   { 

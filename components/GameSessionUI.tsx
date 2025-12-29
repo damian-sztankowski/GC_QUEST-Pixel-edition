@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
-import { CloudRole, Level, Question, GameState } from '../types';
+import { CloudRole, Level, Question, GameState, DifficultyLevel } from '../types';
 import { generateQuestion, getGeminiFeedback, generateHint } from '../services/geminiService';
-import { LEVELS } from '../constants';
+import { LEVELS, DIFFICULTY_SETTINGS } from '../constants';
 import Avatar from './Avatar';
 import { soundService } from '../services/soundService';
 import { notificationService } from '../services/notificationService';
@@ -10,6 +11,7 @@ import ChapterMap from './ChapterMap';
 
 interface GameSessionUIProps {
   role: CloudRole;
+  difficulty: DifficultyLevel;
   onGameEnd: (score: number) => void;
   initialLevelIdx?: number;
 }
@@ -17,8 +19,12 @@ interface GameSessionUIProps {
 const QUESTIONS_PER_LEVEL = 10;
 const HINT_COST = 25;
 const SKIP_COST = 150;
+const BASE_MAX_TIME = 1200;
 
-const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialLevelIdx = 0 }) => {
+const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameEnd, initialLevelIdx = 0 }) => {
+  const diffSetting = DIFFICULTY_SETTINGS[difficulty];
+  const maxTime = Math.floor(BASE_MAX_TIME * diffSetting.timeMultiplier);
+  
   const [currentLevelIdx, setCurrentLevelIdx] = useState(initialLevelIdx);
   const [currentQuestionInLevel, setCurrentQuestionInLevel] = useState(1);
   const [question, setQuestion] = useState<Question | null>(null);
@@ -28,12 +34,11 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
   const [isHintLoading, setIsHintLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(1200); 
+  const [timeLeft, setTimeLeft] = useState(maxTime); 
   const [isAnswering, setIsAnswering] = useState(false);
   const [mode, setMode] = useState<'QUESTION' | 'PUZZLE' | 'MAP'>('QUESTION');
 
   const level = LEVELS[currentLevelIdx];
-  const maxTime = 1200;
 
   useEffect(() => {
     if (mode === 'QUESTION') {
@@ -67,7 +72,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
     } catch (err) {
       console.error(err);
       notificationService.notify('COMM_FAILURE', 'DATA_STREAM_INTERRUPTED', 'ERROR');
-      // Fallback for API failure
       setQuestion({
         text: "EMERGENCY FALLBACK: Which computing model offers the most infrastructure control?",
         options: ["IaaS", "PaaS", "SaaS", "Serverless"],
@@ -116,9 +120,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
     const correct = index === question?.correctIndex;
     
     if (correct) {
-      setScore(prev => prev + 100);
+      const reward = Math.floor(100 * diffSetting.scoreMultiplier);
+      setScore(prev => prev + reward);
       soundService.playCorrect();
-      notificationService.notify('CORRECT', '+100_CREDITS_RESTORED', 'SUCCESS');
+      notificationService.notify('CORRECT', `+${reward}_CREDITS_RESTORED`, 'SUCCESS');
     } else {
       soundService.playIncorrect();
       notificationService.notify('BREACH', 'SYSTEM_STABILITY_DECREASED', 'ERROR');
@@ -145,17 +150,16 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
 
   const handlePuzzleComplete = (bonus: number) => {
     setMode('QUESTION');
-    const finalScore = score + bonus;
+    const adjustedBonus = Math.floor(bonus * diffSetting.scoreMultiplier);
+    const finalScore = score + adjustedBonus;
     setScore(finalScore);
-    notificationService.notify('CHAPTER_SYNCED', `LEVEL_BONUS:_${bonus}`, 'SUCCESS');
+    notificationService.notify('CHAPTER_SYNCED', `LEVEL_BONUS:_${adjustedBonus}`, 'SUCCESS');
     
     if (currentLevelIdx < LEVELS.length - 1) {
-      // Transition to next chapter
       setCurrentLevelIdx(prev => prev + 1);
       setCurrentQuestionInLevel(1);
     } else {
-      // Final win condition
-      onGameEnd(finalScore + Math.floor(timeLeft * 2));
+      onGameEnd(finalScore + Math.floor(timeLeft * 2 * diffSetting.scoreMultiplier));
     }
   };
 
@@ -170,13 +174,12 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
 
   return (
     <div className="game-viewport px-4 pb-8 space-y-6">
-      {/* HUD - Larger HUD items */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="pixel-box p-3 flex items-center space-x-3 bg-[#111] border-2">
           <Avatar role={role} size="sm" animate={false} />
           <div className="pixel-font leading-none truncate">
             <div className="text-[8px] text-slate-400 uppercase font-black">USER</div>
-            <div className="text-[10px] text-blue-400 font-bold truncate">QUESTER</div>
+            <div className="text-[10px] text-blue-400 font-bold truncate">{diffSetting.label}</div>
           </div>
         </div>
         
@@ -203,7 +206,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
           </div>
           <div className="pixel-progress-container h-2 border-[2px]">
             <div 
-              className={`pixel-progress-bar ${timeLeft < 240 ? 'bg-red-500' : 'bg-green-500'}`} 
+              className={`pixel-progress-bar ${timeLeft < (maxTime * 0.2) ? 'bg-red-500' : 'bg-green-500'}`} 
               style={{ width: `${timePercentage}%` }} 
             />
           </div>
@@ -238,11 +241,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
           </div>
         ) : mode === 'PUZZLE' ? (
           <div className="animate-in zoom-in duration-300 h-full flex flex-col">
-            <PuzzleStage levelId={level.id} onComplete={handlePuzzleComplete} />
+            <PuzzleStage levelId={level.id} difficulty={difficulty} onComplete={handlePuzzleComplete} />
           </div>
         ) : (
           <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] flex flex-col h-full min-h-[500px] shadow-[12px_12px_0_#000]">
-            {/* Stage Banner */}
             <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black shrink-0">
               <div className="flex items-center space-x-3">
                  <span className="w-3 h-3 bg-blue-500 border-2 border-black blinking"></span>
@@ -254,7 +256,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
             </div>
 
             <div className="p-6 md:p-10 space-y-8 flex-1 overflow-y-auto">
-              {/* Question Area */}
               <div className="relative">
                  <div className="p-6 md:p-10 border-4 border-white bg-[#111] text-lg md:text-2xl leading-relaxed text-white mono-font flex flex-col space-y-4 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
                     <div className="flex items-start space-x-4">
@@ -271,7 +272,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
                  </div>
               </div>
 
-              {/* Options - Larger buttons */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {question?.options.map((opt, idx) => {
                   let btnClass = "pixel-button p-5 md:p-8 pixel-font text-left flex items-start space-x-4 border-4 transition-all duration-75 ";
@@ -300,7 +300,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
                 })}
               </div>
 
-              {/* Action Buttons & Feedback - Clearly disabled states */}
               <div className="min-h-[120px]">
                 {feedback ? (
                   <div className={`p-6 border-4 flex items-start space-x-4 bg-black shadow-[8px_8px_0_#000] animate-in slide-in-from-bottom-4 duration-300 ${

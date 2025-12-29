@@ -15,6 +15,12 @@ export enum CloudRole {
   DIGITAL_LEADER = 'Cloud Digital Leader'
 }
 
+export enum DifficultyLevel {
+  EASY = 'EASY',
+  NORMAL = 'NORMAL',
+  HARD = 'HARD'
+}
+
 export type PuzzleType = 'CATCHER' | 'SORTER' | 'DEFENDER';
 
 export interface Level {
