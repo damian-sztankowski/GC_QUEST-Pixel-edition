@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { CloudRole, Level, Question, GameState } from '../types';
 import { generateQuestion, getGeminiFeedback, generateHint } from '../services/geminiService';
 import { LEVELS } from '../constants';
 import Avatar from './Avatar';
 import { soundService } from '../services/soundService';
+import { notificationService } from '../services/notificationService';
 import PuzzleStage from './PuzzleStage';
 import ChapterMap from './ChapterMap';
 
@@ -41,12 +41,14 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
       loadNewQuestion();
     } else if (mode === 'PUZZLE') {
       soundService.setBGMSpeed(true);
+      notificationService.notify('PUZZLE_PHASE', `INITIATING_${level.puzzleType}_PROTOCOLS`, 'ACHIEVEMENT');
     }
   }, [currentLevelIdx, currentQuestionInLevel, mode]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
       soundService.playIncorrect();
+      notificationService.notify('STABILITY_CRITICAL', 'NODE_OFFLINE_ZERO_POWER', 'ERROR');
       onGameEnd(score);
       return;
     }
@@ -64,6 +66,14 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
       setQuestion(q);
     } catch (err) {
       console.error(err);
+      notificationService.notify('COMM_FAILURE', 'DATA_STREAM_INTERRUPTED', 'ERROR');
+      // Fallback for API failure
+      setQuestion({
+        text: "EMERGENCY FALLBACK: Which computing model offers the most infrastructure control?",
+        options: ["IaaS", "PaaS", "SaaS", "Serverless"],
+        correctIndex: 0,
+        explanation: "Infrastructure as a Service (IaaS) provides maximum control over virtual machines and network resources."
+      });
     } finally {
       setLoading(false);
     }
@@ -80,8 +90,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
       const clue = await generateHint(question?.text || '', level.topic);
       setHint(clue);
       soundService.playPowerUp();
+      notificationService.notify('HINT_ACQUIRED', `-${HINT_COST}_CREDITS_SPENT`, 'INFO');
     } catch (err) {
       setHint("SYSTEM_ERROR: CLUE_FILE_CORRUPTED.");
+      notificationService.notify('HINT_ERROR', 'ENCRYPTION_OVER_RIDE_FAILED', 'ERROR');
     } finally {
       setIsHintLoading(false);
     }
@@ -92,6 +104,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
     
     soundService.playSkip();
     setScore(prev => prev - SKIP_COST);
+    notificationService.notify('NODE_BYPASSED', `-${SKIP_COST}_CREDITS_SPENT`, 'ERROR');
     nextStep();
   };
 
@@ -105,8 +118,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
     if (correct) {
       setScore(prev => prev + 100);
       soundService.playCorrect();
+      notificationService.notify('CORRECT', '+100_CREDITS_RESTORED', 'SUCCESS');
     } else {
       soundService.playIncorrect();
+      notificationService.notify('BREACH', 'SYSTEM_STABILITY_DECREASED', 'ERROR');
     }
 
     try {
@@ -129,13 +144,18 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
   };
 
   const handlePuzzleComplete = (bonus: number) => {
-    setScore(s => s + bonus);
     setMode('QUESTION');
+    const finalScore = score + bonus;
+    setScore(finalScore);
+    notificationService.notify('CHAPTER_SYNCED', `LEVEL_BONUS:_${bonus}`, 'SUCCESS');
+    
     if (currentLevelIdx < LEVELS.length - 1) {
+      // Transition to next chapter
       setCurrentLevelIdx(prev => prev + 1);
       setCurrentQuestionInLevel(1);
     } else {
-      onGameEnd(score + bonus + Math.floor(timeLeft * 2));
+      // Final win condition
+      onGameEnd(finalScore + Math.floor(timeLeft * 2));
     }
   };
 
@@ -148,50 +168,40 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
   const timePercentage = (timeLeft / maxTime) * 100;
   const stageProgressPercentage = (currentQuestionInLevel / QUESTIONS_PER_LEVEL) * 100;
 
-  if (loading && mode === 'QUESTION') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[300px] pixel-font text-center p-6">
-        <div className="w-16 h-16 border-8 border-white border-t-blue-500 animate-spin mb-8 shadow-[6px_6px_0_#000]"></div>
-        <p className="text-lg animate-pulse text-white uppercase font-black">Syncing_Chapter_Data...</p>
-        <p className="text-[8px] text-slate-500 mt-2 uppercase font-black">Consulting_Gemini_Cloud_Oracle</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full max-w-5xl space-y-6 animate-in fade-in duration-500 pb-12 scale-down-content px-2">
-      {/* HUD */}
+    <div className="game-viewport px-4 pb-8 space-y-6">
+      {/* HUD - Larger HUD items */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="pixel-box p-2 md:p-3 flex items-center space-x-3 bg-[#111] shadow-[4px_4px_0_#000]">
+        <div className="pixel-box p-3 flex items-center space-x-3 bg-[#111] border-2">
           <Avatar role={role} size="sm" animate={false} />
-          <div className="pixel-font leading-none">
-            <div className="text-[8px] text-slate-400 font-black uppercase">PLAYER</div>
-            <div className="text-[10px] text-blue-400 font-bold">QUESTER</div>
+          <div className="pixel-font leading-none truncate">
+            <div className="text-[8px] text-slate-400 uppercase font-black">USER</div>
+            <div className="text-[10px] text-blue-400 font-bold truncate">QUESTER</div>
           </div>
         </div>
         
         <button 
           onClick={() => setMode(mode === 'MAP' ? 'QUESTION' : 'MAP')}
-          className={`pixel-box p-2 md:p-3 pixel-font transition-all shadow-[4px_4px_0_#000] text-left ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
+          className={`pixel-box p-3 pixel-font transition-all text-left border-2 ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
         >
-          <div className="flex flex-col mb-1.5 leading-none">
-            <div className="text-[8px] text-slate-400 font-black mb-0.5 uppercase">CH_{currentLevelIdx + 1}</div>
-            <div className="text-[9px] text-white font-bold leading-tight uppercase flex justify-between">
+          <div className="flex flex-col leading-none mb-1">
+            <div className="text-[8px] text-slate-400 mb-1 uppercase font-black">CH_{currentLevelIdx + 1}</div>
+            <div className="text-[10px] text-white flex justify-between font-bold">
               <span>PROG:</span> 
               <span>{currentQuestionInLevel}/{QUESTIONS_PER_LEVEL}</span>
             </div>
           </div>
-          <div className="pixel-progress-container h-2.5 border-2">
+          <div className="pixel-progress-container h-2 border-[2px] mt-1">
             <div className="pixel-progress-bar bg-blue-500" style={{ width: `${stageProgressPercentage}%` }} />
           </div>
         </button>
 
-        <div className="pixel-box p-2 md:p-3 pixel-font bg-[#200] border-red-500 shadow-[4px_4px_0_#000] leading-none">
-          <div className="flex justify-between items-center mb-1.5">
-            <div className="text-[8px] text-red-300 font-black uppercase">STABILITY</div>
+        <div className="pixel-box p-3 pixel-font bg-[#200] border-red-500 border-2 leading-none">
+          <div className="flex justify-between items-center mb-1">
+            <div className="text-[8px] text-red-300 uppercase font-black">STABILITY</div>
             <div className="text-[10px] text-white font-bold">{formatTime(timeLeft)}</div>
           </div>
-          <div className="pixel-progress-container h-2.5 border-2">
+          <div className="pixel-progress-container h-2 border-[2px]">
             <div 
               className={`pixel-progress-bar ${timeLeft < 240 ? 'bg-red-500' : 'bg-green-500'}`} 
               style={{ width: `${timePercentage}%` }} 
@@ -199,158 +209,157 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, onGameEnd, initialL
           </div>
         </div>
 
-        <div className="pixel-box p-2 md:p-3 pixel-font bg-[#002] border-blue-500 shadow-[4px_4px_0_#000] leading-none">
-          <div className="text-[8px] text-blue-300 font-black mb-1.5 uppercase">HI-SCORE</div>
-          <div className="text-lg text-white font-bold">{score.toString().padStart(6, '0')}</div>
+        <div className="pixel-box p-3 pixel-font bg-[#002] border-blue-500 border-2 leading-none">
+          <div className="text-[8px] text-blue-300 mb-1 uppercase font-black">CREDITS</div>
+          <div className="text-lg md:text-xl text-white font-bold">{score.toString().padStart(6, '0')}</div>
         </div>
       </div>
 
-      {mode === 'MAP' ? (
-        <div className="animate-in zoom-in duration-300 space-y-6">
-           <div className="pixel-box border-4 md:border-8 p-6 md:p-10 bg-black shadow-[8px_8px_0_#000]">
-              <h2 className="text-2xl md:text-4xl pixel-font text-white mb-8 text-center font-black">CLOUD_MAP</h2>
-              <ChapterMap currentLevelIdx={currentLevelIdx} />
-              <div className="mt-8 flex justify-center">
-                 <button 
-                   onClick={() => setMode('QUESTION')}
-                   className="pixel-button bg-blue-600 text-white px-10 py-5 pixel-font text-xs font-black shadow-[6px_6px_0_#000]"
-                 >
-                   RESUME_QUEST
-                 </button>
-              </div>
-           </div>
-        </div>
-      ) : mode === 'PUZZLE' ? (
-        <div className="animate-in zoom-in duration-300">
-          <PuzzleStage levelId={level.id} onComplete={handlePuzzleComplete} />
-        </div>
-      ) : (
-        <div className="pixel-box border-4 md:border-8 p-0 overflow-hidden bg-[#0c0c0c] shadow-[0_12px_0_#000]">
-          {/* Stage Banner */}
-          <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black">
-            <div className="flex items-center space-x-3">
-               <span className="w-3 h-3 bg-blue-500 border-2 border-black blinking"></span>
-               <span className="text-xs uppercase font-black truncate max-w-[150px] md:max-w-none">{level.title}</span>
-            </div>
-            <span className="text-[8px] bg-black text-white px-2 py-0.5 border-2 border-black max-w-[40%] truncate font-black uppercase">
-               {level.topic.split(':')[0]}
-            </span>
+      <div className="flex-1 min-h-0">
+        {loading && mode === 'QUESTION' ? (
+          <div className="flex flex-col items-center justify-center h-full min-h-[400px] pixel-font text-center">
+            <div className="w-16 h-16 border-8 border-white border-t-blue-500 animate-spin mb-6 shadow-[8px_8px_0_#000]"></div>
+            <p className="text-lg animate-pulse text-white uppercase font-black">Syncing_Chapter_Nodes...</p>
           </div>
-
-          <div className="p-4 md:p-8 space-y-6">
-            {/* Question Area */}
-            <div className="relative">
-               <div className="absolute -top-3 left-4 px-2 bg-black text-white pixel-font text-[8px] z-10 border-2 border-white font-black uppercase">
-                  QUEST_{currentQuestionInLevel}
-               </div>
-               
-               {/* Controls Trigger */}
-               <div className="absolute -top-4 right-4 z-10 flex space-x-2">
-                 <button 
-                   onClick={handleRequestHint}
-                   disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
-                   className={`pixel-button px-3 py-1 text-[8px] pixel-font transition-all border-2 border-white font-bold shadow-[4px_4px_0_#000] ${
-                     hint || selectedOption !== null || score < HINT_COST
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80 border-slate-500' 
-                      : 'bg-purple-600 text-white hover:bg-purple-500'
-                   }`}
-                 >
-                   {isHintLoading ? 'WAIT...' : hint ? 'HINT_ON' : `HINT: -${HINT_COST}`}
-                 </button>
-
-                 <button 
-                   onClick={handleSkipQuestion}
-                   disabled={score < SKIP_COST || selectedOption !== null}
-                   className={`pixel-button px-3 py-1 text-[8px] pixel-font transition-all border-2 border-white font-bold shadow-[4px_4px_0_#000] ${
-                     selectedOption !== null || score < SKIP_COST
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-80 border-slate-500' 
-                      : 'bg-red-600 text-white hover:bg-red-500'
-                   }`}
-                 >
-                   SKIP: -${SKIP_COST}
-                 </button>
-               </div>
-
-               <div className="p-5 md:p-7 border-4 border-white bg-[#111] text-xl md:text-2xl leading-relaxed text-white mono-font flex flex-col space-y-3 min-h-[100px]">
-                  <div className="flex items-start space-x-4">
-                    <span className="text-blue-500 shrink-0 select-none animate-pulse">>>></span>
-                    <p className="text-white uppercase font-black text-lg md:text-xl">{question?.text}</p>
-                  </div>
-                  
-                  {/* Hint Display */}
-                  {hint && (
-                    <div className="border-t-2 border-dashed border-purple-500/50 pt-3 mt-2 animate-in slide-in-from-top-2 duration-300">
-                      <div className="pixel-font text-[7px] text-purple-400 mb-1 font-black uppercase">DEBUG_CLUE:</div>
-                      <p className="text-purple-300 text-base md:text-lg uppercase italic font-bold">"{hint}"</p>
-                    </div>
-                  )}
-               </div>
-            </div>
-
-            {/* Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              {question?.options.map((opt, idx) => {
-                let btnClass = "pixel-button p-4 md:p-6 pixel-font text-left flex items-start space-x-4 h-full border-4 ";
-                
-                if (selectedOption === null) {
-                  btnClass += "text-white bg-[#222] border-white hover:bg-[#333]";
-                } else if (idx === question.correctIndex) {
-                  btnClass += "bg-green-800 border-green-400 text-white scale-[1.02] z-10 shadow-[6px_6px_0_#000]";
-                } else if (idx === selectedOption) {
-                  btnClass += "bg-red-800 border-red-400 text-white";
-                } else {
-                  btnClass += "bg-black opacity-30 text-slate-600 grayscale border-slate-800";
-                }
-
-                return (
-                  <button 
-                    key={idx}
-                    disabled={selectedOption !== null}
-                    onClick={(e) => { e.stopPropagation(); handleAnswer(idx); }}
-                    className={btnClass}
-                  >
-                    <span className="shrink-0 text-xs text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
-                    <span className="text-[10px] md:text-xs leading-5 uppercase font-black">{opt}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Feedback Area */}
-            <div className="min-h-[100px]">
-              {feedback && (
-                <div className={`p-4 md:p-6 border-4 flex items-center space-x-6 animate-in slide-in-from-bottom-4 duration-300 bg-black shadow-[6px_6px_0_#000] ${
-                  selectedOption === question?.correctIndex ? 'border-green-500' : 'border-red-500'
-                }`}>
-                  <div className="text-4xl animate-pixel-float shrink-0 select-none hidden md:block">
-                     {selectedOption === question?.correctIndex ? '😎' : '👾'}
-                  </div>
-                  <div className="pixel-font flex-1">
-                    <div className={`text-[8px] mb-2 font-black uppercase ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
-                       [ ANALYZER_REPORT ]
-                    </div>
-                    <div className="text-[10px] md:text-xs text-white leading-relaxed uppercase font-black">
-                      {feedback}
-                    </div>
-                  </div>
+        ) : mode === 'MAP' ? (
+          <div className="animate-in zoom-in duration-300 h-full overflow-y-auto">
+             <div className="pixel-box border-4 p-8 bg-black">
+                <h2 className="text-2xl md:text-4xl pixel-font text-white mb-8 text-center font-black">CLOUD_MAP</h2>
+                <ChapterMap currentLevelIdx={currentLevelIdx} />
+                <div className="mt-12 flex justify-center">
+                   <button 
+                     onClick={() => setMode('QUESTION')}
+                     className="pixel-button bg-blue-600 text-white px-12 py-4 pixel-font text-xs font-black shadow-[6px_6px_0_#000]"
+                   >
+                     RESUME_QUEST
+                   </button>
                 </div>
-              )}
+             </div>
+          </div>
+        ) : mode === 'PUZZLE' ? (
+          <div className="animate-in zoom-in duration-300 h-full flex flex-col">
+            <PuzzleStage levelId={level.id} onComplete={handlePuzzleComplete} />
+          </div>
+        ) : (
+          <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] flex flex-col h-full min-h-[500px] shadow-[12px_12px_0_#000]">
+            {/* Stage Banner */}
+            <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black shrink-0">
+              <div className="flex items-center space-x-3">
+                 <span className="w-3 h-3 bg-blue-500 border-2 border-black blinking"></span>
+                 <span className="text-xs md:text-sm uppercase font-black tracking-tight">{level.title.toUpperCase()}</span>
+              </div>
+              <span className="text-[9px] bg-black text-white px-3 py-1 border-2 border-black font-black uppercase">
+                 SECTION {currentLevelIdx + 1}
+              </span>
             </div>
 
-            {/* Action Footer */}
-            {selectedOption !== null && !isAnswering && (
-              <div className="flex justify-center pt-2">
-                <button 
-                  onClick={(e) => { e.stopPropagation(); nextStep(); }}
-                  className="pixel-button bg-yellow-500 text-black px-12 py-5 pixel-font text-xs hover:scale-105 active:scale-95 transition-all shadow-[6px_6px_0_#000] font-black uppercase"
-                >
-                  {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "NEXT_NODE" : "CHAPTER_CLEAR"}
-                </button>
+            <div className="p-6 md:p-10 space-y-8 flex-1 overflow-y-auto">
+              {/* Question Area */}
+              <div className="relative">
+                 <div className="p-6 md:p-10 border-4 border-white bg-[#111] text-lg md:text-2xl leading-relaxed text-white mono-font flex flex-col space-y-4 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                    <div className="flex items-start space-x-4">
+                      <span className="text-blue-500 shrink-0 select-none animate-pulse text-2xl">>>></span>
+                      <p className="text-white uppercase font-black text-base md:text-lg lg:text-xl tracking-wide">{question?.text}</p>
+                    </div>
+                    
+                    {hint && (
+                      <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-4 animate-in slide-in-from-top-2 duration-300">
+                        <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black uppercase">ANALYZER_HINT:</div>
+                        <p className="text-purple-300 text-sm md:text-lg uppercase italic font-bold">"{hint}"</p>
+                      </div>
+                    )}
+                 </div>
               </div>
-            )}
+
+              {/* Options - Larger buttons */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {question?.options.map((opt, idx) => {
+                  let btnClass = "pixel-button p-5 md:p-8 pixel-font text-left flex items-start space-x-4 border-4 transition-all duration-75 ";
+                  
+                  if (selectedOption === null) {
+                    btnClass += "text-white bg-[#222] border-white hover:bg-[#333] hover:scale-[1.02] shadow-[6px_6px_0_#000]";
+                  } else if (idx === question.correctIndex) {
+                    btnClass += "bg-green-800 border-green-400 text-white scale-[1.05] z-10 shadow-[8px_8px_0_#000]";
+                  } else if (idx === selectedOption) {
+                    btnClass += "bg-red-800 border-red-400 text-white shadow-[6px_6px_0_#000]";
+                  } else {
+                    btnClass += "bg-black opacity-30 text-slate-600 grayscale border-slate-800 shadow-none";
+                  }
+
+                  return (
+                    <button 
+                      key={idx}
+                      disabled={selectedOption !== null}
+                      onClick={(e) => { e.stopPropagation(); handleAnswer(idx); }}
+                      className={btnClass}
+                    >
+                      <span className="shrink-0 text-xs md:text-sm text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
+                      <span className="text-[9px] md:text-[11px] lg:text-xs leading-tight uppercase font-black">{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Action Buttons & Feedback - Clearly disabled states */}
+              <div className="min-h-[120px]">
+                {feedback ? (
+                  <div className={`p-6 border-4 flex items-start space-x-4 bg-black shadow-[8px_8px_0_#000] animate-in slide-in-from-bottom-4 duration-300 ${
+                    selectedOption === question?.correctIndex ? 'border-green-500' : 'border-red-500'
+                  }`}>
+                    <div className="pixel-font flex-1">
+                      <div className={`text-[9px] mb-2 font-black uppercase ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
+                         [ ANALYZER_FEEDBACK ]
+                      </div>
+                      <div className="text-xs md:text-sm text-white leading-relaxed uppercase font-black">
+                        {feedback}
+                      </div>
+                      <div className="mt-6 flex justify-end">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); nextStep(); }}
+                          className="pixel-button bg-yellow-500 text-black px-12 py-4 pixel-font text-[10px] font-black uppercase shadow-[6px_6px_0_#000] hover:scale-105 active:scale-95"
+                        >
+                          {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "CONTINUE_QUEST" : "FINALIZE_CHAPTER"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center py-4 px-2">
+                    <div className="flex space-x-4">
+                        <button 
+                          onClick={handleRequestHint}
+                          disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
+                          className={`pixel-button px-6 py-2 text-[9px] pixel-font font-black transition-all border-2 shadow-[4px_4px_0_#000] ${
+                            (score < HINT_COST && !hint) || selectedOption !== null 
+                            ? 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed grayscale' 
+                            : 'bg-purple-700 text-white hover:bg-purple-600 border-white'
+                          }`}
+                        >
+                          {hint ? 'HINT_ACTIVE' : `HINT (-${HINT_COST})`}
+                        </button>
+                        <button 
+                          onClick={handleSkipQuestion}
+                          disabled={score < SKIP_COST || selectedOption !== null}
+                          className={`pixel-button px-6 py-2 text-[9px] pixel-font font-black transition-all border-2 shadow-[4px_4px_0_#000] ${
+                            (score < SKIP_COST) || selectedOption !== null 
+                            ? 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed grayscale' 
+                            : 'bg-red-700 text-white hover:bg-red-600 border-white'
+                          }`}
+                        >
+                          SKIP (-${SKIP_COST})
+                        </button>
+                    </div>
+                    
+                    <div className="hidden md:block text-[8px] text-slate-500 pixel-font uppercase font-bold animate-pulse">
+                      STATUS: MONITORING_USER_INPUT...
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

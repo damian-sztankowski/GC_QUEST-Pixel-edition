@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { soundService } from '../services/soundService';
 import { PuzzleType } from '../types';
@@ -89,12 +88,12 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
   const targetCategoryRef = useRef('');
   const gameRef = useRef<HTMLDivElement>(null);
   const scoreRef = useRef(0);
+  const isSuccessRef = useRef(false);
 
   const config = SYLLABUS_ITEMS[levelId] || SYLLABUS_ITEMS[1];
   const targetCategory = config.categories[0]; 
   const allowedItems = CATEGORY_MAP[targetCategory] || [];
 
-  // Calculate dynamic win threshold for SORTER based on items available
   const winThreshold = useRef(200);
   
   useEffect(() => {
@@ -102,7 +101,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
     soundService.playSiren();
     const startTimeout = setTimeout(() => setIsActive(true), 3000);
     
-    // Create background stars
     const newParticles = Array.from({ length: 40 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
@@ -111,7 +109,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
     }));
     setParticles(newParticles);
 
-    // Calculate win threshold for Sorter (it's static initial items)
     if (puzzleType === 'SORTER') {
        const correctItems = config.items.filter(label => {
          let type = 'Noise';
@@ -136,7 +133,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
     return () => clearInterval(timer);
   }, [isActive, isSuccess]);
 
-  // CATCHER & DEFENDER MECHANICS
   useEffect(() => {
     if (!isActive || isSuccess || puzzleType === 'SORTER') return;
 
@@ -165,7 +161,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
     }, 1000);
 
     const physicsLoop = setInterval(() => {
-      // Move Items
       setItems(prev => {
         const next = prev.map(item => ({ ...item, y: item.y + (item.vy || 1) }));
         const remaining: GameObject[] = [];
@@ -178,7 +173,10 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
                 scoreRef.current += 50;
                 setScore(scoreRef.current);
                 soundService.playBlip();
-                if (scoreRef.current >= winThreshold.current) setIsSuccess(true);
+                if (scoreRef.current >= winThreshold.current) {
+                  isSuccessRef.current = true;
+                  setIsSuccess(true);
+                }
               } else {
                 scoreRef.current = Math.max(0, scoreRef.current - 25);
                 setScore(scoreRef.current);
@@ -194,12 +192,10 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
         return remaining;
       });
 
-      // Move Projectiles for Defender
       if (puzzleType === 'DEFENDER') {
         setProjectiles(prev => {
           const next = prev.map(p => ({ ...p, y: p.y - 6 })).filter(p => p.y > -10);
           
-          // Collision Detection
           setItems(currentItems => {
             const hitItems = new Set<number>();
             next.forEach(p => {
@@ -212,7 +208,10 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
                       scoreRef.current += 50;
                       setScore(scoreRef.current);
                       soundService.playBlip();
-                      if (scoreRef.current >= winThreshold.current) setIsSuccess(true);
+                      if (scoreRef.current >= winThreshold.current) {
+                        isSuccessRef.current = true;
+                        setIsSuccess(true);
+                      }
                    } else {
                       scoreRef.current = Math.max(0, scoreRef.current - 20);
                       setScore(scoreRef.current);
@@ -235,7 +234,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
     };
   }, [isActive, config, isSuccess, puzzleType]);
 
-  // SORTER MECHANICS
   useEffect(() => {
     if (!isActive || isSuccess || puzzleType !== 'SORTER') return;
     
@@ -261,7 +259,10 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
       setScore(s => {
         const ns = s + 50;
         scoreRef.current = ns;
-        if (ns >= winThreshold.current) setIsSuccess(true);
+        if (ns >= winThreshold.current) {
+          isSuccessRef.current = true;
+          setIsSuccess(true);
+        }
         return ns;
       });
       soundService.playBlip();
@@ -281,10 +282,14 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
   useEffect(() => {
     if (isSuccess) {
       soundService.playLevelComplete();
-      const finishTimeout = setTimeout(() => onComplete(scoreRef.current + gameTime * 10), 2000);
+      const currentScore = scoreRef.current;
+      const currentTimeBonus = gameTime * 10;
+      const finishTimeout = setTimeout(() => {
+        onComplete(currentTimeBonus); // Send only bonus to parent
+      }, 3000);
       return () => clearTimeout(finishTimeout);
     }
-  }, [isSuccess, gameTime, onComplete]);
+  }, [isSuccess]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!gameRef.current || isSuccess) return;
@@ -299,15 +304,15 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
     switch (puzzleType) {
       case 'SORTER':
         return (
-          <div className="grid grid-cols-3 gap-8 p-16 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 p-4 md:p-8 relative z-10 w-full overflow-y-auto max-h-full">
             {items.map(item => (
               <button
                 key={item.id}
                 onClick={() => handleSorterClick(item)}
-                className="pixel-box bg-[#111] hover:bg-blue-900 p-8 pixel-font text-[10px] text-white uppercase font-black transition-all transform hover:scale-105 active:scale-90 border-4 shadow-[8px_8px_0_#000] flex flex-col items-center gap-4"
+                className="pixel-box bg-[#111] hover:bg-blue-900 p-3 md:p-4 pixel-font text-[7px] md:text-[9px] text-white uppercase font-black transition-all transform active:scale-95 border-2 flex flex-col items-center gap-2"
               >
-                <div className="text-4xl animate-pixel-float">{item.sprite}</div>
-                <div className="text-center">{item.label}</div>
+                <div className="text-xl md:text-3xl">{item.sprite}</div>
+                <div className="text-center break-words w-full leading-tight">{item.label}</div>
               </button>
             ))}
           </div>
@@ -316,11 +321,11 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
       case 'CATCHER':
       default:
         return (
-          <>
+          <div className="w-full h-full relative">
             {items.map(item => (
               <div 
                 key={item.id}
-                className={`absolute pixel-box px-4 py-2 border-2 border-white whitespace-nowrap shadow-[4px_4px_0_#000] flex items-center gap-2 ${
+                className={`absolute pixel-box px-2 py-1 border-1 border-white whitespace-nowrap shadow-[2px_2px_0_#000] flex items-center gap-1.5 ${
                   item.type === targetCategory ? 'bg-blue-600 animate-pulse border-blue-300' : 'bg-slate-800 grayscale opacity-90'
                 }`}
                 style={{ 
@@ -330,8 +335,8 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
                   zIndex: 5
                 }}
               >
-                <span className="text-xl">{item.sprite}</span>
-                <div className="pixel-font text-[8px] text-white uppercase font-black tracking-tighter">
+                <span className="text-sm md:text-lg">{item.sprite}</span>
+                <div className="pixel-font text-[5px] md:text-[7px] text-white uppercase font-black tracking-tighter">
                   {item.label}
                 </div>
               </div>
@@ -340,28 +345,24 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
             {projectiles.map(p => (
               <div 
                 key={p.id}
-                className="absolute w-2 h-6 bg-yellow-400 border-x-2 border-white shadow-[0_0_8px_#fbbf24]"
+                className="absolute w-1.5 h-4 bg-yellow-400 border-x-1 border-white shadow-[0_0_5px_#fbbf24]"
                 style={{ left: `${p.x}%`, top: `${p.y}%`, transform: 'translateX(-50%)' }}
               />
             ))}
 
             <div 
-              className={`absolute bottom-6 h-20 w-32 border-4 border-white ${puzzleType === 'DEFENDER' ? 'bg-red-700' : 'bg-blue-700'} shadow-[0_12px_0_#000] z-10 transition-colors flex items-center justify-center`}
+              className={`absolute bottom-4 h-12 md:h-16 w-20 md:w-28 border-3 border-white ${puzzleType === 'DEFENDER' ? 'bg-red-700' : 'bg-blue-700'} z-10 flex items-center justify-center`}
               style={{ left: `${basketX}%`, transform: 'translateX(-50%)' }}
             >
-              <div className="absolute -top-8 left-0 w-full text-center pixel-font text-[8px] text-white font-black bg-black border-2 border-white px-2 py-1 shadow-[2px_2px_0_#000]">
-                 {puzzleType === 'DEFENDER' ? '[ LASER_TURRET ]' : '[ DECRYPTOR_v3 ]'}
+              <div className="absolute -top-6 left-0 w-full text-center pixel-font text-[5px] md:text-[7px] text-white font-black bg-black border-1 border-white px-1.5 py-0.5 truncate">
+                 {puzzleType === 'DEFENDER' ? 'TURRET' : 'DECRYPTOR'}
               </div>
-              <div className="absolute inset-2 border-2 border-white/20 animate-pulse" />
-              <div className="text-3xl drop-shadow-md">{puzzleType === 'DEFENDER' ? '🔫' : '🛒'}</div>
-              
+              <div className="text-xl md:text-2xl">{puzzleType === 'DEFENDER' ? '🔫' : '🛒'}</div>
               {puzzleType === 'DEFENDER' && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-4 h-10 bg-white border-2 border-black" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-2 h-6 bg-white border-1 border-black" />
               )}
-              <div className="absolute -left-2 top-2 w-2 h-4 bg-white" />
-              <div className="absolute -right-2 top-2 w-2 h-4 bg-white" />
             </div>
-          </>
+          </div>
         );
     }
   };
@@ -371,117 +372,78 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, onComplete }) => {
       ref={gameRef}
       onMouseMove={handleMouseMove}
       onClick={handleDefenderClick}
-      className={`relative w-full aspect-video pixel-box border-8 bg-[#020202] overflow-hidden ${puzzleType === 'SORTER' ? 'cursor-default' : 'cursor-none'}`}
+      className={`relative w-full aspect-video md:aspect-[21/9] lg:aspect-video pixel-box border-4 bg-[#020202] overflow-hidden ${puzzleType === 'SORTER' ? 'cursor-default' : 'cursor-none'} flex flex-col`}
     >
-      <div className="absolute inset-0 pointer-events-none opacity-40 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none opacity-30">
         {particles.map(p => (
           <div 
             key={p.id} 
-            className="absolute bg-white rounded-full animate-pulse" 
+            className="absolute bg-white rounded-full" 
             style={{ 
               left: `${p.x}%`, 
               top: `${p.y}%`, 
               width: `${p.size}px`, 
               height: `${p.size}px`,
-              opacity: Math.random() * 0.5 + 0.2
+              opacity: 0.3
             }} 
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent bg-[length:100%_4px] pointer-events-none" />
       </div>
 
       {!isActive ? (
-        <div className="absolute inset-0 flex flex-row items-center justify-center bg-black z-30 border-4 border-white m-4 gap-12 animate-in fade-in duration-300">
-          <div className="text-left max-w-sm">
-            <div className="pixel-font text-white text-5xl mb-6 animate-pixel-float font-black tracking-tighter">INIT_{puzzleType}</div>
-            <div className="pixel-font text-yellow-400 text-[10px] leading-relaxed font-black mb-8 border-l-4 border-yellow-500 pl-4">
-              OBJECTIVE: {puzzleType === 'SORTER' ? 'VALIDATE_DATA_NODES' : puzzleType === 'DEFENDER' ? 'INTERCEPT_THREATS' : 'RECOVER_STRAY_PACKETS'}<br/>
-              THRESHOLD: {winThreshold.current}_INTEGRITY_REQUIRED
-            </div>
-            <div className="bg-[#111] border-4 border-white p-6 shadow-[8px_8px_0_#000]">
-              <div className="text-[10px] text-blue-400 pixel-font mb-3 uppercase">Priority_Target</div>
-              <div className="flex items-center gap-4">
-                 <div className="text-4xl">{CATEGORY_SPRITES[targetCategory] || '📡'}</div>
-                 <div className="text-3xl text-white pixel-font font-black">{targetCategory}</div>
-              </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-30 border-2 border-white m-2 md:m-4 gap-4 animate-in fade-in duration-300 text-center p-4">
+          <div className="pixel-font text-white text-xl md:text-4xl mb-2 font-black">INIT_{puzzleType}</div>
+          <div className="bg-[#111] border-2 border-white p-3 md:p-6 shadow-[4px_4px_0_#000]">
+            <div className="text-[7px] md:text-[10px] text-blue-400 pixel-font mb-2 uppercase">PRIORITY_NODE:</div>
+            <div className="flex items-center justify-center gap-3">
+               <div className="text-2xl md:text-4xl">{CATEGORY_SPRITES[targetCategory] || '📡'}</div>
+               <div className="text-sm md:text-2xl text-white pixel-font font-black">{targetCategory}</div>
             </div>
           </div>
-          <div className="bg-slate-900 border-4 border-white p-8 max-w-xs shadow-[8px_8px_0_#000]">
-             <div className="text-[12px] text-green-400 pixel-font mb-6 uppercase underline font-bold">LEGITIMATE_SERVICES:</div>
-             <div className="space-y-3">
-                {allowedItems.map((item, i) => (
-                  <div key={i} className="text-[12px] text-white pixel-font flex items-center font-bold">
-                    <span className="text-yellow-500 mr-3 animate-pulse">>>></span> {item.toUpperCase()}
-                  </div>
-                ))}
-             </div>
-          </div>
+          <div className="text-[7px] md:text-[9px] text-yellow-400 pixel-font font-bold uppercase">STABILIZE SYSTEM_FLOW IN {gameTime}S</div>
         </div>
       ) : isSuccess ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 z-40 animate-in fade-in zoom-in duration-500">
-           <div className="pixel-font text-white text-7xl mb-6 font-black tracking-tighter shadow-green-900 drop-shadow-xl animate-pixel-float">LINK_ESTABLISHED</div>
-           <div className="pixel-font text-green-400 text-2xl animate-pulse font-black">RESOURCES_SYNCHRONIZED...</div>
-           <div className="mt-12 text-white pixel-font text-sm font-bold bg-green-900 px-6 py-2 border-2 border-white">TIME_BONUS: +{gameTime * 10}</div>
-           <div className="absolute top-1/2 left-0 w-full h-1 bg-white/20 animate-pixel-float" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 z-40 animate-in fade-in zoom-in duration-500 p-4 text-center">
+           <div className="pixel-font text-white text-responsive-xl mb-4 font-black tracking-tighter drop-shadow-lg animate-pixel-float uppercase">LINK_RESTORED</div>
+           <div className="pixel-font text-green-400 text-xs md:text-lg animate-pulse font-black uppercase">SYNCHRONIZING_DATA_NODES...</div>
+           <div className="mt-6 text-white pixel-font text-[8px] md:text-xs font-bold bg-green-900 px-4 py-1.5 border-1 border-white">TIME_BONUS: +{gameTime * 10}</div>
         </div>
       ) : (
-        <>
-          <div className="absolute top-6 left-6 right-6 flex justify-between z-10 pointer-events-none">
-            <div className="pixel-box bg-black border-4 border-blue-500 p-4 shadow-[4px_4px_0_#000] flex items-center gap-3">
-              <div className="text-2xl">{CATEGORY_SPRITES[targetCategory]}</div>
-              <div>
-                <div className="text-[8px] text-slate-400 pixel-font mb-1 uppercase font-bold">Target</div>
-                <div className="text-sm text-white pixel-font font-black">{targetCategory}</div>
-              </div>
+        <div className="flex-1 flex flex-col relative">
+          <div className="absolute top-2 left-2 right-2 flex justify-between z-10 pointer-events-none gap-2">
+            <div className="pixel-box bg-black/80 border-1 border-blue-500 p-1.5 shadow-[2px_2px_0_#000] flex items-center gap-1.5">
+              <div className="text-sm">{CATEGORY_SPRITES[targetCategory]}</div>
+              <div className="text-[7px] text-white pixel-font font-black leading-none">{targetCategory}</div>
             </div>
             
-            <div className="pixel-box bg-black border-4 border-red-500 p-4 shadow-[4px_4px_0_#000] min-w-[140px] text-center">
-              <div className="text-[8px] text-slate-400 pixel-font mb-1 uppercase font-bold">Stability_Loss</div>
-              <div className={`text-xl pixel-font font-black ${gameTime < 7 ? 'text-red-500 animate-pulse' : 'text-red-400'}`}>{gameTime}s</div>
+            <div className="pixel-box bg-black/80 border-1 border-red-500 p-1.5 shadow-[2px_2px_0_#000] text-center">
+              <div className={`text-[9px] pixel-font font-black leading-none ${gameTime < 7 ? 'text-red-500 animate-pulse' : 'text-red-400'}`}>{gameTime}S</div>
             </div>
 
-            <div className="pixel-box bg-black border-4 border-green-500 p-4 shadow-[4px_4px_0_#000]">
-              <div className="text-[8px] text-slate-400 pixel-font mb-1 uppercase font-bold">Data_Integrity</div>
-              <div className="flex items-center space-x-4">
-                <div className="text-sm text-green-400 pixel-font font-black">{score} / {winThreshold.current}</div>
-                <div className="w-24 h-3 bg-slate-900 border-2 border-white">
-                  <div className="h-full bg-green-500 transition-all shadow-[inset_-2px_-2px_0_#1a5e20]" style={{ width: `${(score/winThreshold.current)*100}%` }} />
-                </div>
-              </div>
+            <div className="pixel-box bg-black/80 border-1 border-green-500 p-1.5 shadow-[2px_2px_0_#000]">
+              <div className="text-[9px] text-green-400 pixel-font font-black leading-none">{score}/{winThreshold.current}</div>
             </div>
           </div>
 
-          {renderGame()}
-
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/80 border-2 border-white px-6 py-2 z-20 pixel-font text-[10px] text-yellow-400 font-bold animate-pixel-float shadow-[4px_4px_0_#000]">
-            MISSION: {puzzleType === 'SORTER' ? `CLICK ALL ${targetCategory.toUpperCase()} SERVICES` : puzzleType === 'DEFENDER' ? `BLAST THE ${targetCategory.toUpperCase()} ITEMS` : `CATCH THE ${targetCategory.toUpperCase()} PACKETS`}
+          <div className="flex-1 flex items-center justify-center relative">
+            {renderGame()}
           </div>
 
-          <div className="absolute inset-0 pointer-events-none opacity-20">
-            <div className="w-full h-1 bg-white animate-[scanline_3s_linear_infinite]" />
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 border-1 border-white px-3 py-1 z-20 pixel-font text-[7px] text-yellow-400 font-bold uppercase whitespace-nowrap">
+            {puzzleType === 'SORTER' ? `VALIDATE_NODES` : puzzleType === 'DEFENDER' ? `DEFEND_CORE` : `CAPTURE_PACKETS`}
           </div>
-        </>
+        </div>
       )}
 
       {gameTime === 0 && !isSuccess && isActive && (
-        <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 animate-in fade-in duration-500 p-12">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-          <div className="text-8xl mb-8 animate-pixel-float grayscale">🚫</div>
-          <div className="pixel-font text-red-600 text-7xl mb-8 font-black tracking-tighter drop-shadow-[0_8px_0_#450a0a]">BREACH_FAILED</div>
-          <div className="pixel-font text-white text-[10px] mb-12 uppercase font-black text-center max-w-lg leading-loose bg-red-950/50 p-6 border-2 border-red-900 border-dashed">
-            SECURITY_HANDSHAKE_TIMEOUT.<br/>
-            BIT_STREAM_CORRUPTED.<br/>
-            INTRUSION_DETECTED_RESETTING_NODE...
-          </div>
-          <div 
+        <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 p-4 text-center">
+          <div className="pixel-font text-red-600 text-2xl md:text-5xl mb-6 font-black uppercase">ACCESS_DENIED</div>
+          <button 
             onClick={() => window.location.reload()} 
-            className="pixel-button bg-red-800 text-white px-16 py-8 pixel-font text-xl font-black animate-pulse cursor-pointer border-4 border-white shadow-[8px_8px_0_#000] hover:bg-red-700 active:translate-y-2"
+            className="pixel-button bg-red-800 text-white px-6 py-3 pixel-font text-xs font-black border-2 border-white shadow-[4px_4px_0_#000] uppercase"
           >
-            REINITIALIZING...
-          </div>
-          <div className="absolute bottom-10 w-full text-center pixel-font text-[8px] text-slate-600 font-black">
-             ERROR_CODE: 0x80042109 // KERNEL_PANIC
-          </div>
+            REBOOT_SYSTEM
+          </button>
         </div>
       )}
     </div>

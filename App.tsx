@@ -7,10 +7,12 @@ import GameSessionUI from './components/GameSessionUI';
 import Avatar from './components/Avatar';
 import ChapterMap from './components/ChapterMap';
 import AboutSection from './components/AboutSection';
+import NotificationSystem from './components/NotificationSystem';
 import { GameState, CloudRole, RoleConfig } from './types';
 import { ROLES, LEVELS } from './constants';
 import { generateAvatar } from './services/geminiService';
 import { soundService } from './services/soundService';
+import { notificationService } from './services/notificationService';
 
 const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -75,6 +77,7 @@ const App: React.FC = () => {
       } catch (err) {
         console.error("Initialization failed", err);
         setIsInitializing(false);
+        notificationService.notify('INIT_ERROR', 'SYSTEM_CORE_SYNC_FAILED', 'ERROR');
       }
     };
 
@@ -83,25 +86,29 @@ const App: React.FC = () => {
 
   const handleStartGame = () => {
     soundService.playPowerUp();
+    notificationService.notify('SESSION_START', 'USER_CREDENTIALS_VERIFIED', 'SUCCESS');
     setGameState(GameState.ROLE_SELECTION);
   };
 
   const handleRoleSelect = (r: CloudRole) => {
     soundService.playClick();
     setSelectedRole(r);
+    notificationService.notify('ROLE_LOCKED', `PATH_SELECTED:_${r.toUpperCase().replace(/\s/g, '_')}`, 'INFO');
+    setGameState(GameState.CHAPTER_SELECTION);
+  };
+
+  const handleSelectChapter = (idx: number) => {
+    soundService.playClick();
+    setInitialLevelIdx(idx);
+    notificationService.notify('WARP_GATE_OPEN', `JUMPING_TO_CHAPTER_${idx + 1}`, 'INFO');
     setGameState(GameState.PLAYING);
   };
 
   const handleGameEnd = (s: number) => {
     soundService.playLevelComplete();
     setFinalScore(s);
+    notificationService.notify('CHAPTERS_CLEARED', `FINAL_SCORE: ${s}`, 'ACHIEVEMENT');
     setGameState(GameState.GAME_OVER);
-  };
-
-  const handleSelectChapter = (idx: number) => {
-    soundService.playClick();
-    setInitialLevelIdx(idx);
-    setGameState(GameState.ROLE_SELECTION);
   };
 
   if (isInitializing) {
@@ -123,6 +130,7 @@ const App: React.FC = () => {
 
   return (
     <Layout activeRole={selectedRole}>
+      <NotificationSystem />
       {gameState === GameState.HOME && (
         <div className="relative w-full flex flex-col items-center justify-center py-4 px-6 overflow-y-auto max-h-full">
           <div className="relative z-10 flex flex-col items-center text-center max-w-5xl">
@@ -151,11 +159,6 @@ const App: React.FC = () => {
                    ESCAPE_THE_BIT_MATRIX_DUNGEON.
                  </p>
               </div>
-            </div>
-
-            <div className="mb-8 w-full">
-               <div className="pixel-font text-[8px] text-blue-400 mb-4 uppercase tracking-widest font-black">STAGE_SELECT_HUD</div>
-               <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 w-full max-w-2xl">
@@ -214,6 +217,24 @@ const App: React.FC = () => {
           
           <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-12 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
             [ Exit_To_Title_Screen ]
+          </button>
+        </div>
+      )}
+
+      {gameState === GameState.CHAPTER_SELECTION && (
+        <div className="w-full animate-in zoom-in duration-300 pt-6 px-4 flex flex-col items-center">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl md:text-6xl font-black pixel-font text-white mb-4 uppercase leading-tight">Stage_Select</h2>
+            <div className="pixel-hr w-48 mx-auto mb-4 my-2"></div>
+            <p className="text-blue-400 pixel-font text-xs animate-pulse uppercase tracking-widest font-black">Loading_Chapter_Data_Modules...</p>
+          </div>
+
+          <div className="w-full max-w-5xl pixel-box border-8 p-10 bg-[#0c0c0c] shadow-[12px_12px_0_#000]">
+             <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
+          </div>
+
+          <button onClick={() => { soundService.playClick(); setGameState(GameState.ROLE_SELECTION); }} className="mt-12 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
+            [ Back_To_Hero_Select ]
           </button>
         </div>
       )}

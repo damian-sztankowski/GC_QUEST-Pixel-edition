@@ -2,6 +2,7 @@
 export enum GameState {
   HOME = 'HOME',
   ROLE_SELECTION = 'ROLE_SELECTION',
+  CHAPTER_SELECTION = 'CHAPTER_SELECTION',
   PLAYING = 'PLAYING',
   PUZZLE = 'PUZZLE',
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',
@@ -53,4 +54,13 @@ export interface PuzzleGame {
   title: string;
   instructions: string;
   type: 'SORTER' | 'CONNECTOR' | 'DEFENDER';
+}
+
+export type NotificationType = 'INFO' | 'SUCCESS' | 'ERROR' | 'ACHIEVEMENT';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  message: string;
+  title: string;
 }
