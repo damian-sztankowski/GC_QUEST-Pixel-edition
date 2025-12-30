@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import RoleCard from './components/RoleCard';
@@ -144,26 +143,26 @@ const App: React.FC = () => {
     <Layout activeRole={selectedRole}>
       <NotificationSystem />
       {gameState === GameState.HOME && (
-        <div className="relative w-full flex-1 flex flex-col items-center justify-center py-4 px-6 overflow-y-auto">
-          <div className="relative z-10 flex flex-col items-center text-center max-w-5xl">
+        <div className="relative w-full flex-1 flex flex-col items-center justify-center py-6 px-6 overflow-y-auto">
+          <div className="relative z-10 flex flex-col items-center text-center max-w-5xl h-full justify-center">
             
-            <div className="mb-6 border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000]">
+            <div className="mb-4 border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000]">
                <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
             </div>
             
-            <div className="mb-8 relative">
+            <div className="mb-6 relative">
               <div className="absolute -top-10 -left-16 md:-left-32 text-4xl md:text-6xl opacity-20 animate-pixel-float">☁️</div>
               <div className="absolute -bottom-4 -right-16 md:-right-32 text-4xl md:text-6xl opacity-20 animate-pixel-float" style={{ animationDelay: '1s' }}>☁️</div>
               
-              <h1 className="text-5xl md:text-8xl font-black pixel-font text-white mb-4 drop-shadow-[8px_8px_0_#4285F4] leading-none">
-                CLOUD<br />QUEST
+              <h1 className="text-4xl md:text-7xl font-black pixel-font text-white mb-4 drop-shadow-[8px_8px_0_#4285F4] leading-tight uppercase tracking-tight">
+                PIXEL_CLOUD<br />ESCAPE
               </h1>
-              <div className="text-lg md:text-xl pixel-font text-yellow-500 animate-pulse tracking-widest bg-blue-900/40 inline-block px-6 py-1.5 border-2 border-blue-500 font-black uppercase">
-                :: PIXEL_EDITION ::
+              <div className="text-sm md:text-lg pixel-font text-yellow-500 animate-pulse tracking-widest bg-blue-900/40 inline-block px-6 py-1.5 border-2 border-blue-500 font-black uppercase">
+                :: BIT_CHALLENGE ::
               </div>
             </div>
             
-            <div className="mb-6 max-w-xl">
+            <div className="mb-8 max-w-xl">
               <div className="pixel-box p-6 bg-black/90 border-4">
                  <p className="mono-font text-xl md:text-2xl text-slate-200 leading-tight uppercase font-black">
                    COMPLETE_THE_6_STAGES_OF_CLOUDOM.<br/>
@@ -174,7 +173,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Codename Entry */}
-            <div className="mb-10 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
+            <div className="mb-8 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
                <h4 className="pixel-font text-[10px] text-blue-400 mb-3 font-black uppercase text-left">ENTER_CODENAME:</h4>
                <input 
                  type="text" 
@@ -186,7 +185,7 @@ const App: React.FC = () => {
                <div className="mt-1 text-right text-[7px] pixel-font text-slate-500 uppercase">MAX_12_CHARS</div>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 w-full max-w-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8 w-full max-w-2xl">
               <button 
                 onClick={handleStartGame}
                 className="pixel-button pixel-button-primary px-12 py-6 md:px-16 md:py-8 pixel-font text-2xl md:text-3xl group shadow-[8px_8px_0_#000] font-black"
@@ -197,13 +196,13 @@ const App: React.FC = () => {
               <div className="flex gap-4">
                 <button 
                   onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-                  className="pixel-button bg-black text-white px-8 py-4 pixel-font text-xs hover:bg-slate-900 font-black shadow-[4px_4px_0_#000]"
+                  className="pixel-button bg-black text-white px-8 py-4 pixel-font text-[10px] hover:bg-slate-900 font-black shadow-[4px_4px_0_#000]"
                 >
                   HI_SCORE
                 </button>
                 <button 
                   onClick={() => { soundService.playClick(); setGameState(GameState.ABOUT); }}
-                  className="pixel-button bg-slate-800 text-white px-8 py-4 pixel-font text-xs hover:bg-slate-700 font-black border-slate-400 shadow-[4px_4px_0_#000]"
+                  className="pixel-button bg-slate-800 text-white px-8 py-4 pixel-font text-[10px] hover:bg-slate-700 font-black border-slate-400 shadow-[4px_4px_0_#000]"
                 >
                   ABOUT
                 </button>
@@ -214,43 +213,43 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.ROLE_SELECTION && (
-        <div className="w-full flex-1 animate-in slide-in-from-bottom-8 duration-500 pt-6 px-4 flex flex-col items-center">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl md:text-6xl font-black pixel-font text-white mb-4 uppercase leading-tight">Hero_Select</h2>
-            <div className="pixel-hr w-48 mx-auto mb-4 my-2"></div>
-            <p className="text-yellow-500 pixel-font text-xs animate-pulse uppercase tracking-widest font-black">SYNCING_{playerName}...</p>
+        <div className="w-full flex-1 animate-in slide-in-from-bottom-8 duration-500 pt-4 px-4 flex flex-col items-center justify-center overflow-y-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-4xl md:text-6xl font-black pixel-font text-white mb-2 uppercase leading-tight">Hero_Select</h2>
+            <div className="pixel-hr w-48 mx-auto mb-2 my-1"></div>
+            <p className="text-yellow-500 pixel-font text-[10px] animate-pulse uppercase tracking-widest font-black">SYNCING_{playerName}...</p>
           </div>
           
-          <div className="max-w-xl mx-auto w-full px-4 flex-1">
+          <div className="max-w-xl mx-auto w-full px-4 flex flex-col justify-center">
             {rolesWithAvatars.map((role, idx) => (
               <RoleCard key={idx} role={role} onSelect={handleRoleSelect} index={idx} />
             ))}
           </div>
           
-          <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-12 mb-8 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
+          <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-8 mb-6 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
             [ Exit_To_Title_Screen ]
           </button>
         </div>
       )}
 
       {gameState === GameState.CHAPTER_SELECTION && (
-        <div className="w-full flex-1 animate-in zoom-in duration-300 pt-6 px-4 flex flex-col items-center max-w-6xl">
-          <div className="text-center mb-6">
+        <div className="w-full flex-1 animate-in zoom-in duration-300 pt-4 px-4 flex flex-col items-center max-w-6xl justify-center overflow-y-auto">
+          <div className="text-center mb-4">
             <h2 className="text-4xl md:text-5xl font-black pixel-font text-white mb-2 uppercase leading-tight">Stage_Select</h2>
             <p className="text-blue-400 pixel-font text-[10px] animate-pulse uppercase tracking-widest font-black">CHOOSE_YOUR_DESTINATION</p>
           </div>
 
-          <div className="w-full pixel-box border-8 p-6 md:p-10 bg-[#0c0c0c] shadow-[12px_12px_0_#000] flex flex-col gap-10 flex-1 overflow-y-auto">
+          <div className="w-full pixel-box border-8 p-6 md:p-8 bg-[#0c0c0c] shadow-[12px_12px_0_#000] flex flex-col gap-6 flex-1 overflow-y-auto justify-center">
              <div className="w-full">
                 <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
              </div>
 
-             <div className="w-full border-t-4 border-white pt-10">
+             <div className="w-full border-t-4 border-white pt-6">
                 <div className="max-w-md mx-auto">
-                    <div className="pixel-box p-6 border-4 bg-slate-900 shadow-[8px_8px_0_#000]">
-                       <div className="flex justify-between items-center mb-6">
-                          <h4 className="pixel-font text-[12px] text-white font-black uppercase tracking-tighter">STABILITY_MODE:</h4>
-                          <span className={`pixel-font text-[10px] font-black uppercase px-2 py-1 border-2 border-white ${
+                    <div className="pixel-box p-4 border-4 bg-slate-900 shadow-[8px_8px_0_#000]">
+                       <div className="flex justify-between items-center mb-4">
+                          <h4 className="pixel-font text-[10px] text-white font-black uppercase tracking-tighter">STABILITY_MODE:</h4>
+                          <span className={`pixel-font text-[8px] font-black uppercase px-2 py-1 border-2 border-white ${
                             difficulty === DifficultyLevel.EASY ? 'bg-green-600 text-white' : difficulty === DifficultyLevel.NORMAL ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'
                           }`}>
                             {difficulty}
@@ -264,19 +263,19 @@ const App: React.FC = () => {
                          step="1" 
                          value={difficultyIndex}
                          onChange={handleDifficultyChange}
-                         className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-white mb-4"
+                         className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-white mb-2"
                          style={{ 
                            imageRendering: 'pixelated',
                          }}
                        />
 
-                       <div className="flex justify-between mb-6 pixel-font text-[8px] text-slate-400 font-black uppercase">
+                       <div className="flex justify-between mb-4 pixel-font text-[7px] text-slate-400 font-black uppercase">
                           <span className={difficulty === DifficultyLevel.EASY ? 'text-white' : ''}>JUNIOR</span>
                           <span className={difficulty === DifficultyLevel.NORMAL ? 'text-white' : ''}>ARCHITECT</span>
                           <span className={difficulty === DifficultyLevel.HARD ? 'text-white' : ''}>LEGEND</span>
                        </div>
 
-                       <div className="grid grid-cols-2 gap-4 text-[7px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-4 border-2 border-slate-700">
+                       <div className="grid grid-cols-2 gap-2 text-[6px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
                           <div className="flex justify-between border-b border-slate-800 pb-1">
                             <span>TIME_MOD:</span>
                             <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span>
@@ -299,7 +298,7 @@ const App: React.FC = () => {
              </div>
           </div>
 
-          <button onClick={() => { soundService.playClick(); setGameState(GameState.ROLE_SELECTION); }} className="mt-8 mb-8 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
+          <button onClick={() => { soundService.playClick(); setGameState(GameState.ROLE_SELECTION); }} className="mt-4 mb-4 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
             [ Back_To_Hero_Select ]
           </button>
         </div>

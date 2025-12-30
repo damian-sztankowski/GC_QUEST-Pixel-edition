@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { CloudRole } from '../types';
 import { ROLES } from '../constants';
@@ -60,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
             <div className="w-3 h-3 bg-green-500 border-1 border-white"></div>
           </div>
           <h1 className="text-xl md:text-2xl font-black pixel-font tracking-tighter text-white">
-            GC_QUEST <span style={{ color: currentAccent }}>::PIXEL</span>
+            GC_ESCAPE <span style={{ color: currentAccent }}>::BIT</span>
           </h1>
         </div>
         
@@ -82,14 +81,14 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
 
           <div className="hidden sm:flex flex-col items-end pixel-font leading-none">
             <div className="text-[8px] text-yellow-500 mb-0.5 font-black uppercase">Foundational</div>
-            <div className="text-[10px] text-white bg-black px-1.5 border-2 border-white">
+            <div className="text-[10px] text-white bg-black px-1.5 border-2 border-white whitespace-nowrap">
               {activeRole ? `SYS: CDL` : 'STATUS: STBY'}
             </div>
           </div>
         </div>
       </header>
       
-      <main className="flex-1 w-full max-w-7xl px-4 py-6 md:px-8 md:py-8 flex flex-col items-center relative z-10 overflow-y-auto">
+      <main className="flex-1 w-full max-w-7xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center relative z-10 overflow-hidden">
         {children}
       </main>
 
