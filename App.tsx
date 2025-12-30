@@ -54,7 +54,7 @@ const App: React.FC = () => {
         const cached = localStorage.getItem('quest_avatars');
         if (cached) {
           setRolesWithAvatars(JSON.parse(cached));
-          setInitStage('BOOTING_CDL_v1.0');
+          setInitStage('BOOTING SYSTEMS');
           setTimeout(() => setIsInitializing(false), 1200);
           return;
         }
@@ -73,7 +73,7 @@ const App: React.FC = () => {
         );
         setRolesWithAvatars(updatedRoles);
         localStorage.setItem('quest_avatars', JSON.stringify(updatedRoles));
-        setInitStage('READY_PLAYER_ONE');
+        setInitStage('SYSTEM_READY');
         setTimeout(() => setIsInitializing(false), 1000);
       } catch (err) {
         console.error("Initialization failed", err);
@@ -255,8 +255,8 @@ const App: React.FC = () => {
                 <div className="max-w-md mx-auto">
                     <div className="pixel-box p-4 border-4 bg-slate-900 shadow-[8px_8px_0_#000]">
                        <div className="flex justify-between items-center mb-4">
-                          <h4 className="pixel-font text-[10px] text-white font-black uppercase tracking-tighter">STABILITY_MODE:</h4>
-                          <span className={`pixel-font text-[8px] font-black uppercase px-2 py-1 border-2 border-white ${
+                          <h4 className="pixel-font text-[12px] text-white font-black uppercase tracking-tighter">STABILITY_MODE:</h4>
+                          <span className={`pixel-font text-[10px] font-black uppercase px-2 py-1 border-2 border-white ${
                             difficulty === DifficultyLevel.EASY ? 'bg-green-600 text-white' : difficulty === DifficultyLevel.NORMAL ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'
                           }`}>
                             {difficulty}
@@ -282,7 +282,7 @@ const App: React.FC = () => {
                           <span className={difficulty === DifficultyLevel.HARD ? 'text-white' : ''}>LEGEND</span>
                        </div>
 
-                       <div className="grid grid-cols-2 gap-2 text-[6px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
+                       <div className="grid grid-cols-2 gap-2 text-[10px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
                           <div className="flex justify-between border-b border-slate-800 pb-1">
                             <span>TIME_MOD:</span>
                             <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span>
