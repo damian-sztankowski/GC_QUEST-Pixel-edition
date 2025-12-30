@@ -54,7 +54,7 @@ const App: React.FC = () => {
         const cached = localStorage.getItem('quest_avatars');
         if (cached) {
           setRolesWithAvatars(JSON.parse(cached));
-          setInitStage('BOOTING_CDL_v1.0');
+          setInitStage('STARTING SYSTEMS');
           setTimeout(() => setIsInitializing(false), 1200);
           return;
         }
@@ -73,7 +73,7 @@ const App: React.FC = () => {
         );
         setRolesWithAvatars(updatedRoles);
         localStorage.setItem('quest_avatars', JSON.stringify(updatedRoles));
-        setInitStage('READY_PLAYER_ONE');
+        setInitStage('PLAYER_READY');
         setTimeout(() => setIsInitializing(false), 1000);
       } catch (err) {
         console.error("Initialization failed", err);
@@ -132,7 +132,7 @@ const App: React.FC = () => {
              <div className="h-full bg-blue-500 animate-[text-reveal_2s_ease-in-out_infinite]" />
           </div>
           <div className="text-[10px] text-slate-500 tracking-widest text-center uppercase font-black">
-             (C) 2025 System Stability OK
+             (C) 2025 System Stability // OK
           </div>
         </div>
       </div>
