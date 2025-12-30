@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { CloudRole, Level, Question, GameState, DifficultyLevel } from '../types';
 import { generateQuestion, getGeminiFeedback, generateHint } from '../services/geminiService';
@@ -177,11 +176,19 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
   return (
     <div className="game-viewport px-4 pb-8 space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="pixel-box p-3 flex items-center space-x-3 bg-[#111] border-2">
-          <Avatar role={role} size="sm" animate={false} />
-          <div className="pixel-font leading-none truncate">
-            <div className="text-[8px] text-slate-400 uppercase font-black">DIFFICULTY</div>
-            <div className="text-[10px] text-blue-400 font-bold truncate">{diffSetting.label}</div>
+        <div className="pixel-box p-3 flex items-center space-x-4 bg-[#111] border-2">
+          <div className="shrink-0 border-2 border-slate-700 bg-black p-0.5 shadow-[2px_2px_0_#000]">
+            <Avatar role={role} size="sm" animate={false} />
+          </div>
+          <div className="pixel-font leading-none truncate flex flex-col space-y-2">
+            <div>
+              <div className="text-[6px] text-yellow-500 uppercase font-black mb-1">HERO_UNIT</div>
+              <div className="text-[8px] text-white font-bold truncate">SYS_CDL_v1.0</div>
+            </div>
+            <div className="border-t border-slate-800 pt-1.5">
+              <div className="text-[6px] text-slate-400 uppercase font-black mb-1">DIFFICULTY</div>
+              <div className="text-[9px] text-blue-400 font-bold truncate">{diffSetting.label}</div>
+            </div>
           </div>
         </div>
         
