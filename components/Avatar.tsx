@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { CloudRole, RoleConfig } from '../types';
 import { ROLES } from '../constants';
@@ -24,39 +25,38 @@ const Avatar: React.FC<AvatarProps> = ({ role, size = 'md', animate = true, base
   }, [role, base64]);
 
   const sizeClasses = {
-    sm: 'w-12 h-12',
-    md: 'w-20 h-20',
-    lg: 'w-32 h-32',
-    xl: 'w-48 h-48',
+    sm: 'w-10 h-10',
+    md: 'w-16 h-16',
+    lg: 'w-24 h-24',
+    xl: 'w-32 h-32',
   };
 
   return (
-    <div className={`relative flex items-center justify-center border-4 border-white bg-black ${sizeClasses[size]} overflow-hidden shadow-[6px_6px_0_#000] shrink-0 ${animate ? 'animate-pulse' : ''}`}>
+    <div className={`relative flex items-center justify-center border-4 border-white bg-[#0c0c0c] ${sizeClasses[size]} overflow-hidden shadow-[4px_4px_0_#000] shrink-0`}>
       {displayBase64 ? (
         <img 
           src={displayBase64} 
           alt={role} 
           className="w-full h-full object-cover" 
-          style={{ imageRendering: 'pixelated', filter: 'contrast(1.4) brightness(1.2) hue-rotate(-5deg)' }} 
+          style={{ imageRendering: 'pixelated', filter: 'contrast(1.2) brightness(1.1)' }} 
         />
       ) : (
-        <span className="select-none text-4xl">{icon}</span>
+        <span className="select-none text-2xl">{icon}</span>
       )}
-      
-      {/* Scanline overlay for avatar */}
-      <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px]"></div>
       
       {animate && (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-1 bg-white/20 animate-[scan_2s_linear_infinite]" />
+          <div className="absolute top-0 left-0 w-full h-2 bg-white/10 animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-full h-2 bg-white/10 animate-pulse" style={{ animationDelay: '0.8s' }} />
+          <div className="absolute inset-0 border-2 border-white/5" />
         </div>
       )}
       
-      {/* Corner Brackets */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white"></div>
-      <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-white"></div>
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-white"></div>
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white"></div>
+      {/* Pixel corners */}
+      <div className="absolute top-0 left-0 w-1 h-1 bg-white"></div>
+      <div className="absolute top-0 right-0 w-1 h-1 bg-white"></div>
+      <div className="absolute bottom-0 left-0 w-1 h-1 bg-white"></div>
+      <div className="absolute bottom-0 right-0 w-1 h-1 bg-white"></div>
     </div>
   );
 };

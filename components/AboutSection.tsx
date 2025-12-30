@@ -5,7 +5,7 @@ const AboutSection: React.FC = () => {
   return (
     <div className="w-full max-w-4xl pixel-box border-8 p-10 bg-black shadow-[16px_16px_0_#000] animate-in slide-in-from-bottom-8 duration-500">
       <div className="text-center mb-10">
-        <h2 className="text-5xl font-black pixel-font text-white mb-6 tracking-tight">ABOUT_GC_QUEST</h2>
+        <h2 className="text-3xl font-black pixel-font text-white mb-6 tracking-tight">ABOUT_PIXEL_CLOUD:ESCAPE</h2>
         <div className="pixel-hr w-48 mx-auto opacity-50 my-4"></div>
       </div>
 
@@ -13,7 +13,7 @@ const AboutSection: React.FC = () => {
         <section className="space-y-4">
           <h3 className="pixel-font text-blue-400 text-xl mb-4 font-black">:: THE_MISSION ::</h3>
           <p className="text-slate-200">
-            GOOGLE CLOUD QUEST IS AN INTERACTIVE ESCAPE ROOM DESIGNED TO PREPARE YOU FOR THE <span className="text-white font-bold">CLOUD DIGITAL LEADER</span> CERTIFICATION. 
+            PIXEL_CLOUD:ESCAPE IS AN INTERACTIVE ESCAPE ROOM DESIGNED TO PREPARE YOU FOR THE <span className="text-white font-bold">CLOUD DIGITAL LEADER</span> CERTIFICATION. 
             YOU MUST NAVIGATE 6 CRITICAL CHAPTERS OF CLOUD ARCHITECTURE, SOLVING QUIZZES AND CHALLENGES TO RESTORE STABILITY TO THE DATA CORE.
           </p>
         </section>
