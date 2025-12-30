@@ -13,8 +13,8 @@ const AboutSection: React.FC = () => {
         <section className="space-y-4">
           <h3 className="pixel-font text-blue-400 text-xl mb-4 font-black">:: THE_MISSION ::</h3>
           <p className="text-slate-200">
-            GOOGLE CLOUD QUEST IS AN INTERACTIVE ESCAPE ROOM DESIGNED TO PREPARE YOU FOR THE <span className="text-white font-bold">CLOUD DIGITAL LEADER</span> CERTIFICATION. 
-            YOU MUST NAVIGATE 6 CRITICAL CHAPTERS OF CLOUD ARCHITECTURE, SOLVING REAL-WORLD BUSINESS CHALLENGES TO RESTORE STABILITY TO THE DATA CORE.
+            GOOGLE CLOUD QUEST IS AN INTERACTIVE ESCAPE ROOM DESIGNED TO PREPARE YOU FOR THE <span className="text-white font-bold">GOOGLE CLOUD</span> CERTIFICATIONS. 
+            YOU MUST NAVIGATE 6 CRITICAL CHAPTERS OF CLOUD ARCHITECTURE, SOLVING QUIZZES AND CHALLENGES TO RESTORE STABILITY TO THE DATA CORE.
           </p>
         </section>
 
