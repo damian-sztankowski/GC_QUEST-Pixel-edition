@@ -69,7 +69,7 @@ const AboutSection: React.FC = () => {
           </div>
         </section>
 
-        <p className="text-center text-sm italic text-slate-500 mt-8">
+        <p className="text-center text-lg italic text-slate-500 mt-8">
           "THE CLOUD IS NOT JUST INFRASTRUCTURE. IT IS AN OPPORTUNITY TO TRANSFORM."
         </p>
       </div>
