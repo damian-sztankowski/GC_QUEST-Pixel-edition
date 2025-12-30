@@ -10,9 +10,48 @@ interface AvatarProps {
   base64?: string;
 }
 
+const CloudHeroSVG: React.FC<{ size: string }> = ({ size }) => (
+  <svg 
+    viewBox="0 0 64 64" 
+    className={`${size} animate-pixel-float`} 
+    style={{ imageRendering: 'pixelated' }}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Digital Cape with flicker animation */}
+    <path d="M15 35 L5 50 L20 45 L15 35" fill="#1A73E8">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="0.5s" repeatCount="indefinite" />
+    </path>
+    <path d="M12 30 L2 45 L15 40 L12 30" fill="#4285F4">
+      <animate attributeName="opacity" values="1;0.5;1" dur="0.8s" repeatCount="indefinite" />
+    </path>
+
+    {/* Cloud Body - Pixelated circles */}
+    <rect x="20" y="24" width="24" height="16" fill="#4285F4" />
+    <rect x="16" y="28" width="32" height="12" fill="#4285F4" />
+    <rect x="24" y="20" width="16" height="4" fill="#4285F4" />
+    <rect x="24" y="38" width="16" height="4" fill="#4285F4" />
+    
+    {/* Highlights */}
+    <rect x="22" y="26" width="4" height="2" fill="#ADCCFF" />
+    <rect x="26" y="22" width="6" height="2" fill="#ADCCFF" />
+
+    {/* Heroic Arm (Upward) */}
+    <rect x="42" y="16" width="6" height="10" fill="#4285F4" />
+    <rect x="44" y="14" width="6" height="6" fill="#4285F4" />
+    <rect x="46" y="12" width="4" height="4" fill="#0D47A1" />
+
+    {/* G-Logo or Cloud core on chest */}
+    <rect x="28" y="30" width="8" height="6" fill="#0D47A1" />
+    <rect x="30" y="32" width="4" height="2" fill="#FFF" />
+
+    {/* Pixel Eyes */}
+    <rect x="26" y="27" width="2" height="2" fill="#000" />
+    <rect x="36" y="27" width="2" height="2" fill="#000" />
+  </svg>
+);
+
 const Avatar: React.FC<AvatarProps> = ({ role, size = 'md', animate = true, base64 }) => {
   const roleConfig = ROLES.find(r => r.type === role);
-  const icon = roleConfig?.icon || '☁️';
 
   const displayBase64 = useMemo(() => {
     if (base64) return base64;
@@ -41,7 +80,7 @@ const Avatar: React.FC<AvatarProps> = ({ role, size = 'md', animate = true, base
           style={{ imageRendering: 'pixelated', filter: 'contrast(1.2) brightness(1.1)' }} 
         />
       ) : (
-        <span className="select-none text-2xl">{icon}</span>
+        <CloudHeroSVG size="w-full h-full p-2" />
       )}
       
       {animate && (

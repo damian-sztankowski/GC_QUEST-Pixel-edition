@@ -164,7 +164,7 @@ const App: React.FC = () => {
 
               <div className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500">
                 <div className="bit-challenge-text pixel-font text-xs md:text-sm font-black uppercase">
-                   :: GC_EDITION ::
+                   :: CDL_EDITION ::
                 </div>
               </div>
             </div>

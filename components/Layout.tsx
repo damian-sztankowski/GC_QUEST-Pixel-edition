@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
             <div className="w-3 h-3 bg-green-500 border-1 border-white"></div>
           </div>
           <h1 className="text-xl md:text-2xl font-black pixel-font tracking-tighter text-white">
-            PIXEL_CLOUD:ESCAPE <span style={{ color: currentAccent }}>::GC EDITION</span>
+            PIXEL_CLOUD:ESCAPE <span style={{ color: currentAccent }}>::CDL EDITION</span>
           </h1>
         </div>
         

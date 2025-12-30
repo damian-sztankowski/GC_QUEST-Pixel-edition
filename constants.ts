@@ -4,7 +4,7 @@ import { CloudRole, Level, RoleConfig, DifficultyLevel } from './types';
 export const ROLES: RoleConfig[] = [
   {
     type: CloudRole.DIGITAL_LEADER,
-    icon: '☁️',
+    icon: 'HERO',
     description: 'The young adept of the cloud. Master business value, data, and infrastructure in a retro 16-bit environment.',
     color: 'blue',
     avatarPrompt: '16-bit pixel art icon of a blue superhero cloud with a digital cape, solid black background, retro video game style, centered, high contrast, vibrant Google blue colors.'
