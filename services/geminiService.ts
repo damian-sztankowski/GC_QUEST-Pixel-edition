@@ -7,7 +7,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateQuestion = async (role: CloudRole, level: Level): Promise<Question> => {
   const prompt = `Generate a Google Cloud certification-style question for a ${role} exam candidate.
-  The question MUST be strictly derived from the official Cloud Digital Leader Exam Guide.
+  The question MUST be strictly derived from the official ${role} Exam Guide.
   
   CURRENT CHAPTER: "${level.topic}"
   SYLLABUS FOCUS: "${level.description}"

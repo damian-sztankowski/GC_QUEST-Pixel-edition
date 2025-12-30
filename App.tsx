@@ -40,6 +40,7 @@ const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.HOME);
+  const [playerName, setPlayerName] = useState('PLAYER_01');
   const [selectedRole, setSelectedRole] = useState<CloudRole | null>(null);
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(DifficultyLevel.NORMAL);
   const [initialLevelIdx, setInitialLevelIdx] = useState(0);
@@ -87,7 +88,7 @@ const App: React.FC = () => {
 
   const handleStartGame = () => {
     soundService.playPowerUp();
-    notificationService.notify('SESSION_START', 'USER_CREDENTIALS_VERIFIED', 'SUCCESS');
+    notificationService.notify('SESSION_START', `${playerName.toUpperCase()}_LINK_ESTABLISHED`, 'SUCCESS');
     setGameState(GameState.ROLE_SELECTION);
   };
 
@@ -162,7 +163,7 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            <div className="mb-8 max-w-xl">
+            <div className="mb-6 max-w-xl">
               <div className="pixel-box p-6 bg-black/90 border-4">
                  <p className="mono-font text-xl md:text-2xl text-slate-200 leading-tight uppercase font-black">
                    COMPLETE_THE_6_STAGES_OF_CLOUDOM.<br/>
@@ -172,38 +173,17 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Difficulty Settings */}
+            {/* Codename Entry */}
             <div className="mb-10 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
-               <div className="flex justify-between items-center mb-4">
-                  <h4 className="pixel-font text-[10px] text-white font-black uppercase tracking-tighter">DIFFICULTY_LEVEL:</h4>
-                  <span className={`pixel-font text-[10px] font-black uppercase ${
-                    difficulty === DifficultyLevel.EASY ? 'text-green-500' : difficulty === DifficultyLevel.NORMAL ? 'text-blue-500' : 'text-red-500'
-                  }`}>
-                    {difficulty} ({DIFFICULTY_SETTINGS[difficulty].label})
-                  </span>
-               </div>
+               <h4 className="pixel-font text-[10px] text-blue-400 mb-3 font-black uppercase text-left">ENTER_CODENAME:</h4>
                <input 
-                 type="range" 
-                 min="0" 
-                 max="2" 
-                 step="1" 
-                 value={difficultyIndex}
-                 onChange={handleDifficultyChange}
-                 className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-blue-500"
-                 style={{ 
-                   imageRendering: 'pixelated',
-                 }}
+                 type="text" 
+                 maxLength={12}
+                 value={playerName}
+                 onChange={(e) => setPlayerName(e.target.value.toUpperCase().replace(/\s/g, '_'))}
+                 className="w-full bg-black border-2 border-white text-white p-3 pixel-font text-sm uppercase outline-none focus:border-yellow-500"
                />
-               <div className="flex justify-between mt-2 pixel-font text-[7px] text-slate-500 font-black uppercase">
-                  <span>JUNIOR</span>
-                  <span>ARCHITECT</span>
-                  <span>LEGEND</span>
-               </div>
-               <div className="mt-4 grid grid-cols-3 gap-2 text-[6px] pixel-font text-slate-400 uppercase leading-tight font-black">
-                  <div className="border-r border-slate-700">TIME: {DIFFICULTY_SETTINGS[difficulty].timeMultiplier}x</div>
-                  <div className="border-r border-slate-700">SCORE: {DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}x</div>
-                  <div>SPEED: {DIFFICULTY_SETTINGS[difficulty].speedMultiplier}x</div>
-               </div>
+               <div className="mt-1 text-right text-[7px] pixel-font text-slate-500 uppercase">MAX_12_CHARS</div>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 w-full max-w-2xl">
@@ -231,15 +211,15 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl pb-10">
-               <div className="pixel-box p-6 border-4 hover:bg-blue-950 transition-colors group">
+               <div className="pixel-box p-6 border-4 hover:bg-blue-950 transition-colors group text-left">
                   <div className="text-4xl mb-4 group-hover:animate-pixel-float">👾</div>
-                  <h3 className="text-xl pixel-font text-blue-400 mb-2 font-black uppercase">Exam Logic</h3>
-                  <p className="mono-font text-slate-400 text-lg uppercase font-black">6 sections of the CDL Guide.</p>
+                  <h3 className="text-xl pixel-font text-blue-400 mb-2 font-black uppercase">Adaptive_Quiz</h3>
+                  <p className="mono-font text-slate-400 text-lg uppercase font-black">Dynamic Gemini-powered Cloud questions.</p>
                </div>
-               <div className="pixel-box p-6 border-4 hover:bg-red-950 transition-colors group">
+               <div className="pixel-box p-6 border-4 hover:bg-red-950 transition-colors group text-left">
                   <div className="text-4xl mb-4 group-hover:animate-pixel-float">💣</div>
-                  <h3 className="text-xl pixel-font text-red-400 mb-2 font-black uppercase">Arcade Mode</h3>
-                  <p className="mono-font text-slate-400 text-lg uppercase font-black">Beat stability decay.</p>
+                  <h3 className="text-xl pixel-font text-red-400 mb-2 font-black uppercase">Stabilize_Core</h3>
+                  <p className="mono-font text-slate-400 text-lg uppercase font-black">Correct answers add time to the clock.</p>
                </div>
             </div>
           </div>
@@ -251,7 +231,7 @@ const App: React.FC = () => {
           <div className="text-center mb-8">
             <h2 className="text-4xl md:text-6xl font-black pixel-font text-white mb-4 uppercase leading-tight">Hero_Select</h2>
             <div className="pixel-hr w-48 mx-auto mb-4 my-2"></div>
-            <p className="text-yellow-500 pixel-font text-xs animate-pulse uppercase tracking-widest font-black">Detecting_User_Biometrics...</p>
+            <p className="text-yellow-500 pixel-font text-xs animate-pulse uppercase tracking-widest font-black">SYNCING_{playerName}...</p>
           </div>
           
           <div className="max-w-xl mx-auto w-full px-4">
@@ -267,15 +247,70 @@ const App: React.FC = () => {
       )}
 
       {gameState === GameState.CHAPTER_SELECTION && (
-        <div className="w-full animate-in zoom-in duration-300 pt-6 px-4 flex flex-col items-center">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl md:text-6xl font-black pixel-font text-white mb-4 uppercase leading-tight">Stage_Select</h2>
-            <div className="pixel-hr w-48 mx-auto mb-4 my-2"></div>
-            <p className="text-blue-400 pixel-font text-xs animate-pulse uppercase tracking-widest font-black">Loading_Chapter_Data_Modules...</p>
+        <div className="w-full animate-in zoom-in duration-300 pt-6 px-4 flex flex-col items-center max-w-6xl">
+          <div className="text-center mb-6">
+            <h2 className="text-4xl md:text-5xl font-black pixel-font text-white mb-2 uppercase leading-tight">Stage_Select</h2>
+            <p className="text-blue-400 pixel-font text-[10px] animate-pulse uppercase tracking-widest font-black">CHOOSE_YOUR_DESTINATION</p>
           </div>
 
-          <div className="w-full max-w-5xl pixel-box border-8 p-10 bg-[#0c0c0c] shadow-[12px_12px_0_#000]">
-             <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
+          <div className="w-full pixel-box border-8 p-6 md:p-10 bg-[#0c0c0c] shadow-[12px_12px_0_#000] flex flex-col gap-10">
+             <div className="w-full">
+                <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
+             </div>
+
+             <div className="w-full border-t-4 border-white pt-10">
+                <div className="max-w-md mx-auto">
+                    {/* Stability Mode Settings moved here */}
+                    <div className="pixel-box p-6 border-4 bg-slate-900 shadow-[8px_8px_0_#000]">
+                       <div className="flex justify-between items-center mb-6">
+                          <h4 className="pixel-font text-[12px] text-white font-black uppercase tracking-tighter">STABILITY_MODE:</h4>
+                          <span className={`pixel-font text-[10px] font-black uppercase px-2 py-1 border-2 border-white ${
+                            difficulty === DifficultyLevel.EASY ? 'bg-green-600 text-white' : difficulty === DifficultyLevel.NORMAL ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'
+                          }`}>
+                            {difficulty}
+                          </span>
+                       </div>
+                       
+                       <input 
+                         type="range" 
+                         min="0" 
+                         max="2" 
+                         step="1" 
+                         value={difficultyIndex}
+                         onChange={handleDifficultyChange}
+                         className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-white mb-4"
+                         style={{ 
+                           imageRendering: 'pixelated',
+                         }}
+                       />
+
+                       <div className="flex justify-between mb-6 pixel-font text-[8px] text-slate-400 font-black uppercase">
+                          <span className={difficulty === DifficultyLevel.EASY ? 'text-white' : ''}>JUNIOR</span>
+                          <span className={difficulty === DifficultyLevel.NORMAL ? 'text-white' : ''}>ARCHITECT</span>
+                          <span className={difficulty === DifficultyLevel.HARD ? 'text-white' : ''}>LEGEND</span>
+                       </div>
+
+                       <div className="grid grid-cols-2 gap-4 text-[7px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-4 border-2 border-slate-700">
+                          <div className="flex justify-between border-b border-slate-800 pb-1">
+                            <span>TIME_MOD:</span>
+                            <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-800 pb-1">
+                            <span>SCORE_MOD:</span>
+                            <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}X</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>SPEED_MOD:</span>
+                            <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].speedMultiplier}X</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>TIME_BONUS:</span>
+                            <span className="text-white">+{DIFFICULTY_SETTINGS[difficulty].timeBonus}S</span>
+                          </div>
+                       </div>
+                    </div>
+                </div>
+             </div>
           </div>
 
           <button onClick={() => { soundService.playClick(); setGameState(GameState.ROLE_SELECTION); }} className="mt-12 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
@@ -301,7 +336,7 @@ const App: React.FC = () => {
             <div className="border-4 md:border-8 border-white p-1 md:p-2 bg-slate-900 shadow-[6px_6px_0_#000] mb-4">
                <Avatar role={selectedRole!} size="lg" animate={true} />
             </div>
-            <div className="pixel-font text-blue-400 text-lg md:text-xl uppercase tracking-widest font-black leading-none">{selectedRole}</div>
+            <div className="pixel-font text-blue-400 text-lg md:text-xl uppercase tracking-widest font-black leading-none">{playerName}</div>
             <div className="mt-2 text-green-500 pixel-font text-[8px] font-black uppercase tracking-widest animate-pulse">
                RANK: {difficulty === DifficultyLevel.HARD ? 'SRE_OVERLORD' : difficulty === DifficultyLevel.NORMAL ? 'CDL_EXPERT' : 'FOUNDATIONAL_CLOUD'}
             </div>

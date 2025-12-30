@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { soundService } from '../services/soundService';
 import { DifficultyLevel } from '../types';
@@ -104,7 +105,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
   const [isActive, setIsActive] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [score, setScore] = useState(0);
-  const [gameTime, setGameTime] = useState(45); // Increased base time for clarity
+  const [gameTime, setGameTime] = useState(45);
   
   const [subState, setSubState] = useState<any>({
     items: [],
@@ -159,7 +160,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
       }, 1000);
 
       if (['TRIAGE', 'SHOOTER', 'FIREWALL'].includes(mission.type)) {
-        // Slower spawn rate for better reaction
         spawnRef.current = setInterval(() => {
           const newItem = generateItem();
           if (newItem) {
@@ -167,7 +167,6 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
           }
         }, 1800 / diffSetting.speedMultiplier);
 
-        // Much slower physics for playability
         physicsRef.current = setInterval(() => {
           setSubState((s: any) => {
             const updated = s.items.map((i: any) => ({ 
@@ -235,28 +234,22 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
     setSubState((s: any) => ({ ...s, items: s.items.filter((i: any) => i.id !== id) }));
   };
 
-  // ---------------- RENDERERS ----------------
-
   const renderTriage = () => (
     <div className="relative h-full w-full flex flex-col justify-between bg-[#0a0a0c]">
       <div className="flex-1 relative">
         {subState.items.map((i: any) => (
-          <div 
-            key={i.id} 
-            className="absolute p-4 border-2 border-white bg-black pixel-font text-[10px] text-white shadow-[4px_4px_0_#000]"
-            style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}
-          >
+          <div key={i.id} className="absolute p-4 border-2 border-white bg-black pixel-font text-[10px] text-white shadow-[4px_4px_0_#000]" style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}>
             <div className="mb-4 text-center font-black">{i.label}</div>
             <div className="flex gap-2">
-              <button onClick={() => handleTriage(i.id, 'PROVIDER')} className="bg-blue-600 px-3 py-2 border-2 border-white hover:bg-white hover:text-blue-600 transition-colors">GOOGLE</button>
-              <button onClick={() => handleTriage(i.id, 'CUSTOMER')} className="bg-green-600 px-3 py-2 border-2 border-white hover:bg-white hover:text-green-600 transition-colors">YOU</button>
+              <button onClick={() => handleTriage(i.id, 'PROVIDER')} className="bg-blue-600 px-3 py-2 border-2 border-white hover:bg-white hover:text-blue-600">GOOGLE</button>
+              <button onClick={() => handleTriage(i.id, 'CUSTOMER')} className="bg-green-600 px-3 py-2 border-2 border-white hover:bg-white hover:text-green-600">YOU</button>
             </div>
           </div>
         ))}
       </div>
       <div className="h-20 flex border-t-4 border-white pixel-font">
-        <div className="flex-1 bg-blue-900/60 flex items-center justify-center text-[12px] text-blue-200 border-r-2 border-white">PROVIDER RESPONSIBILITY</div>
-        <div className="flex-1 bg-green-900/60 flex items-center justify-center text-[12px] text-green-200">CUSTOMER RESPONSIBILITY</div>
+        <div className="flex-1 bg-blue-900/60 flex items-center justify-center text-[12px] text-blue-200 border-r-2 border-white">PROVIDER</div>
+        <div className="flex-1 bg-green-900/60 flex items-center justify-center text-[12px] text-green-200">CUSTOMER</div>
       </div>
     </div>
   );
@@ -271,18 +264,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl">
           {mission.silos.map((s: string) => (
-            <button 
-              key={s} 
-              onClick={() => {
-                if (s === prompt.a) {
-                  updateScore(120);
-                  setSubState((prev: any) => ({ ...prev, index: prev.index + 1 }));
-                } else {
-                  updateScore(-60);
-                }
-              }}
-              className="pixel-box bg-slate-900 border-4 border-white p-6 text-white pixel-font text-[10px] hover:scale-105 hover:bg-blue-600 transition-all flex flex-col items-center gap-3"
-            >
+            <button key={s} onClick={() => { if (s === prompt.a) { updateScore(120); setSubState((prev: any) => ({ ...prev, index: prev.index + 1 })); } else { updateScore(-60); } }} className="pixel-box bg-slate-900 border-4 border-white p-6 text-white pixel-font text-[10px] hover:scale-105 hover:bg-blue-600 transition-all flex flex-col items-center gap-3">
               <span className="text-4xl">🗄️</span>
               <span className="font-black">{s.toUpperCase()}</span>
             </button>
@@ -300,25 +282,13 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
            <div className="text-8xl animate-pixel-float">👤</div>
            <div className="pixel-box bg-black border-4 border-white p-8 flex-1 relative shadow-[8px_8px_0_#000]">
              <div className="absolute -left-4 top-6 w-6 h-6 bg-black border-l-4 border-t-4 border-white rotate-[-45deg]" />
-             <div className="text-blue-400 pixel-font text-[10px] mb-3 font-black">USER_STORY_ID_{subState.index + 1}:</div>
-             <p className="text-white pixel-font text-sm uppercase leading-relaxed font-black">"{req.q}"</p>
+             <div className="text-blue-400 pixel-font text-[10px] mb-3 font-black">USER_STORY_{subState.index + 1}:</div>
+             <p className="text-white pixel-font text-sm uppercase font-black">"{req.q}"</p>
            </div>
         </div>
         <div className="flex flex-col gap-4 w-full max-w-2xl">
           {mission.paths.map((p: any) => (
-            <button 
-              key={p.id}
-              onClick={() => {
-                if (p.id === req.a) {
-                  updateScore(150);
-                  setSubState((prev: any) => ({ ...prev, index: prev.index + 1, feedback: req.detail }));
-                  setTimeout(() => setSubState((prev: any) => ({ ...prev, feedback: null })), 2500);
-                } else {
-                  updateScore(-70);
-                }
-              }}
-              className="pixel-button bg-[#111] border-4 border-white p-6 text-white flex justify-between items-center group hover:bg-yellow-500 hover:text-black transition-colors"
-            >
+            <button key={p.id} onClick={() => { if (p.id === req.a) { updateScore(150); setSubState((prev: any) => ({ ...prev, index: prev.index + 1, feedback: req.detail })); setTimeout(() => setSubState((prev: any) => ({ ...prev, feedback: null })), 2500); } else { updateScore(-70); } }} className="pixel-button bg-[#111] border-4 border-white p-6 text-white flex justify-between items-center group hover:bg-yellow-500 hover:text-black">
               <div className="flex flex-col items-start text-left">
                 <span className="pixel-font text-sm mb-1 font-black">{p.label}</span>
                 <span className="pixel-font text-[8px] opacity-70 font-black">{p.cost}</span>
@@ -328,8 +298,8 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
           ))}
         </div>
         {subState.feedback && (
-          <div className="text-green-500 pixel-font text-[12px] animate-bounce font-black bg-black px-4 py-2 border-2 border-green-500 shadow-[4px_4px_0_#000]">
-             PATH_OPTIMIZED: {subState.feedback}
+          <div className="text-green-500 pixel-font text-[12px] animate-bounce font-black bg-black px-4 py-2 border-2 border-green-500">
+             PATH: {subState.feedback}
           </div>
         )}
       </div>
@@ -338,111 +308,67 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
 
   const renderShooter = () => (
     <div className="relative h-full w-full bg-[#0a0a12] overflow-hidden">
-      <div className="absolute inset-0 opacity-10 pixel-grid" />
-      
       {subState.items.map((i: any) => (
-        <button 
-          key={i.id}
-          onClick={() => handleShoot(i.id)}
-          className={`absolute p-5 border-4 border-white pixel-font text-[10px] text-white flex flex-col items-center gap-3 transition-transform hover:scale-110 shadow-[6px_6px_0_#000] ${
-            subState.weapon === i.weak ? 'bg-red-800 animate-pulse' : 'bg-slate-800'
-          }`}
-          style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}
-        >
+        <button key={i.id} onClick={() => handleShoot(i.id)} className={`absolute p-5 border-4 border-white pixel-font text-[10px] text-white flex flex-col items-center gap-3 shadow-[6px_6px_0_#000] ${subState.weapon === i.weak ? 'bg-red-800' : 'bg-slate-800'}`} style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}>
           <span className="text-4xl">👾</span>
           <span className="font-black">{i.label}</span>
         </button>
       ))}
-
-      <div className="absolute bottom-10 left-0 right-0 px-10 flex flex-col items-center pointer-events-none">
-        <div className="flex gap-6 mb-6 pointer-events-auto">
+      <div className="absolute bottom-10 left-0 right-0 px-10 flex flex-col items-center">
+        <div className="flex gap-6 mb-6">
           {mission.weapons.map((w: any) => (
-            <button 
-              key={w.id}
-              onClick={() => { setSubState((s:any)=>({...s, weapon: w.id})); soundService.playClick(); }}
-              className={`pixel-box border-4 p-4 transition-all shadow-[6px_6px_0_#000] ${
-                subState.weapon === w.id ? 'bg-white text-black -translate-y-4 scale-110' : 'bg-black text-white'
-              }`}
-            >
+            <button key={w.id} onClick={() => { setSubState((s:any)=>({...s, weapon: w.id})); soundService.playClick(); }} className={`pixel-box border-4 p-4 ${subState.weapon === w.id ? 'bg-white text-black -translate-y-4' : 'bg-black text-white'}`}>
               <div className="text-[12px] pixel-font mb-2 font-black">[{w.key}]</div>
-              <div className="text-[10px] pixel-font font-black mb-1">{w.id}</div>
-              <div className="text-[6px] pixel-font opacity-60 font-black">{w.desc}</div>
+              <div className="text-[10px] pixel-font font-black">{w.id}</div>
             </button>
           ))}
         </div>
-        <div className="w-20 h-20 relative animate-pixel-float">
-          <div className={`w-full h-full border-4 border-white ${mission.weapons.find((w:any)=>w.id === subState.weapon)?.color} shadow-[0_0_20px_#fff]`} />
-          <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-2 h-16 bg-white/60 animate-ping" />
-        </div>
+        <div className={`w-20 h-20 border-4 border-white ${mission.weapons.find((w:any)=>w.id === subState.weapon)?.color}`} />
       </div>
     </div>
   );
 
   const renderFirewall = () => (
     <div className="relative h-full w-full bg-[#0a0c0a] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-y-0 left-1/2 w-1 bg-white/20 border-l-2 border-dashed border-white/40" />
+      {/* Redesigned Firewall UI: Status info moved to a compact header to avoid blocking the view */}
+      <div className="absolute top-16 left-0 right-0 z-10 flex justify-center">
+        <div className="pixel-box border-4 border-white p-3 bg-black/80 flex items-center gap-4 shadow-[8px_8px_0_#000]">
+           <div className="text-2xl animate-pulse">🛡️</div>
+           <div className="flex flex-col">
+              <div className="pixel-font text-[10px] text-white font-black uppercase tracking-tighter">FIREWALL_ACTIVE</div>
+              <div className="text-[6px] pixel-font text-blue-400 font-black">INTERCEPTING_INTRUSIONS...</div>
+           </div>
+        </div>
+      </div>
+
+      <div className="absolute inset-y-0 left-1/2 w-1 bg-white/10 border-l-2 border-dashed border-white/40" />
+      
       {subState.items.map((i: any) => (
-        <div 
-          key={i.id}
-          className="absolute flex flex-col items-center gap-3 animate-in fade-in zoom-in-50 duration-300"
-          style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}
-        >
-          <div className="pixel-box bg-black border-4 border-white p-3 text-white pixel-font text-[10px] font-black shadow-[4px_4px_0_#000]">
-            {i.label}
-          </div>
+        <div key={i.id} className="absolute flex flex-col items-center gap-3 animate-in fade-in duration-300" style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}>
+          <div className="pixel-box bg-black border-4 border-white p-3 text-white pixel-font text-[10px] font-black shadow-[4px_4px_0_#000]">{i.label}</div>
           <div className="flex gap-3">
             <button onClick={() => handleFirewall(i.id, true)} className="bg-green-600 px-4 py-2 border-2 border-white pixel-font text-[10px] text-white hover:bg-white hover:text-green-600 transition-colors font-black shadow-[2px_2px_0_#000]">ALLOW</button>
             <button onClick={() => handleFirewall(i.id, false)} className="bg-red-600 px-4 py-2 border-2 border-white pixel-font text-[10px] text-white hover:bg-white hover:text-red-600 transition-colors font-black shadow-[2px_2px_0_#000]">DENY</button>
           </div>
         </div>
       ))}
-      <div className="pixel-box border-8 border-white p-10 bg-black/90 z-10 flex flex-col items-center shadow-[16px_16px_0_#000]">
-         <div className="text-6xl mb-6">🛡️</div>
-         <div className="pixel-font text-[14px] text-white animate-pulse font-black tracking-[0.2em]">ARMOR_SHIELD_ACTIVE</div>
-         <div className="mt-4 text-[8px] pixel-font text-blue-400 font-black">INTERCEPTING_INTRUSIONS...</div>
-      </div>
     </div>
   );
 
   const renderStacker = () => (
     <div className="flex flex-col items-center justify-center h-full p-12 gap-12 bg-[#0c080c]">
-      <div className="flex flex-col-reverse gap-4 w-80 border-b-8 border-white pb-4 min-h-[320px] justify-start items-center">
+      <div className="flex flex-col-reverse gap-4 w-80 border-b-8 border-white pb-4 min-h-[320px] items-center">
         {subState.stack.map((s: string, idx: number) => (
-          <div key={idx} className="w-full bg-blue-700 border-4 border-white p-5 text-white pixel-font text-[12px] text-center shadow-[8px_8px_0_#000] animate-in slide-in-from-top-4 font-black">
-            {s.toUpperCase()}
-          </div>
+          <div key={idx} className="w-full bg-blue-700 border-4 border-white p-5 text-white pixel-font text-[12px] text-center shadow-[8px_8px_0_#000] font-black">{s.toUpperCase()}</div>
         ))}
         {subState.stack.length === 0 && (
           <div className="text-white/20 pixel-font text-[10px] font-black uppercase mb-10">PLACE_ROOT_HERE</div>
         )}
       </div>
-      
       <div className="flex flex-wrap justify-center gap-6">
         {mission.layers.filter((l: string) => !subState.stack.includes(l)).map((l: string) => (
-          <button 
-            key={l}
-            onClick={() => {
-              const nextIndex = subState.stack.length;
-              if (l === mission.layers[nextIndex]) {
-                const newStack = [...subState.stack, l];
-                setSubState((s: any) => ({ ...s, stack: newStack }));
-                updateScore(150);
-                if (newStack.length === mission.layers.length) {
-                  setTimeout(handleWin, 1000);
-                }
-              } else {
-                updateScore(-70);
-              }
-            }}
-            className="pixel-button bg-slate-900 border-4 border-white p-5 text-white pixel-font text-[10px] hover:bg-white hover:text-black transition-all font-black shadow-[6px_6px_0_#000]"
-          >
-            {l}
-          </button>
+          <button key={l} onClick={() => { const nextIndex = subState.stack.length; if (l === mission.layers[nextIndex]) { const newStack = [...subState.stack, l]; setSubState((s: any) => ({ ...s, stack: newStack })); updateScore(150); if (newStack.length === mission.layers.length) { setTimeout(handleWin, 1000); } } else { updateScore(-70); } }} className="pixel-button bg-slate-900 border-4 border-white p-5 text-white pixel-font text-[10px] hover:invert font-black shadow-[6px_6px_0_#000]">{l}</button>
         ))}
-      </div>
-
-      <div className="text-slate-400 pixel-font text-[10px] animate-pulse font-black uppercase tracking-widest">
-        HIERARCHY_REMAINING: {mission.layers.length - subState.stack.length}
       </div>
     </div>
   );
@@ -462,37 +388,23 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
   return (
     <div className="relative w-full aspect-video bg-[#050505] border-4 border-blue-900 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none z-50 opacity-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
-
       {!isActive ? (
         <div className="absolute inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-12 text-center">
-          <div className="mb-2 text-yellow-500 pixel-font text-[12px] font-black uppercase tracking-widest">SYSTEM_INIT_LEVEL_{levelId}</div>
           <h2 className="pixel-font text-blue-500 text-4xl mb-6 font-black uppercase">{mission.name.replace(/_/g, ' ')}</h2>
-          <div className="w-32 h-2 border-b-4 border-blue-500 mb-10" />
-          <p className="pixel-font text-white text-[12px] mb-12 max-w-2xl leading-relaxed uppercase tracking-normal font-black bg-blue-950/30 p-8 border-2 border-blue-900 shadow-inner">
-             {mission.instructions}
-          </p>
-          <button 
-            onClick={() => { setIsActive(true); soundService.playPowerUp(); }} 
-            className="pixel-button bg-white text-black px-16 py-6 hover:bg-blue-600 hover:text-white transition-all shadow-[10px_10px_0_#000] text-2xl font-black"
-          >
-            START_CHALLENGE
-          </button>
+          <p className="pixel-font text-white text-[12px] mb-12 max-w-2xl font-black bg-blue-950/30 p-8 border-2 border-blue-900">{mission.instructions}</p>
+          <button onClick={() => { setIsActive(true); soundService.playPowerUp(); }} className="pixel-button bg-white text-black px-16 py-6 text-2xl font-black">START_CHALLENGE</button>
         </div>
       ) : isSuccess ? (
-        <div className="absolute inset-0 z-[200] bg-blue-700 flex flex-col items-center justify-center animate-in fade-in duration-500">
-           <div className="pixel-font text-white text-6xl mb-6 animate-bounce font-black tracking-widest">SYNC_COMPLETE!</div>
-           <div className="pixel-font text-white text-lg opacity-80 tracking-[0.3em] uppercase font-black">CHAPTER {levelId} KNOWLEDGE INTEGRATED</div>
-           <div className="mt-16 w-80 h-4 bg-white/20 border-4 border-white relative overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-             <div className="h-full bg-white animate-[progress_2s_linear] shadow-[0_0_25px_white]" style={{width: '100%'}} />
-           </div>
+        <div className="absolute inset-0 z-[200] bg-blue-700 flex flex-col items-center justify-center">
+           <div className="pixel-font text-white text-6xl mb-6 animate-bounce font-black">SYNC_COMPLETE!</div>
+           <div className="pixel-font text-white text-lg font-black uppercase">CHAPTER {levelId} INTEGRATED</div>
+           <div className="mt-16 w-80 h-4 bg-white/20 border-4 border-white"><div className="h-full bg-white animate-[progress_2s_linear]" style={{width: '100%'}} /></div>
         </div>
       ) : (
         <>
           <div className="absolute top-6 left-6 right-6 flex justify-between pixel-font text-[12px] z-[100] pointer-events-none">
-            <div className="bg-black border-4 border-white p-3 text-white shadow-[6px_6px_0_#000] font-black">CREDITS: {score} / 400</div>
-            <div className={`bg-black border-4 p-3 shadow-[6px_6px_0_#000] font-black ${gameTime < 10 ? 'border-red-500 text-red-500 animate-pulse' : 'border-white text-white'}`}>
-              TIME_REMAINING: {gameTime}S
-            </div>
+            <div className="bg-black border-4 border-white p-3 text-white shadow-[6px_6px_0_#000] font-black">SCORE: {score} / 400</div>
+            <div className={`bg-black border-4 p-3 shadow-[6px_6px_0_#000] font-black ${gameTime < 10 ? 'border-red-500 text-red-500 animate-pulse' : 'border-white text-white'}`}>TIME: {gameTime}S</div>
           </div>
           {renderCurrentGame()}
         </>

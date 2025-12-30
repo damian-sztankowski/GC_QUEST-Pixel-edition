@@ -121,9 +121,11 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
     
     if (correct) {
       const reward = Math.floor(100 * diffSetting.scoreMultiplier);
+      const timeBonus = diffSetting.timeBonus || 0;
       setScore(prev => prev + reward);
+      setTimeLeft(prev => Math.min(maxTime, prev + timeBonus));
       soundService.playCorrect();
-      notificationService.notify('CORRECT', `+${reward}_CREDITS_RESTORED`, 'SUCCESS');
+      notificationService.notify('CORRECT', `+${reward}_CREDITS | +${timeBonus}S_STABILITY`, 'SUCCESS');
     } else {
       soundService.playIncorrect();
       notificationService.notify('BREACH', 'SYSTEM_STABILITY_DECREASED', 'ERROR');
@@ -178,7 +180,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
         <div className="pixel-box p-3 flex items-center space-x-3 bg-[#111] border-2">
           <Avatar role={role} size="sm" animate={false} />
           <div className="pixel-font leading-none truncate">
-            <div className="text-[8px] text-slate-400 uppercase font-black">USER</div>
+            <div className="text-[8px] text-slate-400 uppercase font-black">DIFFICULTY</div>
             <div className="text-[10px] text-blue-400 font-bold truncate">{diffSetting.label}</div>
           </div>
         </div>

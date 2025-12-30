@@ -16,18 +16,21 @@ export const DIFFICULTY_SETTINGS = {
     timeMultiplier: 1.5,
     scoreMultiplier: 0.75,
     speedMultiplier: 0.7,
+    timeBonus: 15,
     label: 'JUNIOR_ADMIN'
   },
   [DifficultyLevel.NORMAL]: {
     timeMultiplier: 1.0,
     scoreMultiplier: 1.0,
     speedMultiplier: 1.0,
+    timeBonus: 8,
     label: 'CLOUD_ARCHITECT'
   },
   [DifficultyLevel.HARD]: {
     timeMultiplier: 0.6,
     scoreMultiplier: 2.0,
     speedMultiplier: 1.5,
+    timeBonus: 4,
     label: 'SRE_LEGEND'
   }
 };
