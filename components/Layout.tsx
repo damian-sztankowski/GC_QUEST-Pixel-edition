@@ -94,7 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
       </main>
 
       <footer className="w-full max-w-7xl px-4 py-2 border-t-2 border-white bg-black text-center text-slate-500 text-[10px] pixel-font tracking-widest relative z-20">
-        (C) 2025 Built with <span style={{ color: 'red' }}>&hearts;</span> for Google Cloud Community  // V_BIT.01
+        (C) 2025 BUILT WITH <span style={{ color: 'red' }}>&hearts;</span> for GOOGLE CLOUD COMMUNITY // V_BIT.01
       </footer>
     </div>
   );

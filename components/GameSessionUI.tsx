@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CloudRole, Level, Question, GameState, DifficultyLevel } from '../types';
+import { CloudRole, Level, Question, DifficultyLevel } from '../types';
 import { generateQuestion, getGeminiFeedback, generateHint } from '../services/geminiService';
 import { LEVELS, DIFFICULTY_SETTINGS } from '../constants';
 import Avatar from './Avatar';
@@ -11,6 +11,7 @@ import ChapterMap from './ChapterMap';
 interface GameSessionUIProps {
   role: CloudRole;
   difficulty: DifficultyLevel;
+  playerName: string;
   onGameEnd: (score: number) => void;
   initialLevelIdx?: number;
 }
@@ -20,7 +21,7 @@ const HINT_COST = 25;
 const SKIP_COST = 150;
 const BASE_MAX_TIME = 1200;
 
-const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameEnd, initialLevelIdx = 0 }) => {
+const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerName, onGameEnd, initialLevelIdx = 0 }) => {
   const diffSetting = DIFFICULTY_SETTINGS[difficulty];
   const maxTime = Math.floor(BASE_MAX_TIME * diffSetting.timeMultiplier);
   
@@ -174,16 +175,18 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
   const stageProgressPercentage = (currentQuestionInLevel / QUESTIONS_PER_LEVEL) * 100;
 
   return (
-    <div className="game-viewport px-4 pb-8 space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="flex-1 w-full max-w-7xl flex flex-col px-4 pb-8 space-y-4">
+      {/* Top Stats Bar */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
+        {/* Nickname Box */}
         <div className="pixel-box p-3 flex items-center space-x-4 bg-[#111] border-2">
           <div className="shrink-0 border-2 border-slate-700 bg-black p-0.5 shadow-[2px_2px_0_#000]">
             <Avatar role={role} size="sm" animate={false} />
           </div>
-          <div className="pixel-font leading-none flex flex-col justify-between h-full py-0.5">
+          <div className="pixel-font leading-none flex flex-col justify-between h-full py-0.5 overflow-hidden">
             <div>
-              <div className="text-[6px] text-yellow-500 uppercase font-black mb-1">HERO_UNIT</div>
-              <div className="text-[8px] text-white font-bold tracking-tight">SYS_CDL_v1.0</div>
+              <div className="text-[6px] text-yellow-500 uppercase font-black mb-1">USER_NICKNAME</div>
+              <div className="text-[10px] text-white font-bold tracking-tight uppercase break-all">{playerName}</div>
             </div>
             <div className="border-t border-slate-800 pt-2 mt-1">
               <div className="text-[6px] text-slate-400 uppercase font-black mb-1">DIFFICULTY</div>
@@ -192,6 +195,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
           </div>
         </div>
         
+        {/* Progress Box */}
         <button 
           onClick={() => setMode(mode === 'MAP' ? 'QUESTION' : 'MAP')}
           className={`pixel-box p-3 pixel-font transition-all text-left border-2 ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
@@ -208,6 +212,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
           </div>
         </button>
 
+        {/* Stability Box */}
         <div className="pixel-box p-3 pixel-font bg-[#200] border-red-500 border-2 leading-none flex flex-col items-center justify-center">
           <div className="w-full flex justify-between items-center mb-2 px-1">
             <div className="text-[8px] text-red-300 uppercase font-black">STABILITY</div>
@@ -223,24 +228,26 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
           </div>
         </div>
 
+        {/* Credits Box */}
         <div className="pixel-box p-3 pixel-font bg-[#002] border-blue-500 border-2 leading-none flex flex-col items-center justify-center">
           <div className="w-full text-left mb-1 px-1">
             <div className="text-[8px] text-blue-300 uppercase font-black">CREDITS</div>
           </div>
-          <div className="text-lg md:text-xl text-white font-bold tracking-widest">{score.toString().padStart(6, '0')}</div>
+          <div className="text-2xl text-white font-bold tracking-widest">{score.toString().padStart(6, '0')}</div>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      {/* Main Game Content */}
+      <div className="flex-1 flex flex-col min-h-0">
         {loading && mode === 'QUESTION' ? (
-          <div className="flex flex-col items-center justify-center h-full min-h-[400px] pixel-font text-center">
+          <div className="flex flex-col items-center justify-center h-full pixel-font text-center bg-black/50 border-8 border-white">
             <div className="w-16 h-16 border-8 border-white border-t-blue-500 animate-spin mb-6 shadow-[8px_8px_0_#000]"></div>
             <p className="text-lg animate-pulse text-white uppercase font-black">Syncing_Chapter_Nodes...</p>
           </div>
         ) : mode === 'MAP' ? (
-          <div className="animate-in zoom-in duration-300 h-full overflow-y-auto">
-             <div className="pixel-box border-4 p-8 bg-black">
-                <h2 className="text-2xl md:text-4xl pixel-font text-white mb-8 text-center font-black">CLOUD_MAP</h2>
+          <div className="animate-in zoom-in duration-300 flex-1 overflow-y-auto">
+             <div className="pixel-box border-8 p-8 bg-black h-full">
+                <h2 className="text-4xl pixel-font text-white mb-8 text-center font-black">CLOUD_MAP</h2>
                 <ChapterMap currentLevelIdx={currentLevelIdx} />
                 <div className="mt-12 flex justify-center">
                    <button 
@@ -253,48 +260,48 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
              </div>
           </div>
         ) : mode === 'PUZZLE' ? (
-          <div className="animate-in zoom-in duration-300 h-full flex flex-col">
+          <div className="animate-in zoom-in duration-300 flex-1 flex flex-col">
             <PuzzleStage levelId={level.id} difficulty={difficulty} onComplete={handlePuzzleComplete} />
           </div>
         ) : (
-          <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] flex flex-col h-full min-h-[500px] shadow-[12px_12px_0_#000]">
+          <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] flex flex-col flex-1 shadow-[12px_12px_0_#000]">
             <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black shrink-0">
               <div className="flex items-center space-x-3">
                  <span className="w-3 h-3 bg-blue-500 border-2 border-black blinking"></span>
-                 <span className="text-xs md:text-sm uppercase font-black tracking-tight">{level.title.toUpperCase()}</span>
+                 <span className="text-sm uppercase font-black tracking-tight">{level.title.toUpperCase()}</span>
               </div>
-              <span className="text-[9px] bg-black text-white px-3 py-1 border-2 border-black font-black uppercase">
+              <span className="text-[10px] bg-black text-white px-3 py-1 border-2 border-black font-black uppercase">
                  SECTION {currentLevelIdx + 1}
               </span>
             </div>
 
-            <div className="p-6 md:p-10 space-y-8 flex-1 overflow-y-auto">
-              <div className="relative">
-                 <div className="p-6 md:p-10 border-4 border-white bg-[#111] text-lg md:text-2xl leading-relaxed text-white mono-font flex flex-col space-y-4 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
-                    <div className="flex items-start space-x-4">
-                      <span className="text-blue-500 shrink-0 select-none animate-pulse text-2xl">>>></span>
-                      <p className="text-white uppercase font-black text-base md:text-lg lg:text-xl tracking-wide">{question?.text}</p>
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col space-y-6">
+              <div className="shrink-0">
+                 <div className="p-8 md:p-12 border-4 border-white bg-[#111] text-lg leading-relaxed text-white mono-font flex flex-col space-y-4 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                    <div className="flex items-start space-x-6">
+                      <span className="text-blue-500 shrink-0 select-none animate-pulse text-3xl md:text-4xl">>>></span>
+                      <p className="text-white uppercase font-black text-xl md:text-3xl tracking-tight leading-tight">{question?.text}</p>
                     </div>
                     
                     {hint && (
-                      <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-4 animate-in slide-in-from-top-2 duration-300">
+                      <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-2 animate-in slide-in-from-top-2 duration-300">
                         <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black uppercase">ANALYZER_HINT:</div>
-                        <p className="text-purple-300 text-sm md:text-lg uppercase italic font-bold">"{hint}"</p>
+                        <p className="text-purple-300 text-sm md:text-xl uppercase italic font-bold">"{hint}"</p>
                       </div>
                     )}
                  </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
                 {question?.options.map((opt, idx) => {
-                  let btnClass = "pixel-button p-5 md:p-8 pixel-font text-left flex items-start space-x-4 border-4 transition-all duration-75 ";
+                  let btnClass = "pixel-button p-6 md:p-8 pixel-font text-left flex items-start space-x-6 border-4 transition-all duration-75 h-full ";
                   
                   if (selectedOption === null) {
-                    btnClass += "text-white bg-[#222] border-white hover:bg-[#333] hover:scale-[1.02] shadow-[6px_6px_0_#000]";
+                    btnClass += "text-white bg-[#222] border-white hover:bg-[#333] hover:scale-[1.01] shadow-[4px_4px_0_#000]";
                   } else if (idx === question.correctIndex) {
-                    btnClass += "bg-green-800 border-green-400 text-white scale-[1.05] z-10 shadow-[8px_8px_0_#000]";
+                    btnClass += "bg-green-800 border-green-400 text-white scale-[1.02] z-10 shadow-[6px_6px_0_#000]";
                   } else if (idx === selectedOption) {
-                    btnClass += "bg-red-800 border-red-400 text-white shadow-[6px_6px_0_#000]";
+                    btnClass += "bg-red-800 border-red-400 text-white shadow-[4px_4px_0_#000]";
                   } else {
                     btnClass += "bg-black opacity-30 text-slate-600 grayscale border-slate-800 shadow-none";
                   }
@@ -306,42 +313,42 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
                       onClick={(e) => { e.stopPropagation(); handleAnswer(idx); }}
                       className={btnClass}
                     >
-                      <span className="shrink-0 text-xs md:text-sm text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
-                      <span className="text-[9px] md:text-[11px] lg:text-xs leading-tight uppercase font-black">{opt}</span>
+                      <span className="shrink-0 text-base md:text-lg text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
+                      <span className="text-xs md:text-sm leading-snug uppercase font-black">{opt}</span>
                     </button>
                   );
                 })}
               </div>
 
-              <div className="min-h-[120px]">
+              <div className="shrink-0 pt-4">
                 {feedback ? (
-                  <div className={`p-6 border-4 flex items-start space-x-4 bg-black shadow-[8px_8px_0_#000] animate-in slide-in-from-bottom-4 duration-300 ${
+                  <div className={`p-8 border-4 flex flex-col space-y-6 bg-black shadow-[8px_8px_0_#000] animate-in slide-in-from-bottom-4 duration-300 ${
                     selectedOption === question?.correctIndex ? 'border-green-500' : 'border-red-500'
                   }`}>
-                    <div className="pixel-font flex-1">
-                      <div className={`text-[9px] mb-2 font-black uppercase ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className="pixel-font">
+                      <div className={`text-[10px] mb-3 font-black uppercase ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
                          [ ANALYZER_FEEDBACK ]
                       </div>
-                      <div className="text-xs md:text-sm text-white leading-relaxed uppercase font-black">
+                      <div className="text-sm md:text-base text-white leading-relaxed uppercase font-black">
                         {feedback}
                       </div>
-                      <div className="mt-6 flex justify-end">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); nextStep(); }}
-                          className="pixel-button bg-yellow-500 text-black px-12 py-4 pixel-font text-[10px] font-black uppercase shadow-[6px_6px_0_#000] hover:scale-105 active:scale-95"
-                        >
-                          {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "CONTINUE_QUEST" : "FINALIZE_CHAPTER"}
-                        </button>
-                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); nextStep(); }}
+                        className="pixel-button bg-yellow-500 text-black px-12 py-4 pixel-font text-[12px] font-black uppercase shadow-[6px_6px_0_#000] hover:scale-105 active:scale-95"
+                      >
+                        {currentQuestionInLevel < QUESTIONS_PER_LEVEL ? "CONTINUE_QUEST" : "FINALIZE_CHAPTER"}
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex justify-between items-center py-4 px-2">
-                    <div className="flex space-x-4">
+                  <div className="flex justify-between items-center py-4 px-2 border-t-2 border-white/10">
+                    <div className="flex space-x-6">
                         <button 
                           onClick={handleRequestHint}
                           disabled={score < HINT_COST || !!hint || isHintLoading || selectedOption !== null}
-                          className={`pixel-button px-6 py-2 text-[9px] pixel-font font-black transition-all border-2 shadow-[4px_4px_0_#000] ${
+                          className={`pixel-button px-8 py-3 text-[10px] pixel-font font-black transition-all border-2 shadow-[4px_4px_0_#000] ${
                             (score < HINT_COST && !hint) || selectedOption !== null 
                             ? 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed grayscale' 
                             : 'bg-purple-700 text-white hover:bg-purple-600 border-white'
@@ -352,7 +359,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
                         <button 
                           onClick={handleSkipQuestion}
                           disabled={score < SKIP_COST || selectedOption !== null}
-                          className={`pixel-button px-6 py-2 text-[9px] pixel-font font-black transition-all border-2 shadow-[4px_4px_0_#000] ${
+                          className={`pixel-button px-8 py-3 text-[10px] pixel-font font-black transition-all border-2 shadow-[4px_4px_0_#000] ${
                             (score < SKIP_COST) || selectedOption !== null 
                             ? 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed grayscale' 
                             : 'bg-red-700 text-white hover:bg-red-600 border-white'
@@ -362,7 +369,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
                         </button>
                     </div>
                     
-                    <div className="hidden md:block text-[8px] text-slate-500 pixel-font uppercase font-bold animate-pulse">
+                    <div className="hidden md:block text-[10px] text-slate-500 pixel-font uppercase font-bold animate-pulse">
                       STATUS: MONITORING_USER_INPUT...
                     </div>
                   </div>
