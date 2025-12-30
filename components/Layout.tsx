@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
             <div className="w-3 h-3 bg-green-500 border-1 border-white"></div>
           </div>
           <h1 className="text-xl md:text-2xl font-black pixel-font tracking-tighter text-white">
-            GC_ESCAPE <span style={{ color: currentAccent }}>::BIT</span>
+            PIXEL_CLOUD:ESCAPE <span style={{ color: currentAccent }}>::GC EDITION</span>
           </h1>
         </div>
         
@@ -80,7 +80,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
           </div>
 
           <div className="hidden sm:flex flex-col items-end pixel-font leading-none">
-            <div className="text-[8px] text-yellow-500 mb-0.5 font-black uppercase">Foundational</div>
+            <div className="text-[8px] text-yellow-500 mb-0.5 font-black uppercase">Exam_ready</div>
             <div className="text-[10px] text-white bg-black px-1.5 border-2 border-white whitespace-nowrap">
               {activeRole ? `SYS: CDL` : 'STATUS: STBY'}
             </div>
