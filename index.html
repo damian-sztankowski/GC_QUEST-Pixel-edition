@@ -16,7 +16,7 @@
         }
         body {
             font-family: 'VT323', monospace;
-            background-color: #0c0c0c;
+            background-color: #050505;
             color: #ffffff;
             overflow-x: hidden;
             image-rendering: pixelated;
@@ -165,20 +165,64 @@
             to { opacity: 0; }
         }
 
-        .game-viewport {
-            width: 100%;
-            max-width: 1200px; /* Increased from 1000px */
-            margin: 0 auto;
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            min-height: 0;
+        /* CRT Monitor Simulation */
+        .monitor-bezel {
+            border: 32px solid #222;
+            border-radius: 12px;
+            box-shadow: 
+                0 0 0 4px #444,
+                0 0 50px rgba(0,0,0,0.9);
+            position: relative;
         }
         
-        .text-responsive-xl {
-            font-size: clamp(1.2rem, 6vw, 5rem);
+        @media (min-width: 1440px) {
+            .monitor-bezel::after {
+                content: "BIT_CORE_X1";
+                position: absolute;
+                bottom: -28px;
+                right: 20px;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 8px;
+                color: #555;
+            }
+        }
+
+        /* Specialized Title Styling from Screenshot */
+        .title-container {
+            border: 4px dashed #4285F4;
+            padding: 2.5rem 4rem;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .pixel-cloud-escape-text {
+            color: #ffffff;
+            text-shadow: 
+                6px 6px 0px #4285F4,
+                -1px -1px 0px #4285F4,
+                1px -1px 0px #4285F4,
+                -1px 1px 0px #4285F4,
+                1px 1px 0px #4285F4;
+            letter-spacing: -2px;
             line-height: 1.1;
+        }
+
+        .bit-challenge-banner {
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(rgba(251, 188, 5, 0.1) 50%, transparent 50%);
+            background-size: 100% 4px;
+            border-top: 3px solid #FBBC05;
+            border-bottom: 3px solid #FBBC05;
+            padding: 0.75rem 3rem;
+            box-shadow: 0 0 15px rgba(251, 188, 5, 0.3);
+        }
+
+        .bit-challenge-text {
+            color: #FBBC05;
+            letter-spacing: 0.3em;
+            text-shadow: 0 0 5px rgba(251, 188, 5, 0.8);
         }
 
         #root {
@@ -202,7 +246,6 @@
 <body>
     <div class="crt-overlay"></div>
     <div class="crt-flicker"></div>
-    <div class="scanline-move"></div>
     <div id="root"></div>
 </body>
 </html>

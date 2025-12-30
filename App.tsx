@@ -143,26 +143,33 @@ const App: React.FC = () => {
     <Layout activeRole={selectedRole}>
       <NotificationSystem />
       {gameState === GameState.HOME && (
-        <div className="relative w-full flex-1 flex flex-col items-center justify-center py-6 px-6 overflow-y-auto">
+        <div className="relative w-full flex-1 flex flex-col items-center justify-center py-6 px-6">
           <div className="relative z-10 flex flex-col items-center text-center max-w-5xl h-full justify-center">
             
-            <div className="mb-4 border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000]">
+            <div className="mb-8 border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000]">
                <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
             </div>
             
-            <div className="mb-6 relative">
-              <div className="absolute -top-10 -left-16 md:-left-32 text-4xl md:text-6xl opacity-20 animate-pixel-float">☁️</div>
-              <div className="absolute -bottom-4 -right-16 md:-right-32 text-4xl md:text-6xl opacity-20 animate-pixel-float" style={{ animationDelay: '1s' }}>☁️</div>
+            <div className="mb-12 relative flex flex-col items-center">
+              {/* Floating clouds for extra retro feel */}
+              <div className="absolute -top-12 -left-20 text-4xl opacity-30 animate-pixel-float">☁️</div>
+              <div className="absolute -bottom-6 -right-24 text-4xl opacity-30 animate-pixel-float" style={{ animationDelay: '1.2s' }}>☁️</div>
               
-              <h1 className="text-4xl md:text-7xl font-black pixel-font text-white mb-4 drop-shadow-[8px_8px_0_#4285F4] leading-tight uppercase tracking-tight">
-                PIXEL_CLOUD<br />ESCAPE
-              </h1>
-              <div className="text-sm md:text-lg pixel-font text-yellow-500 animate-pulse tracking-widest bg-blue-900/40 inline-block px-6 py-1.5 border-2 border-blue-500 font-black uppercase">
-                :: BIT_CHALLENGE ::
+              <div className="title-container animate-in zoom-in duration-700">
+                <h1 className="text-4xl md:text-7xl font-black pixel-font pixel-cloud-escape-text uppercase">
+                  PIXEL_CLOUD<br />
+                  <div className="mt-4">ESCAPE</div>
+                </h1>
+              </div>
+
+              <div className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500">
+                <div className="bit-challenge-text pixel-font text-xs md:text-sm font-black uppercase">
+                   :: BIT_CHALLENGE ::
+                </div>
               </div>
             </div>
             
-            <div className="mb-8 max-w-xl">
+            <div className="mb-12 max-w-xl">
               <div className="pixel-box p-6 bg-black/90 border-4">
                  <p className="mono-font text-xl md:text-2xl text-slate-200 leading-tight uppercase font-black">
                    COMPLETE_THE_6_STAGES_OF_CLOUDOM.<br/>
@@ -173,7 +180,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Codename Entry */}
-            <div className="mb-8 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
+            <div className="mb-10 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
                <h4 className="pixel-font text-[10px] text-blue-400 mb-3 font-black uppercase text-left">ENTER_CODENAME:</h4>
                <input 
                  type="text" 
