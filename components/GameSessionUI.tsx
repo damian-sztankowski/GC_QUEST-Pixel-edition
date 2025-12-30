@@ -180,12 +180,12 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
           <div className="shrink-0 border-2 border-slate-700 bg-black p-0.5 shadow-[2px_2px_0_#000]">
             <Avatar role={role} size="sm" animate={false} />
           </div>
-          <div className="pixel-font leading-none truncate flex flex-col space-y-2">
+          <div className="pixel-font leading-none flex flex-col justify-between h-full py-0.5">
             <div>
               <div className="text-[6px] text-yellow-500 uppercase font-black mb-1">HERO_UNIT</div>
-              <div className="text-[8px] text-white font-bold truncate">SYS_CDL_v1.0</div>
+              <div className="text-[8px] text-white font-bold tracking-tight">SYS_CDL_v1.0</div>
             </div>
-            <div className="border-t border-slate-800 pt-1.5">
+            <div className="border-t border-slate-800 pt-2 mt-1">
               <div className="text-[6px] text-slate-400 uppercase font-black mb-1">DIFFICULTY</div>
               <div className="text-[9px] text-blue-400 font-bold truncate">{diffSetting.label}</div>
             </div>
@@ -208,22 +208,26 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, onGameE
           </div>
         </button>
 
-        <div className="pixel-box p-3 pixel-font bg-[#200] border-red-500 border-2 leading-none">
-          <div className="flex justify-between items-center mb-1">
+        <div className="pixel-box p-3 pixel-font bg-[#200] border-red-500 border-2 leading-none flex flex-col items-center justify-center">
+          <div className="w-full flex justify-between items-center mb-2 px-1">
             <div className="text-[8px] text-red-300 uppercase font-black">STABILITY</div>
-            <div className="text-[10px] text-white font-bold">{formatTime(timeLeft)}</div>
+            <div className="text-[10px] text-white font-bold tracking-widest">{formatTime(timeLeft)}</div>
           </div>
-          <div className="pixel-progress-container h-2 border-[2px]">
-            <div 
-              className={`pixel-progress-bar ${timeLeft < (maxTime * 0.2) ? 'bg-red-500' : 'bg-green-500'}`} 
-              style={{ width: `${timePercentage}%` }} 
-            />
+          <div className="w-full px-1">
+            <div className="pixel-progress-container h-3 border-[2px] w-full">
+              <div 
+                className={`pixel-progress-bar ${timeLeft < (maxTime * 0.2) ? 'bg-red-500' : 'bg-green-500'}`} 
+                style={{ width: `${timePercentage}%` }} 
+              />
+            </div>
           </div>
         </div>
 
-        <div className="pixel-box p-3 pixel-font bg-[#002] border-blue-500 border-2 leading-none">
-          <div className="text-[8px] text-blue-300 mb-1 uppercase font-black">CREDITS</div>
-          <div className="text-lg md:text-xl text-white font-bold">{score.toString().padStart(6, '0')}</div>
+        <div className="pixel-box p-3 pixel-font bg-[#002] border-blue-500 border-2 leading-none flex flex-col items-center justify-center">
+          <div className="w-full text-left mb-1 px-1">
+            <div className="text-[8px] text-blue-300 uppercase font-black">CREDITS</div>
+          </div>
+          <div className="text-lg md:text-xl text-white font-bold tracking-widest">{score.toString().padStart(6, '0')}</div>
         </div>
       </div>
 

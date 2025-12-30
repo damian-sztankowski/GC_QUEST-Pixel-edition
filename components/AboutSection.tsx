@@ -51,25 +51,25 @@ const AboutSection: React.FC = () => {
           <h3 className="pixel-font text-red-400 text-xs mb-8 font-black">:: CREDITS_AND_TECH ::</h3>
           <div className="grid grid-cols-2 gap-x-8 gap-y-10 text-base font-black">
             <div>
-              <div className="text-slate-500 mb-2 text-xs">ENGINE:</div>
+              <div className="text-slate-500 mb-2 text-base">ENGINE:</div>
               <div className="text-white">REACT 19 + TAILWIND</div>
             </div>
             <div>
-              <div className="text-slate-500 mb-2 text-xs">BRAIN:</div>
+              <div className="text-slate-500 mb-2 text-base">BRAIN:</div>
               <div className="text-white">GEMINI 3 FLASH</div>
             </div>
             <div>
-              <div className="text-slate-500 mb-2 text-xs">AUTHOR:</div>
+              <div className="text-slate-500 mb-2 text-base">AUTHOR:</div>
               <div className="text-white">DAMIAN SZTANKOWSKI | GDE CLOUD</div>
             </div>
             <div>
-              <div className="text-slate-500 mb-2 text-xs">VERSION:</div>
+              <div className="text-slate-500 mb-2 text-base">VERSION:</div>
               <div className="text-white">1.0.5-PIXEL</div>
             </div>
           </div>
         </section>
 
-        <p className="text-center text-sm italic text-slate-500 mt-8">
+        <p className="text-center text-base italic text-slate-500 mt-8">
           "THE CLOUD IS NOT JUST INFRASTRUCTURE. IT IS AN OPPORTUNITY TO TRANSFORM."
         </p>
       </div>
