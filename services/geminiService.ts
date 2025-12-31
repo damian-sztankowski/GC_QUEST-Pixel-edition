@@ -6,18 +6,19 @@ import { CloudRole, Level, Question } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateQuestion = async (role: CloudRole, level: Level): Promise<Question> => {
-  const prompt = `Generate a Google Cloud certification-style question for a ${role} exam candidate.
+  const prompt = `You are an expert Google Cloud exam setter. Generate a Google Cloud certification-style question for a ${role} exam candidate.
   The question MUST be strictly derived from the official ${role} Exam Guide.
   
   CURRENT CHAPTER: "${level.topic}"
   SYLLABUS FOCUS: "${level.description}"
   
   Requirements:
-  1. Target foundational knowledge (Cloud Digital Leader level).
-  2. Use official terminology: Anthos, BigQuery, VPC, Cloud Run, CapEx, OpEx, TCO, SRE, Vertex AI.
+  1. Target knowledge from ${role}. Focus on high-level concepts and business value." 
+  2. **Terminology:** Strictly use official Google Cloud terminology from ${role}. 
   3. Frame the question for an escape room context (e.g., "The system requires a security configuration..." or "The business needs to migrate...").
   4. Ensure the explanation mentions the specific Google Cloud concept/best practice.
   5. The question must cover one of the sub-points mentioned in the focus text.
+  6. **Distractors:** The wrong answers must be PLAUSIBLE. Do not use made-up service names (e.g., "Google Cloud Box") unless testing for knowledge of real vs. fake services. Common misconceptions are best.
   
   Return JSON: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
 
@@ -50,7 +51,7 @@ export const getGeminiFeedback = async (role: CloudRole, question: string, userA
   The user just answered: "${userAnswer}" to the question: "${question}".
   Result: ${isCorrect ? 'Correct' : 'Incorrect'}.
   
-  Provide a professional, concise feedback snippet (1-2 sentences). Explain the technical logic based on the CDL syllabus. Keep the tone slightly "retro gamer" but educational.`;
+  Provide a professional, concise feedback snippet (1-2 sentences). Explain the technical logic based on the CDL syllabus in a easy way. Keep the tone slightly "retro gamer" but educational.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
