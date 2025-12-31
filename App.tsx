@@ -109,17 +109,14 @@ const App: React.FC = () => {
   };
 
   const triggerEasterEgg = () => {
-    // Save current BGM state to restore it later
     setSavedBgmState(bgmEnabled);
-    
     soundService.playSiren();
     setEeStage('GLITCH');
     
-    // Sequence of animations
     setTimeout(() => {
       setEeStage('SHUTDOWN');
-      soundService.playIncorrect(); // Play a static/buzzing sound for shutdown
-      setBgmEnabled(false); // MUTE BGM DURING SHUTDOWN
+      soundService.playIncorrect(); 
+      setBgmEnabled(false); 
     }, 1200);
 
     setTimeout(() => {
@@ -134,7 +131,6 @@ const App: React.FC = () => {
     setTimeout(() => {
       setEeStage(null);
       setPlayerName('PLAYER_SAFE');
-      // Restore BGM if it was originally enabled
       setBgmEnabled(savedBgmState);
       notificationService.notify('SECURITY_CLEARED', 'Cloud assets protected.', 'SUCCESS');
     }, 9400);
@@ -198,8 +194,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={eeStage === 'GLITCH' ? 'system-wipe-glitch' : ''}>
-      {/* Easter Egg Sequence Overlays */}
+    <div className={eeStage === 'GLITCH' ? 'system-wipe-glitch h-full' : 'h-full'}>
       {eeStage === 'SHUTDOWN' && <div className="crt-shutdown-overlay" />}
       {(eeStage === 'BLACKOUT' || eeStage === 'INFO') && (
         <div className="fixed inset-0 z-[6000] bg-black flex items-center justify-center p-6 text-center">
@@ -228,34 +223,34 @@ const App: React.FC = () => {
       >
         <NotificationSystem />
         {gameState === GameState.HOME && (
-          <div className="relative w-full flex-1 flex flex-col items-center justify-center py-6 px-6">
-            <div className="relative z-10 flex flex-col items-center text-center max-w-5xl h-full justify-center">
+          <div className="relative w-full h-full flex flex-col items-center py-4 px-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
+            <div className="relative z-10 flex flex-col items-center text-center max-w-5xl w-full my-auto space-y-4 md:space-y-6">
               
-              <div className="mb-8 border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000]">
+              <div className="border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000] shrink-0">
                  <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
               </div>
               
-              <div className="mb-12 relative flex flex-col items-center">
-                <div className="absolute -top-12 -left-20 text-4xl opacity-30 animate-pixel-float">☁️</div>
-                <div className="absolute -bottom-6 -right-24 text-4xl opacity-30 animate-pixel-float" style={{ animationDelay: '1.2s' }}>☁️</div>
+              <div className="relative flex flex-col items-center py-4 md:py-8 shrink-0">
+                <div className="absolute -top-4 -left-12 text-2xl md:text-4xl opacity-30 animate-pixel-float hidden sm:block">☁️</div>
+                <div className="absolute -bottom-4 -right-12 text-2xl md:text-4xl opacity-30 animate-pixel-float hidden sm:block" style={{ animationDelay: '1.2s' }}>☁️</div>
                 
-                <div className="title-container animate-in zoom-in duration-700">
-                  <h1 className="text-4xl md:text-7xl font-black pixel-font pixel-cloud-escape-text uppercase">
+                <div className="title-container animate-in zoom-in duration-700 !p-6 md:!p-10 !mb-4">
+                  <h1 className="text-2xl sm:text-4xl md:text-6xl font-black pixel-font pixel-cloud-escape-text uppercase">
                     PIXEL_CLOUD<br />
-                    <div className="mt-4">ESCAPE</div>
+                    <div className="mt-2">ESCAPE</div>
                   </h1>
                 </div>
 
-                <div className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500">
-                  <div className="bit-challenge-text pixel-font text-xs md:text-sm font-black uppercase">
+                <div className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500 !py-2 !px-6">
+                  <div className="bit-challenge-text pixel-font text-[8px] md:text-xs font-black uppercase">
                      :: COMMUNITY_EDITION ::
                   </div>
                 </div>
               </div>
               
-              <div className="mb-12 max-w-xl">
-                <div className="pixel-box p-6 bg-black/90 border-4">
-                   <p className="mono-font text-xl md:text-2xl text-slate-200 leading-tight uppercase font-black">
+              <div className="max-w-xl w-full shrink-0">
+                <div className="pixel-box p-4 md:p-6 bg-black/90 border-4">
+                   <p className="mono-font text-lg md:text-2xl text-slate-200 leading-tight uppercase font-black">
                      COMPLETE_THE_6_STAGES_OF_CLOUDOM.<br/>
                      MASTER_OFFICIAL_CDL_EXAM_GUIDE.<br/>
                      ESCAPE_THE_BIT_MATRIX_DUNGEON.
@@ -263,36 +258,35 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mb-10 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
-                 <h4 className="pixel-font text-[10px] text-blue-400 mb-3 font-black uppercase text-left">ENTER_CODENAME:</h4>
+              <div className="w-full max-w-md pixel-box p-3 md:p-4 border-2 bg-slate-900/50 shrink-0">
+                 <h4 className="pixel-font text-[8px] md:text-[10px] text-blue-400 mb-2 font-black uppercase text-left">ENTER_CODENAME:</h4>
                  <input 
                    type="text" 
                    maxLength={12}
                    value={playerName}
                    onChange={(e) => setPlayerName(e.target.value.replace(/\s+/g, '_'))}
-                   className="w-full bg-black border-2 border-white text-white p-3 pixel-font text-sm uppercase outline-none focus:border-yellow-500"
+                   className="w-full bg-black border-2 border-white text-white p-2 md:p-3 pixel-font text-xs md:text-sm uppercase outline-none focus:border-yellow-500"
                  />
-                 <div className="mt-1 text-right text-[7px] pixel-font text-slate-500 uppercase">MAX_12_CHARS</div>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8 w-full max-w-2xl">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 w-full max-w-2xl shrink-0 pb-8">
                 <button 
                   onClick={handleStartGame}
-                  className="pixel-button pixel-button-primary px-12 py-6 md:px-16 md:py-8 pixel-font text-2xl md:text-3xl group shadow-[8px_8px_0_#000] font-black"
+                  className="pixel-button pixel-button-primary w-full sm:w-auto px-8 py-4 md:px-12 md:py-6 pixel-font text-xl md:text-2xl group shadow-[6px_6px_0_#000] font-black"
                 >
                   1P_START
                 </button>
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 w-full sm:w-auto">
                   <button 
                     onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-                    className="pixel-button bg-black text-white px-8 py-4 pixel-font text-[10px] hover:bg-slate-900 font-black shadow-[4px_4px_0_#000]"
+                    className="flex-1 sm:flex-none pixel-button bg-black text-white px-6 py-4 pixel-font text-[9px] hover:bg-slate-900 font-black shadow-[4px_4px_0_#000]"
                   >
                     HI_SCORE
                   </button>
                   <button 
                     onClick={() => { soundService.playClick(); setGameState(GameState.ABOUT); }}
-                    className="pixel-button bg-slate-800 text-white px-8 py-4 pixel-font text-[10px] hover:bg-slate-700 font-black border-slate-400 shadow-[4px_4px_0_#000]"
+                    className="flex-1 sm:flex-none pixel-button bg-slate-800 text-white px-6 py-4 pixel-font text-[9px] hover:bg-slate-700 font-black border-slate-400 shadow-[4px_4px_0_#000]"
                   >
                     ABOUT
                   </button>
