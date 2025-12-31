@@ -39,7 +39,7 @@ export const LEVELS: Level[] = [
   { 
     id: 1, 
     title: 'Digital Transformation', 
-    description: '1.1 Business Transformation drivers, 1.2 Cloud concepts (CapEx/OpEx, TCO), 1.3 Computing Models (IaaS, PaaS, SaaS) and Shared Responsibility.', 
+    description: 'Why choose Google Cloud for digital transformation? Key concepts: cloud vs on-prem, cloud-native, open source standards. Benefits: scalability, flexibility, agility, security, strategic value. Infrastructure models: public, private, hybrid, and multicloud. Implications of non-adoption. Financials: CapEx to OpEx shift, Total Cost of Ownership (TCO). Networking basics: IP, DNS, regions, zones, latency, and bandwidth. Service models: IaaS, PaaS, SaaS benefits and trade-offs. Shared Responsibility Model for provider vs customer.', 
     topic: 'Section 1: Digital Transformation with Google Cloud', 
     difficulty: 'Foundational',
     puzzleType: 'CATCHER'
@@ -47,7 +47,7 @@ export const LEVELS: Level[] = [
   { 
     id: 2, 
     title: 'Data Transformation', 
-    description: '2.1 Value of Data (Databases vs Warehouses vs Lakes), 2.2 Solutions (SQL, Spanner, Bigtable, BigQuery), 2.3 Analytics (Looker, Pub/Sub, Dataflow).', 
+    description: 'The value of data and its role in digital transformation. Data types: structured vs unstructured. Storage types: Databases, Data Warehouses, and Data Lakes. Google Cloud SQL vs Spanner vs Bigtable. Large scale analytics with BigQuery. Real-time streaming with Pub/Sub and Dataflow. Data visualization and business intelligence with Looker. Benefits of managed data services for agility and cost-efficiency.', 
     topic: 'Section 2: Exploring Data Transformation with Google Cloud', 
     difficulty: 'Foundational',
     puzzleType: 'SORTER'
@@ -55,7 +55,7 @@ export const LEVELS: Level[] = [
   { 
     id: 3, 
     title: 'AI & Machine Learning', 
-    description: '3.1 AI/ML Fundamentals, 3.2 Solution Selection (Pre-trained vs AutoML vs Custom), 3.3 Building (Vertex AI, BigQuery ML, TPUs).', 
+    description: 'AI vs ML fundamentals. Selecting the right solution: Pre-trained APIs (Vision, Translation, Speech) vs AutoML for custom labels vs Vertex AI for custom models. Infrastructure for ML: GPUs and TPUs. Building, deploying, and managing ML models on Vertex AI. The role of BigQuery ML for SQL-based models. Responsible AI principles and ethics in cloud innovation.', 
     topic: 'Section 3: Innovating with Google Cloud Artificial Intelligence', 
     difficulty: 'Foundational',
     puzzleType: 'DEFENDER'
@@ -63,7 +63,7 @@ export const LEVELS: Level[] = [
   { 
     id: 4, 
     title: 'Modernizing Infrastructure', 
-    description: '4.1 Migration (Lift/Shift, Refactor), 4.2 Compute (VMs, GKE, Serverless), 4.3 App Modernization (Cloud Run, Anthos/GKE Enterprise), 4.5 APIs (Apigee).', 
+    description: 'Legacy vs Modernized Infrastructure. Compute options: Virtual Machines (Compute Engine), Containers (GKE), and Serverless (Cloud Run, Cloud Functions). Migration strategies: Rehost (Lift & Shift), Replatform, and Rearchitect. Benefits of App Modernization and CI/CD pipelines. Managing hybrid/multicloud with Anthos and GKE Enterprise. API management with Apigee to unlock legacy value.', 
     topic: 'Section 4: Modernize Infrastructure and Applications with Google Cloud', 
     difficulty: 'Foundational',
     puzzleType: 'CATCHER'
@@ -71,7 +71,7 @@ export const LEVELS: Level[] = [
   { 
     id: 5, 
     title: 'Trust and Security', 
-    description: '5.1 Cloud Security concepts, 5.2 Google Trusted Infrastructure (IAM, Encryption, Cloud Armor), 5.3 Compliance and Trust Principles.', 
+    description: 'Security in the cloud: Defense in Depth and Zero Trust. Google Trusted Infrastructure: data encryption at rest and in transit. Shared Responsibility for security. IAM (Identity and Access Management) and the Principle of Least Privilege. Cloud Armor for DDoS protection. Compliance standards (GDPR, HIPAA). Data sovereignty and residency. Google’s Trust Principles: your data is yours.', 
     topic: 'Section 5: Trust and Security with Google Cloud', 
     difficulty: 'Foundational',
     puzzleType: 'SORTER'
@@ -79,7 +79,7 @@ export const LEVELS: Level[] = [
   { 
     id: 6, 
     title: 'Scaling & Operations', 
-    description: '6.1 Financial Governance (Cost Mgmt, Budgets), 6.2 Operational Excellence (SRE, DevOps, SRE terms), 6.3 Sustainability goals.', 
+    description: 'Financial governance and cost management in the cloud. Google Cloud Resource Hierarchy (Org > Folder > Project > Resource). Billing reports, quotas, and budgets. Operational excellence: DevOps and Site Reliability Engineering (SRE). Reliability metrics: SLIs, SLOs, and SLAs. Error budgets and post-mortems. Google Cloud Sustainability: carbon-neutral goals, carbon-free energy, and net-zero emissions.', 
     topic: 'Section 6: Scaling with Google Cloud Operations', 
     difficulty: 'Foundational',
     puzzleType: 'DEFENDER'

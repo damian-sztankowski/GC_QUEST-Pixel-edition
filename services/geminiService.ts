@@ -7,19 +7,21 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number): Promise<Question> => {
   const entropy = Math.random().toString(36).substring(7);
-  const prompt = `You are an expert Google Cloud exam setter for the CDL (Cloud Digital Leader) path.
+  const prompt = `You are a Lead Google Cloud Certification Architect designed to gamify the Cloud Digital Leader (CDL) exam.
   
-  TASK: Generate a unique, professional certification question.
+  TASK: Generate a unique "Escape Room" style multiple-choice question that tests **one specific concept** found in the Syllabus Scope.
   CHAPTER: "${level.topic}"
   SYLLABUS FOCUS: "${level.description}"
   QUESTION_PROGRESS: ${questionIndex} of 10
   ENTROPY_SEED: ${entropy}
   
   CRITICAL RULES:
-  1. **VARIETY:** Do not repeat previous concepts. If this is Chapter 6, choose specifically between ${level.description} ensuring you don't pick the same sub-topic twice in a row.
-  2. **TONE:** Professional but themed for an "Escape Room" scenario.
+  1. **Selectivity:** The Syllabus Scope provided is a list of keywords. Do NOT test them all. Isolate ONE specific concept (e.g., if the list says "SQL vs Spanner vs Bigtable", choose *only* Spanner for this specific question).
+  2. *The Scenario (The Lock):** Frame the question as an urgent, high-stakes scenario (e.g., "The colony's life-support data is fragmenting...", "The startup's budget is leaking oxygen...").
   3. **STRUCTURE:** Question text, 4 plausible options, 1 correct index, and a clear explanation.
-  4. **TERMINOLOGY:** Use official Google Cloud product names (e.g., "Site Reliability Engineering", "Cloud Billing Reports", "Vertex AI").
+  4. **The Solution (The Key):** The correct answer must be the *exact* Google Cloud product or principle that solves the scenario.
+  5. **Tone:** Immersive and dramatic narrative, but **technically rigorous** options. No magic solutions; only real Google Cloud engineering.
+  6. **Difficulty:** Foundational (CDL Level). Focus on "What is it?" and "When to use it?"
   
   Return JSON format: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
 
