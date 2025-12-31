@@ -56,88 +56,142 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
   useEffect(() => {
     if (stage === 'RESPONSE') {
       const newNodes: BeaconNode[] = [];
-      for (let i = 0; i < 30; i++) {
+      setNodes([]);
+      // High density nodes for a "Global" community feel
+      for (let i = 0; i < 80; i++) {
         setTimeout(() => {
           setNodes(prev => [...prev, {
             id: i,
-            x: Math.random() * 90 + 5,
-            y: Math.random() * 90 + 5,
+            x: Math.floor(Math.random() * 90 + 5),
+            y: Math.floor(Math.random() * 90 + 5),
             color: googleColors[Math.floor(Math.random() * googleColors.length)]
           }]);
           soundService.playConnection();
-        }, i * 80);
+        }, i * 30);
       }
     }
   }, [stage]);
 
   if (!stage || stage === 'IDLE') return null;
 
+  // Pixel-art web path logic: Create horizontal and vertical segments that snap to center
+  const getPixelWebPath = (nodeX: number, nodeY: number) => {
+    const targetX = 50;
+    const targetY = 50;
+    
+    // We create a "step" path that looks like a pixel-art network
+    // First segment: move towards horizontal target, then vertical
+    const midPointX = nodeX < targetX ? nodeX + (targetX - nodeX) * 0.5 : nodeX - (nodeX - targetX) * 0.5;
+    
+    // We want some variation to make it look like a "web"
+    if (Math.random() > 0.5) {
+      return `${nodeX},${nodeY} ${targetX},${nodeY} ${targetX},${targetY}`;
+    } else {
+      return `${nodeX},${nodeY} ${nodeX},${targetY} ${targetX},${targetY}`;
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[7000] bg-black flex items-center justify-center overflow-hidden">
-      {/* Grid in background */}
-      <div className="absolute inset-0 pixel-grid opacity-20" />
+      {/* Background Pixel Grid - Subtle but there */}
+      <div className="absolute inset-0 pixel-grid opacity-10" />
 
-      {/* Nodes and Network lines */}
-      {nodes.map(node => (
-        <React.Fragment key={node.id}>
-          {stage === 'NETWORK' && (
-            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
-              <line 
-                x1={`${node.x}%`} 
-                y1={`${node.y}%`} 
-                x2="50%" 
-                y2="50%" 
+      {/* Network Web lines - Pixel Art Style (Orthogonal) */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <filter id="web-glow">
+            <feGaussianBlur stdDeviation="0.2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        {nodes.map(node => (
+          <React.Fragment key={`web-${node.id}`}>
+            {(stage === 'NETWORK' || stage === 'MESSAGE') && (
+              <polyline 
+                points={getPixelWebPath(node.x, node.y)}
+                fill="none"
                 stroke={node.color} 
-                strokeWidth="2"
-                strokeDasharray="1000"
-                strokeDashoffset="1000"
-                className="animate-[text-reveal_1.5s_ease-out_forwards]"
-                style={{ filter: `drop-shadow(0 0 5px ${node.color})`, opacity: 0.6 }}
+                strokeWidth="0.25"
+                className="animate-in fade-in duration-700"
+                style={{ 
+                  filter: 'url(#web-glow)', 
+                  opacity: 0.4,
+                  strokeLinecap: 'square'
+                }}
               />
-            </svg>
-          )}
-          <div 
-            className="absolute w-2 h-2 animate-in zoom-in duration-300 shadow-[0_0_10px_currentColor]"
-            style={{ 
-              left: `${node.x}%`, 
-              top: `${node.y}%`, 
-              backgroundColor: node.color,
-              color: node.color
-            }} 
-          />
-        </React.Fragment>
+            )}
+          </React.Fragment>
+        ))}
+      </svg>
+
+      {/* Community Nodes (Pixel dots) */}
+      {nodes.map(node => (
+        <div 
+          key={`node-${node.id}`}
+          className="absolute w-2 h-2 animate-in zoom-in duration-300 z-10"
+          style={{ 
+            left: `${node.x}%`, 
+            top: `${node.y}%`, 
+            backgroundColor: node.color,
+            boxShadow: `0 0 5px ${node.color}`,
+          }} 
+        />
       ))}
 
-      {/* Central Character */}
-      <div className={`relative z-10 transition-transform duration-1000 ${stage === 'NETWORK' ? 'scale-150' : 'scale-100'}`}>
-        <div className="pixel-box p-2 border-4 bg-black shadow-[0_0_30px_rgba(66,133,244,0.5)]">
-          <Avatar role={CloudRole.DIGITAL_LEADER} size="lg" animate={true} />
+      {/* Center Stack: Beacon Hub and Terminal Below */}
+      <div className="relative z-50 flex flex-col items-center justify-center gap-12 w-full h-full">
+        
+        {/* The GDE Hub Beacon */}
+        <div className={`transition-all duration-1000 ${stage === 'NETWORK' || stage === 'MESSAGE' ? 'scale-110' : 'scale-100'}`}>
+          <div className="p-1 bg-white border-4 border-black shadow-[0_0_120px_rgba(255,255,255,0.25)]">
+            <div className="p-2 bg-white border-2 border-slate-100">
+              <Avatar role="GDE_LOGO" size="xl" animate={false} />
+            </div>
+          </div>
+          
+          {stage === 'INIT' && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-white animate-sonar" />
+          )}
+          
+          {(stage === 'NETWORK' || stage === 'MESSAGE') && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 animate-pulse blur-[100px]" />
+          )}
         </div>
-        
-        {stage === 'INIT' && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-white animate-sonar" />
-        )}
-        
-        {stage === 'NETWORK' && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-white/10 animate-pulse blur-xl" />
-        )}
-      </div>
 
-      {/* Terminal Message */}
-      {stage === 'MESSAGE' && (
-        <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6">
-          <div className="pixel-box p-6 bg-black/90 border-4 border-blue-500 shadow-[0_0_20px_#4285F4]">
-            <div className="pixel-font text-white space-y-4">
-              <div className="text-[10px] text-blue-400 mb-2 uppercase tracking-tighter typewriter-effect">SIGNAL BROADCAST: SUCCESS.</div>
-              <div className="text-[10px] text-green-400 mb-2 uppercase tracking-tighter typewriter-effect" style={{ animationDelay: '2.5s' }}>KNOWLEDGE SHARED GLOBALLY.</div>
-              <div className="text-[10px] text-yellow-400 mb-2 uppercase tracking-tighter typewriter-effect" style={{ animationDelay: '5s' }}>STATUS: YOU ARE NOT ALONE.</div>
-              <div className="pt-4 text-sm text-white font-black uppercase text-center animate-in fade-in duration-1000" style={{ animationDelay: '7.5s' }}>
-                THANK YOU, GDE COMMUNITY.
+        {/* Broadcast Terminal - Positioned below the Beacon */}
+        {(stage === 'MESSAGE') && (
+          <div className="w-full max-w-xl animate-in slide-in-from-bottom-12 duration-1000">
+            <div className="relative pixel-box p-10 bg-[#0c0c0c]/98 border-4 border-cyan-400 shadow-[0_15px_60px_rgba(34,211,238,0.3)]">
+              {/* Retro Speech Bubble Diamond Arrow (Pointing Up towards Beacon) */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-cyan-400 rotate-45 border-t-4 border-l-4 border-black" />
+              
+              <div className="pixel-font text-white w-full space-y-4">
+                <div className="flex items-start space-x-4">
+                  <span className="text-cyan-400 font-black text-xl select-none">&gt;</span>
+                  <span className="text-[10px] md:text-xs text-white uppercase tracking-tighter typewriter-effect leading-none h-4">SIGNAL BROADCAST: SUCCESS.</span>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <span className="text-green-400 font-black text-xl select-none">&gt;</span>
+                  <span className="text-[10px] md:text-xs text-white uppercase tracking-tighter typewriter-effect leading-none h-4" style={{ animationDelay: '2s' }}>KNOWLEDGE SHARED GLOBALLY.</span>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <span className="text-yellow-400 font-black text-xl select-none">&gt;</span>
+                  <span className="text-[10px] md:text-xs text-white uppercase tracking-tighter typewriter-effect leading-none h-4" style={{ animationDelay: '4s' }}>STATUS: YOU ARE NOT ALONE.</span>
+                </div>
+                
+                <div className="pt-8 border-t-2 border-white/5 text-center mt-4">
+                  <div className="text-sm md:text-lg text-white font-black uppercase animate-in fade-in duration-1000 tracking-[0.25em] leading-tight" style={{ animationDelay: '6s' }}>
+                    THANK YOU, GDE COMMUNITY.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
@@ -214,7 +268,7 @@ const App: React.FC = () => {
       setBannerClickCount(0);
       setBgmEnabled(savedBgmState);
       notificationService.notify('GLOBAL_BEACON', 'BEACON_SYNC_TERMINATED', 'SUCCESS');
-    }, 18000);
+    }, 28000);
   }, [bgmEnabled, savedBgmState]);
 
   const handleBannerClick = () => {
@@ -503,7 +557,7 @@ const App: React.FC = () => {
                             </div>
                             <div className="flex justify-between border-b border-slate-800 pb-1">
                               <span>SCORE_MOD:</span>
-                              <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}X</span>
+                              <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}</span>
                             </div>
                             <div className="flex justify-between">
                               <span>SPEED_MOD:</span>
