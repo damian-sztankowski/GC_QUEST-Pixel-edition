@@ -39,6 +39,8 @@ const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
   return <span>{displayValue.toString().padStart(6, '0')}</span>;
 };
 
+type EasterEggStage = 'GLITCH' | 'SHUTDOWN' | 'BLACKOUT' | 'INFO' | null;
+
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.HOME);
   const [playerName, setPlayerName] = useState('PLAYER_01');
@@ -49,7 +51,7 @@ const App: React.FC = () => {
   const [rolesWithAvatars, setRolesWithAvatars] = useState<RoleConfig[]>(ROLES);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initStage, setInitStage] = useState('INSERTING_CARTRIDGE');
-  const [isGlitching, setIsGlitching] = useState(false);
+  const [eeStage, setEeStage] = useState<EasterEggStage>(null);
 
   useEffect(() => {
     const initializeAvatars = async () => {
@@ -93,21 +95,39 @@ const App: React.FC = () => {
     const normalizedInput = playerName.trim().toLowerCase().replace(/_/g, ' ');
     
     if (normalizedInput === 'rm -rf /') {
-      soundService.playSiren();
-      setIsGlitching(true);
-      
-      setTimeout(() => {
-        setIsGlitching(false);
-        notificationService.notify('SECURITY_ALERT', 'Just kidding. Safety first in the Cloud.', 'INFO');
-        setPlayerName('PLAYER_SAFE');
-      }, 2500);
-      
+      triggerEasterEgg();
       return;
     }
 
     soundService.playPowerUp();
     notificationService.notify('SESSION_START', `${playerName.toUpperCase()}_LINK_ESTABLISHED`, 'SUCCESS');
     setGameState(GameState.ROLE_SELECTION);
+  };
+
+  const triggerEasterEgg = () => {
+    soundService.playSiren();
+    setEeStage('GLITCH');
+    
+    // Sequence of animations
+    setTimeout(() => {
+      setEeStage('SHUTDOWN');
+      soundService.playIncorrect(); // Play a static/buzzing sound for shutdown
+    }, 1200);
+
+    setTimeout(() => {
+      setEeStage('BLACKOUT');
+    }, 2400);
+
+    setTimeout(() => {
+      setEeStage('INFO');
+      soundService.playPowerUp();
+    }, 5400);
+
+    setTimeout(() => {
+      setEeStage(null);
+      setPlayerName('PLAYER_SAFE');
+      notificationService.notify('SECURITY_CLEARED', 'Cloud assets protected.', 'SUCCESS');
+    }, 9400);
   };
 
   const handleRoleSelect = (r: CloudRole) => {
@@ -169,7 +189,27 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={isGlitching ? 'system-wipe-glitch' : ''}>
+    <div className={eeStage === 'GLITCH' ? 'system-wipe-glitch' : ''}>
+      {/* Easter Egg Sequence Overlays */}
+      {eeStage === 'SHUTDOWN' && <div className="crt-shutdown-overlay" />}
+      {(eeStage === 'BLACKOUT' || eeStage === 'INFO') && (
+        <div className="fixed inset-0 z-[6000] bg-black flex items-center justify-center p-6 text-center">
+          {eeStage === 'INFO' && (
+            <div className="animate-in fade-in zoom-in duration-1000">
+               <div className="pixel-font text-xl md:text-3xl text-yellow-500 mb-6 font-black uppercase tracking-tight">
+                  JUST KIDDING.
+               </div>
+               <div className="pixel-font text-sm md:text-lg text-white font-black uppercase tracking-widest leading-loose">
+                  SAFETY FIRST IN THE CLOUD.
+               </div>
+               <div className="mt-12 text-blue-500 pixel-font text-[10px] animate-pulse uppercase">
+                  RESTORE_SEQUENCE_INITIATED...
+               </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <Layout activeRole={selectedRole}>
         <NotificationSystem />
         {gameState === GameState.HOME && (
@@ -249,6 +289,7 @@ const App: React.FC = () => {
           </div>
         )}
 
+        {/* ... Rest of the component remains the same ... */}
         {gameState === GameState.ROLE_SELECTION && (
           <div className="w-full flex-1 animate-in slide-in-from-bottom-8 duration-500 pt-4 px-4 flex flex-col items-center justify-center overflow-y-auto">
             <div className="text-center mb-6">
