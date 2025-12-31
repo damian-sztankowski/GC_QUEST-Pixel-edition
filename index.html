@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,10 +39,38 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
             z-index: 1000;
+        }
+
+        /* Simulated GLSL Rolling Bar using linear-gradient and animation */
+        .crt-overlay::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.04) 50%,
+                rgba(255, 255, 255, 0) 55%,
+                transparent 100%
+            );
+            background-size: 100% 200%;
+            animation: rolling-bar 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rolling-bar {
+            0% { background-position: 0 -100%; }
+            100% { background-position: 0 100%; }
         }
 
         .crt-flicker {
@@ -247,5 +276,33 @@
     <div class="crt-overlay"></div>
     <div class="crt-flicker"></div>
     <div id="root"></div>
+
+    <!-- 
+    GLSL Implementation of the rolling hum bar as requested:
+    
+    float rollingBar(vec2 uv, float time) {
+        // Speed at which the bar rolls down the screen
+        const float rollSpeed = 0.15;
+        
+        // Number of bars visible (frequency of the hum)
+        const float frequency = 1.2;
+        
+        // Intensity of the brightness fluctuation
+        const float intensity = 0.07;
+
+        // Calculate the moving phase based on vertical position and time
+        float phase = fract(uv.y - time * rollSpeed);
+        
+        // Create a periodic wave using sin()
+        float wave = sin(phase * 6.283185 * frequency);
+        
+        // Shape the bar using smoothstep to isolate the 'peak' of the hum.
+        // This creates a distinct band rather than a general blurry wave.
+        float bar = smoothstep(0.3, 0.9, wave) * intensity;
+        
+        // Return a multiplier (1.0 is neutral brightness)
+        return 1.0 + bar;
+    }
+    -->
 </body>
 </html>
