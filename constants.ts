@@ -85,10 +85,3 @@ export const LEVELS: Level[] = [
     puzzleType: 'DEFENDER'
   }
 ];
-
-export const MOCK_LEADERBOARD = [
-  { name: 'PIXEL_KING', score: 9999, role: CloudRole.DIGITAL_LEADER, time: '05:22' },
-  { name: 'RETRO_CLOUD', score: 8500, role: CloudRole.DIGITAL_LEADER, time: '06:45' },
-  { name: 'BIT_QUESTER', score: 7200, role: CloudRole.DIGITAL_LEADER, time: '07:12' },
-  { name: 'CDL_HERO', score: 6400, role: CloudRole.DIGITAL_LEADER, time: '08:50' }
-];

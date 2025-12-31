@@ -7,7 +7,6 @@ export enum GameState {
   PUZZLE = 'PUZZLE',
   LEVEL_COMPLETE = 'LEVEL_COMPLETE',
   GAME_OVER = 'GAME_OVER',
-  LEADERBOARD = 'LEADERBOARD',
   ABOUT = 'ABOUT'
 }
 
@@ -39,15 +38,6 @@ export interface Question {
   explanation: string;
 }
 
-export interface LeaderboardEntry {
-  name: string;
-  score: number;
-  role: CloudRole;
-  time: string;
-  difficulty?: DifficultyLevel;
-  date?: string;
-}
-
 export interface RoleConfig {
   type: CloudRole;
   icon: string;
@@ -71,4 +61,14 @@ export interface Notification {
   type: NotificationType;
   message: string;
   title: string;
+}
+
+// Added missing LeaderboardEntry interface used in leaderboardService.ts
+export interface LeaderboardEntry {
+  name: string;
+  score: number;
+  role: CloudRole;
+  time?: string;
+  date?: string;
+  difficulty?: DifficultyLevel;
 }

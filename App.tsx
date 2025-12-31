@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import RoleCard from './components/RoleCard';
-import Leaderboard from './components/Leaderboard';
 import GameSessionUI from './components/GameSessionUI';
 import Avatar from './components/Avatar';
 import ChapterMap from './components/ChapterMap';
@@ -13,7 +12,6 @@ import { ROLES, LEVELS, DIFFICULTY_SETTINGS } from './constants';
 import { generateAvatar } from './services/geminiService';
 import { soundService } from './services/soundService';
 import { notificationService } from './services/notificationService';
-import { leaderboardService } from './services/leaderboardService';
 
 const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -57,7 +55,6 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
     if (stage === 'RESPONSE') {
       const newNodes: BeaconNode[] = [];
       setNodes([]);
-      // High density nodes for a "Global" community feel
       for (let i = 0; i < 90; i++) {
         setTimeout(() => {
           setNodes(prev => [...prev, {
@@ -76,10 +73,7 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
 
   return (
     <div className="fixed inset-0 z-[7000] bg-black flex items-center justify-center overflow-hidden">
-      {/* Background Pixel Grid */}
       <div className="absolute inset-0 pixel-grid opacity-10" />
-
-      {/* Network Constellation lines - Thin, semi-transparent direct connections */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <filter id="web-glow">
@@ -109,7 +103,6 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
             )}
           </React.Fragment>
         ))}
-        {/* Secondary Orthogonal "Core" Web - Slightly thicker but very transparent */}
         {(stage === 'NETWORK' || stage === 'MESSAGE') && nodes.filter((_, i) => i % 3 === 0).map(node => (
           <polyline 
             key={`orthogonal-${node.id}`}
@@ -122,7 +115,6 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
         ))}
       </svg>
 
-      {/* Community Nodes (Pixel dots) */}
       {nodes.map(node => (
         <div 
           key={`node-${node.id}`}
@@ -136,33 +128,25 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
         />
       ))}
 
-      {/* Center Stack: Hub and Terminal */}
       <div className="relative z-50 flex flex-col items-center justify-center gap-10 w-full h-full">
-        
-        {/* The GDE Hub (Representing the Earth icon/Community Center) */}
         <div className={`transition-all duration-1000 ${stage === 'NETWORK' || stage === 'MESSAGE' ? 'scale-110' : 'scale-100'}`}>
           <div className="p-1 bg-white border-4 border-black shadow-[0_0_150px_rgba(255,255,255,0.3)]">
             <div className="p-2 bg-white border-2 border-slate-100">
               <Avatar role="GDE_LOGO" size="xl" animate={false} />
             </div>
           </div>
-          
           {stage === 'INIT' && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-white animate-sonar" />
           )}
-          
           {(stage === 'NETWORK' || stage === 'MESSAGE') && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 animate-pulse blur-[120px]" />
           )}
         </div>
 
-        {/* Broadcast Terminal - Below the Beacon icon */}
         {(stage === 'MESSAGE') && (
           <div className="w-full max-w-xl animate-in slide-in-from-bottom-12 duration-1000">
             <div className="relative pixel-box p-10 bg-[#0c0c0c]/98 border-4 border-cyan-400 shadow-[0_15px_60px_rgba(34,211,238,0.3)]">
-              {/* Retro Speech Bubble Diamond Arrow (Pointing Up towards Hub) */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-cyan-400 rotate-45 border-t-4 border-l-4 border-black" />
-              
               <div className="pixel-font text-white w-full space-y-4">
                 <div className="flex items-start space-x-4">
                   <span className="text-cyan-400 font-black text-xl select-none">&gt;</span>
@@ -176,7 +160,6 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
                   <span className="text-yellow-400 font-black text-xl select-none">&gt;</span>
                   <span className="text-[10px] md:text-xs text-white uppercase tracking-tighter typewriter-effect leading-none h-4" style={{ animationDelay: '4s' }}>STATUS: YOU ARE NOT ALONE.</span>
                 </div>
-                
                 <div className="pt-8 border-t-2 border-white/5 text-center mt-4">
                   <div className="text-sm md:text-lg text-white font-black uppercase animate-in fade-in duration-1000 tracking-[0.25em] leading-tight" style={{ animationDelay: '6s' }}>
                     THANK YOU, GDE COMMUNITY.
@@ -277,12 +260,10 @@ const App: React.FC = () => {
 
   const handleStartGame = () => {
     const normalizedInput = playerName.trim().toLowerCase().replace(/_/g, ' ');
-    
     if (normalizedInput === 'rm -rf /') {
       triggerEasterEgg();
       return;
     }
-
     soundService.playPowerUp();
     notificationService.notify('SESSION_START', `${playerName.toUpperCase()}_LINK_ESTABLISHED`, 'SUCCESS');
     setGameState(GameState.ROLE_SELECTION);
@@ -292,22 +273,16 @@ const App: React.FC = () => {
     setSavedBgmState(bgmEnabled);
     soundService.playSiren();
     setEeStage('GLITCH');
-    
     setTimeout(() => {
       setEeStage('SHUTDOWN');
       soundService.playIncorrect(); 
       setBgmEnabled(false); 
     }, 1200);
-
-    setTimeout(() => {
-      setEeStage('BLACKOUT');
-    }, 2400);
-
+    setTimeout(() => setEeStage('BLACKOUT'), 2400);
     setTimeout(() => {
       setEeStage('INFO');
       soundService.playPowerUp();
     }, 5400);
-
     setTimeout(() => {
       setEeStage(null);
       setPlayerName('PLAYER_SAFE');
@@ -333,15 +308,6 @@ const App: React.FC = () => {
   const handleGameEnd = (s: number) => {
     soundService.playLevelComplete();
     setFinalScore(s);
-    
-    leaderboardService.saveScore({
-      name: playerName,
-      score: s,
-      role: selectedRole!,
-      difficulty: difficulty,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    });
-
     notificationService.notify('CHAPTERS_CLEARED', `FINAL_SCORE: ${s}`, 'ACHIEVEMENT');
     setGameState(GameState.GAME_OVER);
   };
@@ -394,7 +360,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Global Beacon Cinematic Overlay */}
       <GlobalBeaconOverlay stage={beaconStage} />
 
       <Layout 
@@ -408,7 +373,6 @@ const App: React.FC = () => {
         {gameState === GameState.HOME && (
           <div className="relative w-full h-full flex flex-col items-center py-4 px-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
             <div className="relative z-10 flex flex-col items-center text-center max-w-5xl w-full my-auto space-y-4 md:space-y-6">
-              
               <div className="border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000] shrink-0">
                  <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
               </div>
@@ -416,21 +380,14 @@ const App: React.FC = () => {
               <div className="relative flex flex-col items-center py-4 md:py-8 shrink-0">
                 <div className="absolute -top-4 -left-12 text-2xl md:text-4xl opacity-30 animate-pixel-float hidden sm:block">☁️</div>
                 <div className="absolute -bottom-4 -right-12 text-2xl md:text-4xl opacity-30 animate-pixel-float hidden sm:block" style={{ animationDelay: '1.2s' }}>☁️</div>
-                
                 <div className="title-container animate-in zoom-in duration-700 !p-6 md:!p-10 !mb-4">
                   <h1 className="text-2xl sm:text-4xl md:text-6xl font-black pixel-font pixel-cloud-escape-text uppercase">
                     PIXEL_CLOUD<br />
                     <div className="mt-2">ESCAPE</div>
                   </h1>
                 </div>
-
-                <div 
-                  onClick={handleBannerClick}
-                  className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500 !py-2 !px-6 cursor-pointer hover:bg-yellow-500/20 active:scale-95 transition-all"
-                >
-                  <div className="bit-challenge-text pixel-font text-[8px] md:text-xs font-black uppercase">
-                     :: COMMUNITY_EDITION ::
-                  </div>
+                <div onClick={handleBannerClick} className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500 !py-2 !px-6 cursor-pointer hover:bg-yellow-500/20 active:scale-95 transition-all">
+                  <div className="bit-challenge-text pixel-font text-[8px] md:text-xs font-black uppercase">:: COMMUNITY_EDITION ::</div>
                 </div>
               </div>
               
@@ -462,21 +419,12 @@ const App: React.FC = () => {
                 >
                   1P_START
                 </button>
-
-                <div className="flex gap-4 w-full sm:w-auto">
-                  <button 
-                    onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-                    className="flex-1 sm:flex-none pixel-button bg-black text-white px-6 py-4 pixel-font text-[9px] hover:bg-slate-900 font-black shadow-[4px_4px_0_#000]"
-                  >
-                    HI_SCORE
-                  </button>
-                  <button 
-                    onClick={() => { soundService.playClick(); setGameState(GameState.ABOUT); }}
-                    className="flex-1 sm:flex-none pixel-button bg-slate-800 text-white px-6 py-4 pixel-font text-[9px] hover:bg-slate-700 font-black border-slate-400 shadow-[4px_4px_0_#000]"
-                  >
-                    ABOUT
-                  </button>
-                </div>
+                <button 
+                  onClick={() => { soundService.playClick(); setGameState(GameState.ABOUT); }}
+                  className="w-full sm:w-auto pixel-button bg-slate-800 text-white px-10 py-5 md:px-14 md:py-6 pixel-font text-[10px] md:text-sm font-black border-slate-400 shadow-[6px_6px_0_#000]"
+                >
+                  ABOUT_MISSION
+                </button>
               </div>
             </div>
           </div>
@@ -489,13 +437,11 @@ const App: React.FC = () => {
               <div className="pixel-hr w-48 mx-auto mb-2 my-1"></div>
               <p className="text-yellow-500 pixel-font text-[10px] animate-pulse uppercase tracking-widest font-black">SYNCING_{playerName}...</p>
             </div>
-            
             <div className="max-w-xl mx-auto w-full px-4 flex flex-col justify-center">
               {rolesWithAvatars.map((role, idx) => (
                 <RoleCard key={idx} role={role} onSelect={handleRoleSelect} index={idx} />
               ))}
             </div>
-            
             <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-8 mb-6 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
               [ Exit_To_Title_Screen ]
             </button>
@@ -508,12 +454,8 @@ const App: React.FC = () => {
               <h2 className="text-4xl md:text-5xl font-black pixel-font text-white mb-2 uppercase leading-tight">Stage_Select</h2>
               <p className="text-blue-400 pixel-font text-[10px] animate-pulse uppercase tracking-widest font-black">CHOOSE_YOUR_DESTINATION</p>
             </div>
-
             <div className="w-full pixel-box border-8 p-6 md:p-8 bg-[#0c0c0c] shadow-[12px_12px_0_#000] flex flex-col gap-6 flex-1 overflow-y-auto justify-center">
-               <div className="w-full">
-                  <ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} />
-               </div>
-
+               <div className="w-full"><ChapterMap currentLevelIdx={-1} onSelectLevel={handleSelectChapter} /></div>
                <div className="w-full border-t-4 border-white pt-6">
                   <div className="max-w-md mx-auto">
                       <div className="pixel-box p-4 border-4 bg-slate-900 shadow-[8px_8px_0_#000]">
@@ -525,49 +467,22 @@ const App: React.FC = () => {
                               {difficulty}
                             </span>
                          </div>
-                         
-                         <input 
-                           type="range" 
-                           min="0" 
-                           max="2" 
-                           step="1" 
-                           value={difficultyIndex}
-                           onChange={handleDifficultyChange}
-                           className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-white mb-2"
-                           style={{ 
-                             imageRendering: 'pixelated',
-                           }}
-                         />
-
+                         <input type="range" min="0" max="2" step="1" value={difficultyIndex} onChange={handleDifficultyChange} className="w-full h-8 bg-black border-2 border-white appearance-none cursor-pointer accent-white mb-2" style={{ imageRendering: 'pixelated' }} />
                          <div className="flex justify-between mb-4 pixel-font text-[7px] text-slate-400 font-black uppercase">
                             <span className={difficulty === DifficultyLevel.EASY ? 'text-white' : ''}>JUNIOR</span>
                             <span className={difficulty === DifficultyLevel.NORMAL ? 'text-white' : ''}>ARCHITECT</span>
                             <span className={difficulty === DifficultyLevel.HARD ? 'text-white' : ''}>LEGEND</span>
                          </div>
-
                          <div className="grid grid-cols-2 gap-2 text-[8px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
-                            <div className="flex justify-between border-b border-slate-800 pb-1">
-                              <span>TIME_MOD:</span>
-                              <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-800 pb-1">
-                              <span>SCORE_MOD:</span>
-                              <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>SPEED_MOD:</span>
-                              <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].speedMultiplier}X</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>TIME_BONUS:</span>
-                              <span className="text-white">+{DIFFICULTY_SETTINGS[difficulty].timeBonus}S</span>
-                            </div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1"><span>TIME_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span></div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1"><span>SCORE_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}</span></div>
+                            <div className="flex justify-between"><span>SPEED_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty].speedMultiplier}X</span></div>
+                            <div className="flex justify-between"><span>TIME_BONUS:</span><span className="text-white">+{DIFFICULTY_SETTINGS[difficulty].timeBonus}S</span></div>
                          </div>
                       </div>
                   </div>
                </div>
             </div>
-
             <button onClick={() => { soundService.playClick(); setGameState(GameState.ROLE_SELECTION); }} className="mt-4 mb-4 pixel-button bg-black text-slate-400 px-8 py-4 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
               [ Back_To_Hero_Select ]
             </button>
@@ -588,7 +503,6 @@ const App: React.FC = () => {
           <div className="w-full flex-1 flex flex-col items-center justify-center py-4 px-4 overflow-y-auto">
             <div className="w-full max-w-4xl pixel-box border-8 p-6 md:p-8 bg-[#0c0c0c] animate-in zoom-in-95 duration-500 text-center shadow-[16px_16px_0_#000]">
               <div className="text-3xl md:text-5xl pixel-font text-yellow-500 mb-6 animate-pixel-float font-black whitespace-normal break-words max-w-full px-4 leading-tight">MISSION_COMPLETE!</div>
-              
               <div className="flex flex-col items-center mb-6">
                 <div className="border-4 md:border-8 border-white p-1 md:p-2 bg-slate-900 shadow-[6px_6px_0_#000] mb-4">
                    <Avatar role={selectedRole!} size="lg" animate={true} />
@@ -598,7 +512,6 @@ const App: React.FC = () => {
                    RANK: {difficulty === DifficultyLevel.HARD ? 'SRE_OVERLORD' : difficulty === DifficultyLevel.NORMAL ? 'CDL_EXPERT' : 'FOUNDATIONAL_CLOUD'}
                 </div>
               </div>
-
               <div className="bg-[#111] p-6 md:p-8 border-4 border-white mb-8 shadow-inner relative overflow-hidden font-black">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"></div>
                 <div className="pixel-font text-slate-500 text-[8px] mb-2 uppercase tracking-widest">FINAL_RECAP_MODULE | {difficulty} MODE</div>
@@ -609,31 +522,15 @@ const App: React.FC = () => {
                    6_STAGES_CLEARED: CERT_READY
                 </div>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex justify-center">
                 <button 
                   onClick={resetGame}
-                  className="pixel-button pixel-button-primary px-10 py-5 md:px-14 md:py-6 pixel-font text-lg md:text-xl shadow-[6px_6px_0_#000] font-black"
+                  className="pixel-button pixel-button-primary px-16 py-6 md:px-24 md:py-8 pixel-font text-xl md:text-2xl shadow-[6px_6px_0_#000] font-black"
                 >
-                  REPLAY?
-                </button>
-                <button 
-                  onClick={() => { soundService.playClick(); setGameState(GameState.LEADERBOARD); }}
-                  className="pixel-button bg-slate-800 text-white px-10 py-5 md:px-14 md:py-6 pixel-font text-lg md:text-xl shadow-[6px_6px_0_#000] font-black"
-                >
-                  HALL_OF_FAME
+                  RETURN_TO_HQ
                 </button>
               </div>
             </div>
-          </div>
-        )}
-
-        {gameState === GameState.LEADERBOARD && (
-          <div className="w-full flex-1 flex flex-col items-center pt-6 px-4 pb-12 overflow-y-auto max-h-full">
-             <Leaderboard />
-             <button onClick={() => { soundService.playClick(); setGameState(GameState.HOME); }} className="mt-10 pixel-button bg-black text-slate-400 px-10 py-5 pixel-font text-[10px] font-black uppercase shadow-[4px_4px_0_#000]">
-                [ Return_To_HQ ]
-             </button>
           </div>
         )}
 
