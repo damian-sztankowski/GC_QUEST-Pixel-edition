@@ -302,6 +302,29 @@
         #root {
             height: 100%;
         }
+
+        /* Global Beacon Keyframes */
+        @keyframes sonar-ping {
+          0% { transform: scale(0.1); opacity: 1; border-width: 8px; }
+          100% { transform: scale(2); opacity: 0; border-width: 1px; }
+        }
+
+        .animate-sonar {
+          animation: sonar-ping 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+
+        .typewriter-effect {
+          display: inline-block;
+          overflow: hidden;
+          white-space: nowrap;
+          border-right: 4px solid #fff;
+          animation: typewriter 2s steps(40) forwards, blink 0.5s step-end infinite alternate;
+        }
     </style>
 <script type="importmap">
 {
@@ -321,33 +344,5 @@
     <div class="crt-overlay"></div>
     <div class="crt-flicker"></div>
     <div id="root"></div>
-
-    <!-- 
-    GLSL Implementation of the rolling hum bar as requested:
-    
-    float rollingBar(vec2 uv, float time) {
-        // Speed at which the bar rolls down the screen
-        const float rollSpeed = 0.15;
-        
-        // Number of bars visible (frequency of the hum)
-        const float frequency = 1.2;
-        
-        // Intensity of the brightness fluctuation
-        const float intensity = 0.07;
-
-        // Calculate the moving phase based on vertical position and time
-        float phase = fract(uv.y - time * rollSpeed);
-        
-        // Create a periodic wave using sin()
-        float wave = sin(phase * 6.283185 * frequency);
-        
-        // Shape the bar using smoothstep to isolate the 'peak' of the hum.
-        // This creates a distinct band rather than a general blurry wave.
-        float bar = smoothstep(0.3, 0.9, wave) * intensity;
-        
-        // Return a multiplier (1.0 is neutral brightness)
-        return 1.0 + bar;
-    }
-    -->
 </body>
 </html>

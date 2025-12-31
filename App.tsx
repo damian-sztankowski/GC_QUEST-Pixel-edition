@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import RoleCard from './components/RoleCard';
 import Leaderboard from './components/Leaderboard';
@@ -40,6 +40,107 @@ const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
 };
 
 type EasterEggStage = 'GLITCH' | 'SHUTDOWN' | 'BLACKOUT' | 'INFO' | null;
+type BeaconStage = 'IDLE' | 'INIT' | 'RESPONSE' | 'NETWORK' | 'MESSAGE' | null;
+
+interface BeaconNode {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+}
+
+const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
+  const [nodes, setNodes] = useState<BeaconNode[]>([]);
+  const googleColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853'];
+
+  useEffect(() => {
+    if (stage === 'RESPONSE') {
+      const newNodes: BeaconNode[] = [];
+      for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+          setNodes(prev => [...prev, {
+            id: i,
+            x: Math.random() * 90 + 5,
+            y: Math.random() * 90 + 5,
+            color: googleColors[Math.floor(Math.random() * googleColors.length)]
+          }]);
+          soundService.playConnection();
+        }, i * 80);
+      }
+    }
+  }, [stage]);
+
+  if (!stage || stage === 'IDLE') return null;
+
+  return (
+    <div className="fixed inset-0 z-[7000] bg-black flex items-center justify-center overflow-hidden">
+      {/* Grid in background */}
+      <div className="absolute inset-0 pixel-grid opacity-20" />
+
+      {/* Nodes and Network lines */}
+      {nodes.map(node => (
+        <React.Fragment key={node.id}>
+          {stage === 'NETWORK' && (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+              <line 
+                x1={`${node.x}%`} 
+                y1={`${node.y}%`} 
+                x2="50%" 
+                y2="50%" 
+                stroke={node.color} 
+                strokeWidth="2"
+                strokeDasharray="1000"
+                strokeDashoffset="1000"
+                className="animate-[text-reveal_1.5s_ease-out_forwards]"
+                style={{ filter: `drop-shadow(0 0 5px ${node.color})`, opacity: 0.6 }}
+              />
+            </svg>
+          )}
+          <div 
+            className="absolute w-2 h-2 animate-in zoom-in duration-300 shadow-[0_0_10px_currentColor]"
+            style={{ 
+              left: `${node.x}%`, 
+              top: `${node.y}%`, 
+              backgroundColor: node.color,
+              color: node.color
+            }} 
+          />
+        </React.Fragment>
+      ))}
+
+      {/* Central Character */}
+      <div className={`relative z-10 transition-transform duration-1000 ${stage === 'NETWORK' ? 'scale-150' : 'scale-100'}`}>
+        <div className="pixel-box p-2 border-4 bg-black shadow-[0_0_30px_rgba(66,133,244,0.5)]">
+          <Avatar role={CloudRole.DIGITAL_LEADER} size="lg" animate={true} />
+        </div>
+        
+        {stage === 'INIT' && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-white animate-sonar" />
+        )}
+        
+        {stage === 'NETWORK' && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-white/10 animate-pulse blur-xl" />
+        )}
+      </div>
+
+      {/* Terminal Message */}
+      {stage === 'MESSAGE' && (
+        <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6">
+          <div className="pixel-box p-6 bg-black/90 border-4 border-blue-500 shadow-[0_0_20px_#4285F4]">
+            <div className="pixel-font text-white space-y-4">
+              <div className="text-[10px] text-blue-400 mb-2 uppercase tracking-tighter typewriter-effect">SIGNAL BROADCAST: SUCCESS.</div>
+              <div className="text-[10px] text-green-400 mb-2 uppercase tracking-tighter typewriter-effect" style={{ animationDelay: '2.5s' }}>KNOWLEDGE SHARED GLOBALLY.</div>
+              <div className="text-[10px] text-yellow-400 mb-2 uppercase tracking-tighter typewriter-effect" style={{ animationDelay: '5s' }}>STATUS: YOU ARE NOT ALONE.</div>
+              <div className="pt-4 text-sm text-white font-black uppercase text-center animate-in fade-in duration-1000" style={{ animationDelay: '7.5s' }}>
+                THANK YOU, GDE COMMUNITY.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.HOME);
@@ -52,8 +153,9 @@ const App: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initStage, setInitStage] = useState('INSERTING_CARTRIDGE');
   const [eeStage, setEeStage] = useState<EasterEggStage>(null);
+  const [beaconStage, setBeaconStage] = useState<BeaconStage>(null);
+  const [bannerClickCount, setBannerClickCount] = useState(0);
   
-  // Sound states lifted from Layout
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [bgmEnabled, setBgmEnabled] = useState(true);
   const [savedBgmState, setSavedBgmState] = useState(true);
@@ -94,6 +196,35 @@ const App: React.FC = () => {
 
     initializeAvatars();
   }, []);
+
+  const triggerGlobalBeacon = useCallback(() => {
+    setSavedBgmState(bgmEnabled);
+    setBgmEnabled(false);
+    setBeaconStage('INIT');
+    soundService.playPing();
+
+    setTimeout(() => setBeaconStage('RESPONSE'), 2500);
+    setTimeout(() => {
+      setBeaconStage('NETWORK');
+      soundService.playPowerUp();
+    }, 6000);
+    setTimeout(() => setBeaconStage('MESSAGE'), 8500);
+    setTimeout(() => {
+      setBeaconStage(null);
+      setBannerClickCount(0);
+      setBgmEnabled(savedBgmState);
+      notificationService.notify('GLOBAL_BEACON', 'BEACON_SYNC_TERMINATED', 'SUCCESS');
+    }, 18000);
+  }, [bgmEnabled, savedBgmState]);
+
+  const handleBannerClick = () => {
+    const newCount = bannerClickCount + 1;
+    setBannerClickCount(newCount);
+    soundService.playBlip();
+    if (newCount >= 5) {
+      triggerGlobalBeacon();
+    }
+  };
 
   const handleStartGame = () => {
     const normalizedInput = playerName.trim().toLowerCase().replace(/_/g, ' ');
@@ -214,6 +345,9 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Global Beacon Cinematic Overlay */}
+      <GlobalBeaconOverlay stage={beaconStage} />
+
       <Layout 
         activeRole={selectedRole}
         soundEnabled={soundEnabled}
@@ -241,7 +375,10 @@ const App: React.FC = () => {
                   </h1>
                 </div>
 
-                <div className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500 !py-2 !px-6">
+                <div 
+                  onClick={handleBannerClick}
+                  className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500 !py-2 !px-6 cursor-pointer hover:bg-yellow-500/20 active:scale-95 transition-all"
+                >
                   <div className="bit-challenge-text pixel-font text-[8px] md:text-xs font-black uppercase">
                      :: COMMUNITY_EDITION ::
                   </div>

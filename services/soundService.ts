@@ -169,6 +169,15 @@ class SoundService {
   public playSkip() {
     this.playTone(400, 'sawtooth', 0.3, 0.1, 100);
   }
+
+  public playPing() {
+    this.playTone(880, 'triangle', 1.0, 0.05, 440);
+  }
+
+  public playConnection() {
+    const freq = 400 + Math.random() * 800;
+    this.playTone(freq, 'square', 0.05, 0.02);
+  }
 }
 
 export const soundService = new SoundService();
