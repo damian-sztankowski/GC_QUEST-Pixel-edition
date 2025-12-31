@@ -2,26 +2,35 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { CloudRole, Level, Question } from "../types";
 
-// Fix: Strictly use process.env.API_KEY for initialization as per guidelines
+// Strictly use process.env.API_KEY for initialization as per guidelines
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number): Promise<Question> => {
   const entropy = Math.random().toString(36).substring(7);
-  const prompt = `You are a Lead Google Cloud Certification Architect designed to gamify the Cloud Digital Leader (CDL) exam.
   
-  TASK: Generate a unique "Escape Room" style multiple-choice question that tests **one specific concept** found in the Syllabus Scope.
+  const prompt = `You are a Lead Google Cloud Certification Architect.
+  
+  TASK: Generate a unique "Escape Room" multiple-choice question for the Cloud Digital Leader (CDL) exam.
   CHAPTER: "${level.topic}"
   SYLLABUS FOCUS: "${level.description}"
   QUESTION_PROGRESS: ${questionIndex} of 10
   ENTROPY_SEED: ${entropy}
   
-  CRITICAL RULES:
-  1. **Selectivity:** The Syllabus Scope provided is a list of keywords. Do NOT test them all. Isolate ONE specific concept (e.g., if the list says "SQL vs Spanner vs Bigtable", choose *only* Spanner for this specific question).
-  2. *The Scenario (The Lock):** Frame the question as an urgent, high-stakes scenario (e.g., "The colony's life-support data is fragmenting...", "The startup's budget is leaking oxygen...").
-  3. **STRUCTURE:** Question text, 4 plausible options, 1 correct index, and a clear explanation.
-  4. **The Solution (The Key):** The correct answer must be the *exact* Google Cloud product or principle that solves the scenario.
-  5. **Tone:** Immersive and dramatic narrative, but **technically rigorous** options. No magic solutions; only real Google Cloud engineering.
-  6. **Difficulty:** Foundational (CDL Level). Focus on "What is it?" and "When to use it?"
+  CRITICAL COVERAGE RULES:
+  1. **Concept Rotation (Anti-Repetition):** The SYLLABUS FOCUS contains many topics. To ensure 100% coverage across the 10-question level:
+     - Mentally divide the SYLLABUS FOCUS into 10 distinct logical sub-topics.
+     - You MUST generate a question specifically for the sub-topic at position #${questionIndex}.
+     - EXAMPLE: If index is 1, test the first concept mentioned. If index is 5, test the middle concepts (e.g. financials). If index is 10, test the final concepts (e.g. Shared Responsibility).
+  2. **The Scenario (The Lock):** Frame the question as a high-stakes business or technical emergency (e.g., "A global retailer is bleeding revenue due to high latency in Zone B...", "The CFO demands a shift from CapEx to OpEx but the team is confused...").
+  3. **Technical Rigor:** Use official Google Cloud terminology. Distractors must be plausible but technically inferior or incorrect for the specific CDL use-case.
+  4. **The Solution (The Key):** The correct answer must be the specific Google Cloud product or principle that solves the scenario.
+  5. **Difficulty:** Foundational (CDL Level). Focus on "What is it?" and "When to use it?"
+  
+  STRUCTURE:
+  - Question text: Immersive narrative.
+  - Options: 4 strings.
+  - correctIndex: 0-3.
+  - Explanation: 1-2 sentences of technical logic.
   
   Return JSON format: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
 
