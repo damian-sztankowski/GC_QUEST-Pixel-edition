@@ -5,20 +5,22 @@ import { CloudRole, Level, Question } from "../types";
 // Fix: Strictly use process.env.API_KEY for initialization as per guidelines
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-export const generateQuestion = async (role: CloudRole, level: Level): Promise<Question> => {
-  const prompt = `You are an expert Google Cloud exam setter. Generate a Google Cloud certification-style question for a ${role} exam candidate.
-  The question MUST be strictly derived from the official ${role} Exam Guide.
+export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number): Promise<Question> => {
+  const entropy = Math.random().toString(36).substring(7);
+  const prompt = `You are an expert Google Cloud exam setter. Generate a unique Google Cloud certification-style question for a ${role} exam candidate.
   
   CURRENT CHAPTER: "${level.topic}"
   SYLLABUS FOCUS: "${level.description}"
+  QUESTION NUMBER: ${questionIndex} of 10
+  SESSION_ID: ${entropy}
   
   Requirements:
-  1. Target knowledge from ${role}. Focus on high-level concepts and business value." 
-  2. **Terminology:** Strictly use official Google Cloud terminology from ${role}. 
-  3. Frame the question for an escape room context (e.g., "The system requires a security configuration..." or "The business needs to migrate...").
-  4. Ensure the explanation mentions the specific Google Cloud concept/best practice.
-  5. The question must cover one of the sub-points mentioned in the focus text.
-  6. **Distractors:** The wrong answers must be PLAUSIBLE. Do not use made-up service names (e.g., "Google Cloud Box") unless testing for knowledge of real vs. fake services. Common misconceptions are best.
+  1. Target knowledge from ${role}. Focus on high-level concepts and business value.
+  2. **Terminology:** Strictly use official Google Cloud terminology. 
+  3. Frame the question for an escape room context.
+  4. Ensure the explanation mentions the specific Google Cloud concept.
+  5. **VARIETY:** Do not repeat common questions. Explore different sub-topics within "${level.description}".
+  6. **Distractors:** The wrong answers must be PLAUSIBLE. Use common misconceptions.
   
   Return JSON: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
 

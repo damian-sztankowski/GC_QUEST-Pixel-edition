@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { CloudRole, Level, Question, DifficultyLevel } from '../types';
 import { generateQuestion, getGeminiFeedback, generateHint } from '../services/geminiService';
@@ -67,7 +68,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
     setHint(null);
     setSelectedOption(null);
     try {
-      const q = await generateQuestion(role, level);
+      const q = await generateQuestion(role, level, currentQuestionInLevel);
       setQuestion(q);
     } catch (err) {
       console.error(err);
@@ -175,10 +176,9 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
   const stageProgressPercentage = (currentQuestionInLevel / QUESTIONS_PER_LEVEL) * 100;
 
   return (
-    <div className="flex-1 w-full max-w-7xl flex flex-col px-4 pb-4 space-y-4 min-h-0">
+    <div className="flex-1 w-full max-w-7xl flex flex-col px-4 pb-4 space-y-4 min-h-0 overflow-hidden">
       {/* Top Stats Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
-        {/* Nickname Box - Adjusted for overflow and display */}
         <div className="pixel-box p-3 flex items-center space-x-3 bg-[#111] border-2 min-w-0">
           <div className="shrink-0 border-2 border-slate-700 bg-black p-0.5 shadow-[2px_2px_0_#000]">
             <Avatar role={role} size="sm" animate={false} />
@@ -195,7 +195,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
           </div>
         </div>
         
-        {/* Progress Box */}
         <button 
           onClick={() => setMode(mode === 'MAP' ? 'QUESTION' : 'MAP')}
           className={`pixel-box p-3 pixel-font transition-all text-left border-2 ${mode === 'MAP' ? 'bg-blue-900 border-white' : 'bg-[#111] hover:bg-slate-800'}`}
@@ -212,7 +211,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
           </div>
         </button>
 
-        {/* Stability Box */}
         <div className="pixel-box p-3 pixel-font bg-[#200] border-red-500 border-2 leading-none flex flex-col items-center justify-center">
           <div className="w-full flex justify-between items-center mb-1.5 px-1">
             <div className="text-[7px] text-red-300 uppercase font-black">STABILITY</div>
@@ -228,7 +226,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
           </div>
         </div>
 
-        {/* Credits Box */}
         <div className="pixel-box p-3 pixel-font bg-[#002] border-blue-500 border-2 leading-none flex flex-col items-center justify-center">
           <div className="w-full text-left mb-1 px-1">
             <div className="text-[7px] text-blue-300 uppercase font-black">CREDITS</div>
@@ -237,16 +234,16 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
         </div>
       </div>
 
-      {/* Main Game Content - Improved vertical growth */}
-      <div className="flex-1 flex flex-col min-h-0">
+      {/* Main Game Content */}
+      <div className="flex-1 flex flex-col min-h-0 relative">
         {loading && mode === 'QUESTION' ? (
           <div className="flex flex-col items-center justify-center h-full pixel-font text-center bg-black/50 border-8 border-white">
             <div className="w-16 h-16 border-8 border-white border-t-blue-500 animate-spin mb-6 shadow-[8px_8px_0_#000]"></div>
             <p className="text-lg animate-pulse text-white uppercase font-black">Syncing_Chapter_Nodes...</p>
           </div>
         ) : mode === 'MAP' ? (
-          <div className="animate-in zoom-in duration-300 flex-1 overflow-y-auto">
-             <div className="pixel-box border-8 p-8 bg-black h-full">
+          <div className="animate-in zoom-in duration-300 h-full overflow-y-auto">
+             <div className="pixel-box border-8 p-8 bg-black min-h-full">
                 <h2 className="text-4xl pixel-font text-white mb-8 text-center font-black">CLOUD_MAP</h2>
                 <ChapterMap currentLevelIdx={currentLevelIdx} />
                 <div className="mt-12 flex justify-center">
@@ -260,12 +257,12 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
              </div>
           </div>
         ) : mode === 'PUZZLE' ? (
-          <div className="animate-in zoom-in duration-300 flex-1 flex flex-col min-h-0">
+          <div className="animate-in zoom-in duration-300 h-full flex flex-col min-h-0">
             <PuzzleStage levelId={level.id} difficulty={difficulty} onComplete={handlePuzzleComplete} />
           </div>
         ) : (
-          <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] flex flex-col flex-1 shadow-[12px_12px_0_#000] min-h-0">
-            <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black shrink-0">
+          <div className="pixel-box border-8 p-0 overflow-hidden bg-[#0c0c0c] flex flex-col h-full shadow-[12px_12px_0_#000] min-h-0">
+            <div className="bg-white text-black p-3 md:p-4 pixel-font flex justify-between items-center border-b-4 border-black shrink-0 z-10">
               <div className="flex items-center space-x-3">
                  <span className="w-3 h-3 bg-blue-500 border-2 border-black blinking"></span>
                  <span className="text-sm uppercase font-black tracking-tight whitespace-nowrap">{level.title.toUpperCase()}</span>
@@ -275,7 +272,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
               </span>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col space-y-8">
+            <div className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col space-y-8 min-h-0 custom-scrollbar">
               <div className="shrink-0">
                  <div className="p-8 md:p-12 border-4 border-white bg-[#111] text-lg leading-relaxed text-white mono-font flex flex-col space-y-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
                     <div className="flex items-start space-x-6">
@@ -292,7 +289,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                  </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 shrink-0">
                 {question?.options.map((opt, idx) => {
                   let btnClass = "pixel-button p-6 md:p-10 pixel-font text-left flex items-start space-x-6 border-4 transition-all duration-75 h-full ";
                   
@@ -320,7 +317,10 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                 })}
               </div>
 
-              <div className="shrink-0 pt-6">
+              {/* Bottom Action Area - Anchored inside scrollable or at bottom? 
+                  Moving it outside the scroll view or ensuring it's at the very end. 
+                  In this case, we'll keep it at the bottom of the flex container. */}
+              <div className="shrink-0 pt-6 pb-4">
                 {feedback ? (
                   <div className={`p-8 border-4 flex flex-col space-y-6 bg-black shadow-[10px_10px_0_#000] animate-in slide-in-from-bottom-4 duration-300 ${
                     selectedOption === question?.correctIndex ? 'border-green-500' : 'border-red-500'

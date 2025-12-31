@@ -164,7 +164,7 @@ const App: React.FC = () => {
 
               <div className="bit-challenge-banner animate-in slide-in-from-bottom-8 duration-500">
                 <div className="bit-challenge-text pixel-font text-xs md:text-sm font-black uppercase">
-                   :: CDL_EDITION ::
+                   :: COMMUNITY_EDITION ::
                 </div>
               </div>
             </div>
@@ -282,7 +282,7 @@ const App: React.FC = () => {
                           <span className={difficulty === DifficultyLevel.HARD ? 'text-white' : ''}>LEGEND</span>
                        </div>
 
-                       <div className="grid grid-cols-2 gap-2 text-[6px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
+                       <div className="grid grid-cols-2 gap-2 text-[8px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
                           <div className="flex justify-between border-b border-slate-800 pb-1">
                             <span>TIME_MOD:</span>
                             <span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span>

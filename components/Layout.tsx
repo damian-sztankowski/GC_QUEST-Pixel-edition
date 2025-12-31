@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { CloudRole } from '../types';
 import { ROLES } from '../constants';
@@ -47,10 +48,10 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
 
   return (
     <div 
-      className="min-h-screen bg-[#0c0c0c] flex flex-col items-center relative overflow-hidden pixel-grid"
+      className="h-screen w-full bg-[#0c0c0c] flex flex-col items-center relative overflow-hidden pixel-grid"
       onClick={() => soundEnabled && soundService.playClick()}
     >
-      <header className="w-full max-w-7xl px-4 py-2 flex justify-between items-center border-b-4 border-white bg-[#1a1a1a] shadow-[0_4px_0_#000] relative z-20">
+      <header className="w-full max-w-7xl px-4 py-2 flex justify-between items-center border-b-4 border-white bg-[#1a1a1a] shadow-[0_4px_0_#000] relative z-20 shrink-0">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1 border-2 border-white p-1 bg-black">
             <div className="w-3 h-3 bg-red-500 border-1 border-white"></div>
@@ -59,7 +60,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
             <div className="w-3 h-3 bg-green-500 border-1 border-white"></div>
           </div>
           <h1 className="text-xl md:text-2xl font-black pixel-font tracking-tighter text-white">
-            PIXEL_CLOUD:ESCAPE <span style={{ color: currentAccent }}>::CDL EDITION</span>
+            PIXEL_CLOUD:ESCAPE <span style={{ color: currentAccent }}></span>
           </h1>
         </div>
         
@@ -88,11 +89,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
         </div>
       </header>
       
-      <main className="flex-1 w-full max-w-7xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center relative z-10 overflow-hidden">
+      <main className="flex-1 w-full max-w-7xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center relative z-10 min-h-0">
         {children}
       </main>
 
-      <footer className="w-full max-w-7xl px-4 py-2 border-t-2 border-white bg-black text-center text-slate-500 text-[10px] pixel-font tracking-widest relative z-20">
+      <footer className="w-full max-w-7xl px-4 py-2 border-t-2 border-white bg-black text-center text-slate-500 text-[10px] pixel-font tracking-widest relative z-20 shrink-0">
         (C) 2025 BUILT WITH <span style={{ color: 'red' }}>&hearts;</span> for GOOGLE CLOUD COMMUNITY // V_BIT.01
       </footer>
     </div>
