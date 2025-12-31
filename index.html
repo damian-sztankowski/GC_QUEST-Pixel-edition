@@ -47,7 +47,21 @@
             z-index: 1000;
         }
 
-        /* Simulated GLSL Rolling Bar using linear-gradient and animation */
+        /* Glitch Animation for Easter Egg */
+        .system-wipe-glitch {
+            animation: glitch-shake 0.1s infinite;
+            filter: contrast(2) brightness(1.5) hue-rotate(90deg);
+        }
+
+        @keyframes glitch-shake {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+
         .crt-overlay::after {
             content: "";
             position: absolute;
