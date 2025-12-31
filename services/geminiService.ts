@@ -7,22 +7,21 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number): Promise<Question> => {
   const entropy = Math.random().toString(36).substring(7);
-  const prompt = `You are an expert Google Cloud exam setter. Generate a unique Google Cloud certification-style question for a ${role} exam candidate.
+  const prompt = `You are an expert Google Cloud exam setter for the CDL (Cloud Digital Leader) path.
   
-  CURRENT CHAPTER: "${level.topic}"
+  TASK: Generate a unique, professional certification question.
+  CHAPTER: "${level.topic}"
   SYLLABUS FOCUS: "${level.description}"
-  QUESTION NUMBER: ${questionIndex} of 10
-  SESSION_ID: ${entropy}
+  QUESTION_PROGRESS: ${questionIndex} of 10
+  ENTROPY_SEED: ${entropy}
   
-  Requirements:
-  1. Target knowledge from ${role}. Focus on high-level concepts and business value.
-  2. **Terminology:** Strictly use official Google Cloud terminology. 
-  3. Frame the question for an escape room context.
-  4. Ensure the explanation mentions the specific Google Cloud concept.
-  5. **VARIETY:** Do not repeat common questions. Explore different sub-topics within "${level.description}".
-  6. **Distractors:** The wrong answers must be PLAUSIBLE. Use common misconceptions.
+  CRITICAL RULES:
+  1. **VARIETY:** Do not repeat previous concepts. If this is Chapter 6, choose specifically between ${level.description} ensuring you don't pick the same sub-topic twice in a row.
+  2. **TONE:** Professional but themed for an "Escape Room" scenario.
+  3. **STRUCTURE:** Question text, 4 plausible options, 1 correct index, and a clear explanation.
+  4. **TERMINOLOGY:** Use official Google Cloud product names (e.g., "Site Reliability Engineering", "Cloud Billing Reports", "Vertex AI").
   
-  Return JSON: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
+  Return JSON format: { text, options: [4 strings], correctIndex: number(0-3), explanation: string }`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
@@ -53,7 +52,7 @@ export const getGeminiFeedback = async (role: CloudRole, question: string, userA
   The user just answered: "${userAnswer}" to the question: "${question}".
   Result: ${isCorrect ? 'Correct' : 'Incorrect'}.
   
-  Provide a professional, concise feedback snippet (1-2 sentences). Explain the technical logic based on the CDL syllabus in a easy way. Keep the tone slightly "retro gamer" but educational.`;
+  Provide a professional, concise feedback snippet (1-2 sentences). Explain the technical logic based on the CDL syllabus. Keep the tone slightly "retro gamer" but strictly educational.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",

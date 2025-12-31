@@ -89,7 +89,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
         </div>
       </header>
       
-      <main className="flex-1 w-full max-w-7xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center relative z-10 min-h-0">
+      <main className="flex-1 w-full max-w-7xl px-4 py-4 md:px-8 md:py-6 flex flex-col items-center relative z-10 min-h-0 overflow-hidden">
         {children}
       </main>
 
