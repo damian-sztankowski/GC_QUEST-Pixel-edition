@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { CloudRole } from '../types';
 import { ROLES } from '../constants';
 import { soundService } from '../services/soundService';
@@ -7,11 +7,20 @@ import { soundService } from '../services/soundService';
 interface LayoutProps {
   children: React.ReactNode;
   activeRole?: CloudRole | null;
+  soundEnabled: boolean;
+  setSoundEnabled: (enabled: boolean) => void;
+  bgmEnabled: boolean;
+  setBgmEnabled: (enabled: boolean) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [bgmEnabled, setBgmEnabled] = useState(true);
+const Layout: React.FC<LayoutProps> = ({ 
+  children, 
+  activeRole, 
+  soundEnabled, 
+  setSoundEnabled, 
+  bgmEnabled, 
+  setBgmEnabled 
+}) => {
   const roleConfig = ROLES.find(r => r.type === activeRole);
   const themeColor = roleConfig?.color || 'blue';
 
@@ -32,16 +41,18 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole }) => {
 
   const toggleSound = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSoundEnabled(!soundEnabled);
-    if (!soundEnabled) {
+    const newState = !soundEnabled;
+    setSoundEnabled(newState);
+    if (newState) {
       soundService.playClick();
     }
   };
 
   const toggleBgm = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setBgmEnabled(!bgmEnabled);
-    if (!bgmEnabled && soundEnabled) {
+    const newState = !bgmEnabled;
+    setBgmEnabled(newState);
+    if (newState && soundEnabled) {
       soundService.playClick();
     }
   };

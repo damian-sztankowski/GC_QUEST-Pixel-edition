@@ -52,6 +52,11 @@ const App: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initStage, setInitStage] = useState('INSERTING_CARTRIDGE');
   const [eeStage, setEeStage] = useState<EasterEggStage>(null);
+  
+  // Sound states lifted from Layout
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [bgmEnabled, setBgmEnabled] = useState(true);
+  const [savedBgmState, setSavedBgmState] = useState(true);
 
   useEffect(() => {
     const initializeAvatars = async () => {
@@ -91,7 +96,6 @@ const App: React.FC = () => {
   }, []);
 
   const handleStartGame = () => {
-    // Normalize playerName to check for Easter Egg (handling both underscore replacement and case)
     const normalizedInput = playerName.trim().toLowerCase().replace(/_/g, ' ');
     
     if (normalizedInput === 'rm -rf /') {
@@ -105,6 +109,9 @@ const App: React.FC = () => {
   };
 
   const triggerEasterEgg = () => {
+    // Save current BGM state to restore it later
+    setSavedBgmState(bgmEnabled);
+    
     soundService.playSiren();
     setEeStage('GLITCH');
     
@@ -112,6 +119,7 @@ const App: React.FC = () => {
     setTimeout(() => {
       setEeStage('SHUTDOWN');
       soundService.playIncorrect(); // Play a static/buzzing sound for shutdown
+      setBgmEnabled(false); // MUTE BGM DURING SHUTDOWN
     }, 1200);
 
     setTimeout(() => {
@@ -126,6 +134,8 @@ const App: React.FC = () => {
     setTimeout(() => {
       setEeStage(null);
       setPlayerName('PLAYER_SAFE');
+      // Restore BGM if it was originally enabled
+      setBgmEnabled(savedBgmState);
       notificationService.notify('SECURITY_CLEARED', 'Cloud assets protected.', 'SUCCESS');
     }, 9400);
   };
@@ -148,7 +158,6 @@ const App: React.FC = () => {
     soundService.playLevelComplete();
     setFinalScore(s);
     
-    // Save to real leaderboard
     leaderboardService.saveScore({
       name: playerName,
       score: s,
@@ -210,7 +219,13 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <Layout activeRole={selectedRole}>
+      <Layout 
+        activeRole={selectedRole}
+        soundEnabled={soundEnabled}
+        setSoundEnabled={setSoundEnabled}
+        bgmEnabled={bgmEnabled}
+        setBgmEnabled={setBgmEnabled}
+      >
         <NotificationSystem />
         {gameState === GameState.HOME && (
           <div className="relative w-full flex-1 flex flex-col items-center justify-center py-6 px-6">
@@ -221,7 +236,6 @@ const App: React.FC = () => {
               </div>
               
               <div className="mb-12 relative flex flex-col items-center">
-                {/* Floating clouds for extra retro feel */}
                 <div className="absolute -top-12 -left-20 text-4xl opacity-30 animate-pixel-float">☁️</div>
                 <div className="absolute -bottom-6 -right-24 text-4xl opacity-30 animate-pixel-float" style={{ animationDelay: '1.2s' }}>☁️</div>
                 
@@ -249,7 +263,6 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Codename Entry */}
               <div className="mb-10 w-full max-w-md pixel-box p-4 border-2 bg-slate-900/50">
                  <h4 className="pixel-font text-[10px] text-blue-400 mb-3 font-black uppercase text-left">ENTER_CODENAME:</h4>
                  <input 
@@ -289,7 +302,6 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ... Rest of the component remains the same ... */}
         {gameState === GameState.ROLE_SELECTION && (
           <div className="w-full flex-1 animate-in slide-in-from-bottom-8 duration-500 pt-4 px-4 flex flex-col items-center justify-center overflow-y-auto">
             <div className="text-center mb-6">
