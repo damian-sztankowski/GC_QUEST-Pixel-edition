@@ -58,49 +58,32 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
       const newNodes: BeaconNode[] = [];
       setNodes([]);
       // High density nodes for a "Global" community feel
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 90; i++) {
         setTimeout(() => {
           setNodes(prev => [...prev, {
             id: i,
-            x: Math.floor(Math.random() * 90 + 5),
-            y: Math.floor(Math.random() * 90 + 5),
+            x: Math.floor(Math.random() * 92 + 4),
+            y: Math.floor(Math.random() * 92 + 4),
             color: googleColors[Math.floor(Math.random() * googleColors.length)]
           }]);
           soundService.playConnection();
-        }, i * 30);
+        }, i * 25);
       }
     }
   }, [stage]);
 
   if (!stage || stage === 'IDLE') return null;
 
-  // Pixel-art web path logic: Create horizontal and vertical segments that snap to center
-  const getPixelWebPath = (nodeX: number, nodeY: number) => {
-    const targetX = 50;
-    const targetY = 50;
-    
-    // We create a "step" path that looks like a pixel-art network
-    // First segment: move towards horizontal target, then vertical
-    const midPointX = nodeX < targetX ? nodeX + (targetX - nodeX) * 0.5 : nodeX - (nodeX - targetX) * 0.5;
-    
-    // We want some variation to make it look like a "web"
-    if (Math.random() > 0.5) {
-      return `${nodeX},${nodeY} ${targetX},${nodeY} ${targetX},${targetY}`;
-    } else {
-      return `${nodeX},${nodeY} ${nodeX},${targetY} ${targetX},${targetY}`;
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-[7000] bg-black flex items-center justify-center overflow-hidden">
-      {/* Background Pixel Grid - Subtle but there */}
+      {/* Background Pixel Grid */}
       <div className="absolute inset-0 pixel-grid opacity-10" />
 
-      {/* Network Web lines - Pixel Art Style (Orthogonal) */}
+      {/* Network Constellation lines - Thin, semi-transparent direct connections */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <filter id="web-glow">
-            <feGaussianBlur stdDeviation="0.2" result="blur"/>
+            <feGaussianBlur stdDeviation="0.1" result="blur"/>
             <feMerge>
               <feMergeNode in="blur"/>
               <feMergeNode in="SourceGraphic"/>
@@ -108,22 +91,34 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
           </filter>
         </defs>
         {nodes.map(node => (
-          <React.Fragment key={`web-${node.id}`}>
+          <React.Fragment key={`web-line-${node.id}`}>
             {(stage === 'NETWORK' || stage === 'MESSAGE') && (
-              <polyline 
-                points={getPixelWebPath(node.x, node.y)}
-                fill="none"
+              <line 
+                x1={node.x}
+                y1={node.y}
+                x2={50}
+                y2={50}
                 stroke={node.color} 
-                strokeWidth="0.25"
-                className="animate-in fade-in duration-700"
+                strokeWidth="0.15"
+                className="animate-in fade-in duration-1000"
                 style={{ 
                   filter: 'url(#web-glow)', 
-                  opacity: 0.4,
-                  strokeLinecap: 'square'
+                  opacity: 0.25,
                 }}
               />
             )}
           </React.Fragment>
+        ))}
+        {/* Secondary Orthogonal "Core" Web - Slightly thicker but very transparent */}
+        {(stage === 'NETWORK' || stage === 'MESSAGE') && nodes.filter((_, i) => i % 3 === 0).map(node => (
+          <polyline 
+            key={`orthogonal-${node.id}`}
+            points={`${node.x},${node.y} ${node.x},50 50,50`}
+            fill="none"
+            stroke={node.color}
+            strokeWidth="0.2"
+            style={{ opacity: 0.1, strokeDasharray: "1 1" }}
+          />
         ))}
       </svg>
 
@@ -131,22 +126,22 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
       {nodes.map(node => (
         <div 
           key={`node-${node.id}`}
-          className="absolute w-2 h-2 animate-in zoom-in duration-300 z-10"
+          className="absolute w-1.5 h-1.5 animate-in zoom-in duration-300 z-10"
           style={{ 
             left: `${node.x}%`, 
             top: `${node.y}%`, 
             backgroundColor: node.color,
-            boxShadow: `0 0 5px ${node.color}`,
+            boxShadow: `0 0 4px ${node.color}`,
           }} 
         />
       ))}
 
-      {/* Center Stack: Beacon Hub and Terminal Below */}
-      <div className="relative z-50 flex flex-col items-center justify-center gap-12 w-full h-full">
+      {/* Center Stack: Hub and Terminal */}
+      <div className="relative z-50 flex flex-col items-center justify-center gap-10 w-full h-full">
         
-        {/* The GDE Hub Beacon */}
+        {/* The GDE Hub (Representing the Earth icon/Community Center) */}
         <div className={`transition-all duration-1000 ${stage === 'NETWORK' || stage === 'MESSAGE' ? 'scale-110' : 'scale-100'}`}>
-          <div className="p-1 bg-white border-4 border-black shadow-[0_0_120px_rgba(255,255,255,0.25)]">
+          <div className="p-1 bg-white border-4 border-black shadow-[0_0_150px_rgba(255,255,255,0.3)]">
             <div className="p-2 bg-white border-2 border-slate-100">
               <Avatar role="GDE_LOGO" size="xl" animate={false} />
             </div>
@@ -157,15 +152,15 @@ const GlobalBeaconOverlay: React.FC<{ stage: BeaconStage }> = ({ stage }) => {
           )}
           
           {(stage === 'NETWORK' || stage === 'MESSAGE') && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 animate-pulse blur-[100px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-white/5 animate-pulse blur-[120px]" />
           )}
         </div>
 
-        {/* Broadcast Terminal - Positioned below the Beacon */}
+        {/* Broadcast Terminal - Below the Beacon icon */}
         {(stage === 'MESSAGE') && (
           <div className="w-full max-w-xl animate-in slide-in-from-bottom-12 duration-1000">
             <div className="relative pixel-box p-10 bg-[#0c0c0c]/98 border-4 border-cyan-400 shadow-[0_15px_60px_rgba(34,211,238,0.3)]">
-              {/* Retro Speech Bubble Diamond Arrow (Pointing Up towards Beacon) */}
+              {/* Retro Speech Bubble Diamond Arrow (Pointing Up towards Hub) */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-cyan-400 rotate-45 border-t-4 border-l-4 border-black" />
               
               <div className="pixel-font text-white w-full space-y-4">
