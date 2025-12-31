@@ -74,7 +74,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
       console.error(err);
       notificationService.notify('COMM_FAILURE', 'DATA_STREAM_INTERRUPTED', 'ERROR');
       setQuestion({
-        text: "EMERGENCY FALLBACK: Which computing model offers the most infrastructure control?",
+        text: "EMERGENCY FALLBACK: Which computing model offers the most [clue]infrastructure control[/clue]?",
         options: ["IaaS", "PaaS", "SaaS", "Serverless"],
         correctIndex: 0,
         explanation: "Infrastructure as a Service (IaaS) provides maximum control over virtual machines and network resources."
@@ -170,6 +170,22 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const renderFormattedText = (text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(\[clue\].*?\[\/clue\])/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('[clue]') && part.endsWith('[/clue]')) {
+        const content = part.replace('[clue]', '').replace('[/clue]', '');
+        return (
+          <span key={i} className="text-[#4285F4] px-1 bg-blue-500/10 border-b-2 border-blue-500/50 font-black shadow-[0_0_10px_rgba(66,133,244,0.3)]">
+            {content}
+          </span>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
   };
 
   const timePercentage = (timeLeft / maxTime) * 100;
@@ -277,13 +293,15 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                  <div className="p-6 md:p-10 border-4 border-white bg-[#111] text-lg leading-relaxed text-white mono-font flex flex-col space-y-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
                     <div className="flex items-start space-x-6">
                       <span className="text-blue-500 shrink-0 select-none animate-pulse text-3xl md:text-5xl">>>></span>
-                      <p className="text-white uppercase font-black text-lg md:text-2xl tracking-tight leading-snug">{question?.text}</p>
+                      <p className="text-white uppercase font-black text-lg md:text-2xl tracking-[0.1em] leading-loose">
+                        {renderFormattedText(question?.text || "")}
+                      </p>
                     </div>
                     
                     {hint && (
                       <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-2 animate-in slide-in-from-top-2 duration-300">
                         <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black uppercase">ANALYZER_HINT:</div>
-                        <p className="text-purple-300 text-sm md:text-lg uppercase italic font-bold">"{hint}"</p>
+                        <p className="text-purple-300 text-sm md:text-lg uppercase italic font-bold tracking-wider">"{hint}"</p>
                       </div>
                     )}
                  </div>
@@ -311,7 +329,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                       className={btnClass}
                     >
                       <span className="shrink-0 text-lg md:text-xl text-yellow-500 font-black">[{String.fromCharCode(65 + idx)}]</span>
-                      <span className="text-[10px] md:text-sm leading-snug uppercase font-black">{opt}</span>
+                      <span className="text-[10px] md:text-sm leading-snug uppercase font-black tracking-wider">{opt}</span>
                     </button>
                   );
                 })}
@@ -326,7 +344,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                       <div className={`text-[9px] mb-3 font-black uppercase ${selectedOption === question?.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
                          [ ANALYZER_FEEDBACK ]
                       </div>
-                      <div className="text-xs md:text-base text-white leading-relaxed uppercase font-black">
+                      <div className="text-xs md:text-base text-white leading-relaxed uppercase font-black tracking-wider">
                         {feedback}
                       </div>
                     </div>

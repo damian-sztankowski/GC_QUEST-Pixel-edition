@@ -20,14 +20,14 @@ export const generateQuestion = async (role: CloudRole, level: Level, questionIn
   1. **Concept Rotation (Anti-Repetition):** The SYLLABUS FOCUS contains many topics. To ensure 100% coverage across the 10-question level:
      - Mentally divide the SYLLABUS FOCUS into 10 distinct logical sub-topics.
      - You MUST generate a question specifically for the sub-topic at position #${questionIndex}.
-     - EXAMPLE: If index is 1, test the first concept mentioned. If index is 5, test the middle concepts (e.g. financials). If index is 10, test the final concepts (e.g. Shared Responsibility).
-  2. **The Scenario (The Lock):** Frame the question as a high-stakes business or technical emergency (e.g., "A global retailer is bleeding revenue due to high latency in Zone B...", "The CFO demands a shift from CapEx to OpEx but the team is confused...").
-  3. **Technical Rigor:** Use official Google Cloud terminology. Distractors must be plausible but technically inferior or incorrect for the specific CDL use-case.
-  4. **The Solution (The Key):** The correct answer must be the specific Google Cloud product or principle that solves the scenario.
-  5. **Difficulty:** Foundational (CDL Level). Focus on "What is it?" and "When to use it?"
+  2. **The Scenario (The Lock):** Frame the question as a high-stakes business or technical emergency.
+  3. **Clue Highlighting (NEW):** Identify the 1-3 most critical keywords or technical concepts in the question text that serve as the "clue" to the solution. Wrap these words in [clue] and [/clue] tags. 
+     - EXAMPLE: "A company needs to move [clue]unstructured data[/clue] with [clue]millisecond latency[/clue]..."
+  4. **Technical Rigor:** Use official Google Cloud terminology. Distractors must be plausible but technically inferior.
+  5. **Difficulty:** Foundational (CDL Level).
   
   STRUCTURE:
-  - Question text: Immersive narrative.
+  - Question text: Immersive narrative with [clue] tags.
   - Options: 4 strings.
   - correctIndex: 0-3.
   - Explanation: 1-2 sentences of technical logic.

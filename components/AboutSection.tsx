@@ -52,19 +52,19 @@ const AboutSection: React.FC = () => {
           <div className="grid grid-cols-2 gap-x-8 gap-y-10 text-base font-black">
             <div>
               <div className="text-slate-500 mb-2 text-base">ENGINE:</div>
-              <div className="text-white">REACT 19 + TAILWIND</div>
+              <div className="text-white text-xl">REACT 19 + TAILWIND</div>
             </div>
             <div>
               <div className="text-slate-500 mb-2 text-base">BRAIN:</div>
-              <div className="text-white">GEMINI 3 FLASH</div>
+              <div className="text-white text-xl">GEMINI 3 FLASH</div>
             </div>
             <div>
               <div className="text-slate-500 mb-2 text-base">AUTHOR:</div>
-              <div className="text-white">DAMIAN SZTANKOWSKI | GDE CLOUD</div>
+              <div className="text-white text-xl">DAMIAN SZTANKOWSKI | GDE CLOUD</div>
             </div>
             <div>
               <div className="text-slate-500 mb-2 text-base">VERSION:</div>
-              <div className="text-white">1.0.5-PIXEL</div>
+              <div className="text-white text-xl">1.0.5-PIXEL</div>
             </div>
           </div>
         </section>
