@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import RoleCard from './components/RoleCard';
@@ -12,6 +13,7 @@ import { ROLES, LEVELS, DIFFICULTY_SETTINGS } from './constants';
 import { generateAvatar } from './services/geminiService';
 import { soundService } from './services/soundService';
 import { notificationService } from './services/notificationService';
+import { leaderboardService } from './services/leaderboardService';
 
 const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -108,6 +110,16 @@ const App: React.FC = () => {
   const handleGameEnd = (s: number) => {
     soundService.playLevelComplete();
     setFinalScore(s);
+    
+    // Save to real leaderboard
+    leaderboardService.saveScore({
+      name: playerName,
+      score: s,
+      role: selectedRole!,
+      difficulty: difficulty,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+
     notificationService.notify('CHAPTERS_CLEARED', `FINAL_SCORE: ${s}`, 'ACHIEVEMENT');
     setGameState(GameState.GAME_OVER);
   };

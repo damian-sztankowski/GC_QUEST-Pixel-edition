@@ -44,6 +44,8 @@ export interface LeaderboardEntry {
   score: number;
   role: CloudRole;
   time: string;
+  difficulty?: DifficultyLevel;
+  date?: string;
 }
 
 export interface RoleConfig {
