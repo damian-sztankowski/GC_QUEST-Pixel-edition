@@ -34,7 +34,7 @@ const RoleCard: React.FC<RoleCardProps> = ({ role, onSelect, index }) => {
            <span className="pixel-font text-[10px] text-yellow-500">READY</span>
         </div>
         <span className="pixel-font text-xs text-white group-hover:translate-x-2 group-hover:text-blue-400 transition-all duration-200">
-          START_QUEST >
+          START_QUEST &gt;
         </span>
       </div>
     </div>

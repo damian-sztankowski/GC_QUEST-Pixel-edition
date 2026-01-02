@@ -293,7 +293,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
                 <span className="pixel-font text-sm mb-1 font-black">{p.label}</span>
                 <span className="pixel-font text-[8px] opacity-70 font-black">{p.cost}</span>
               </div>
-              <span className="pixel-font text-[10px] translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all font-black">CHOOSE_PATH ></span>
+              <span className="pixel-font text-[10px] translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all font-black">CHOOSE_PATH &gt;</span>
             </button>
           ))}
         </div>
