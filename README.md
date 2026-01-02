@@ -39,9 +39,9 @@ node server.js
 ```bash
 npm run dev
 ```
-*Note: The frontend proxies `/api` requests to `http://localhost:3000`.*
+*Note: The frontend runs on port 5173 and proxies `/api` requests to the backend on `http://localhost:3000`.*
 
-Open your browser at the URL provided by Vite (usually `http://localhost:5173`).
+Open your browser at `http://localhost:5173`.
 
 ### 4. Run in Production Mode (Simulating Deployment)
 This builds the frontend and serves it via the Express server, exactly as it runs in the container.
