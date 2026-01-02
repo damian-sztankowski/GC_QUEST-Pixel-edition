@@ -2,18 +2,26 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, Type } from "@google/genai";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
+
+if (!API_KEY) {
+  console.warn('Warning: API_KEY or GEMINI_API_KEY is not set.');
+}
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 // API Endpoints
 
