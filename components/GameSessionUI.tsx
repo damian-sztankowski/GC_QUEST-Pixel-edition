@@ -292,7 +292,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
               <div className="shrink-0">
                  <div className="p-6 md:p-10 border-4 border-white bg-[#111] text-lg leading-relaxed text-white mono-font flex flex-col space-y-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
                     <div className="flex items-start space-x-6">
-                      <span className="text-blue-500 shrink-0 select-none animate-pulse text-3xl md:text-5xl">&gt;&gt;&gt;</span>
+                      <span className="text-blue-500 shrink-0 select-none animate-pulse text-3xl md:text-5xl">>>></span>
                       <p className="text-white uppercase font-black text-lg md:text-2xl tracking-[0.1em] leading-loose">
                         {renderFormattedText(question?.text || "")}
                       </p>

@@ -293,7 +293,7 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
                 <span className="pixel-font text-sm mb-1 font-black">{p.label}</span>
                 <span className="pixel-font text-[8px] opacity-70 font-black">{p.cost}</span>
               </div>
-              <span className="pixel-font text-[10px] translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all font-black">CHOOSE_PATH &gt;</span>
+              <span className="pixel-font text-[10px] translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all font-black">CHOOSE_PATH ></span>
             </button>
           ))}
         </div>
@@ -330,25 +330,24 @@ const PuzzleStage: React.FC<PuzzleStageProps> = ({ levelId, difficulty, onComple
 
   const renderFirewall = () => (
     <div className="relative h-full w-full bg-[#0a0c0a] flex items-center justify-center overflow-hidden">
-      {/* Redesigned Firewall UI: Status info moved to a compact header to avoid blocking the view */}
-      <div className="absolute top-16 left-0 right-0 z-10 flex justify-center">
-        <div className="pixel-box border-4 border-white p-3 bg-black/80 flex items-center gap-4 shadow-[8px_8px_0_#000]">
-           <div className="text-2xl animate-pulse">🛡️</div>
+      <div className="absolute top-12 left-0 right-0 z-10 flex justify-center pointer-events-none">
+        <div className="pixel-box border-2 border-white/50 p-2 bg-black/60 flex items-center gap-3 shadow-[4px_4px_0_#000]">
+           <div className="text-xl animate-pulse">🛡️</div>
            <div className="flex flex-col">
-              <div className="pixel-font text-[10px] text-white font-black uppercase tracking-tighter">FIREWALL_ACTIVE</div>
-              <div className="text-[6px] pixel-font text-blue-400 font-black">INTERCEPTING_INTRUSIONS...</div>
+              <div className="pixel-font text-[8px] text-white font-black uppercase tracking-tighter">FIREWALL_ACTIVE</div>
+              <div className="text-[5px] pixel-font text-blue-400 font-black">MONITORING_TRAFFIC...</div>
            </div>
         </div>
       </div>
 
-      <div className="absolute inset-y-0 left-1/2 w-1 bg-white/10 border-l-2 border-dashed border-white/40" />
+      <div className="absolute inset-y-0 left-1/2 w-1 bg-white/5 border-l-2 border-dashed border-white/20" />
       
       {subState.items.map((i: any) => (
-        <div key={i.id} className="absolute flex flex-col items-center gap-3 animate-in fade-in duration-300" style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}>
-          <div className="pixel-box bg-black border-4 border-white p-3 text-white pixel-font text-[10px] font-black shadow-[4px_4px_0_#000]">{i.label}</div>
-          <div className="flex gap-3">
-            <button onClick={() => handleFirewall(i.id, true)} className="bg-green-600 px-4 py-2 border-2 border-white pixel-font text-[10px] text-white hover:bg-white hover:text-green-600 transition-colors font-black shadow-[2px_2px_0_#000]">ALLOW</button>
-            <button onClick={() => handleFirewall(i.id, false)} className="bg-red-600 px-4 py-2 border-2 border-white pixel-font text-[10px] text-white hover:bg-white hover:text-red-600 transition-colors font-black shadow-[2px_2px_0_#000]">DENY</button>
+        <div key={i.id} className="absolute flex flex-col items-center gap-2 animate-in fade-in duration-300" style={{ left: `${i.x}%`, top: `${i.y}%`, transform: 'translateX(-50%)' }}>
+          <div className="pixel-box bg-black border-2 border-white p-2 text-white pixel-font text-[8px] font-black shadow-[3px_3px_0_#000]">{i.label}</div>
+          <div className="flex gap-2">
+            <button onClick={() => handleFirewall(i.id, true)} className="bg-green-600 px-3 py-1.5 border-2 border-white pixel-font text-[8px] text-white hover:bg-white hover:text-green-600 transition-colors font-black shadow-[2px_2px_0_#000]">ALLOW</button>
+            <button onClick={() => handleFirewall(i.id, false)} className="bg-red-600 px-3 py-1.5 border-2 border-white pixel-font text-[8px] text-white hover:bg-white hover:text-red-600 transition-colors font-black shadow-[2px_2px_0_#000]">DENY</button>
           </div>
         </div>
       ))}
