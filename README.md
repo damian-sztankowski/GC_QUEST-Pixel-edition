@@ -12,9 +12,15 @@ View your app in AI Studio: https://ai.studio/apps/drive/1XRmUffOuQEDw6Xxwq5mD0k
 
 **Prerequisites:**  Node.js
 
-
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Set the `API_KEY` (Gemini API Key) and `HANDSHAKE_SECRET` in your environment.
+   *(See `backend_api.js` for required variables)*.
+3. Run the backend:
+   `npm run start-backend`
+4. Run the frontend (in a separate terminal):
    `npm run dev`
+
+## Deployment
+
+For detailed instructions on deploying to Google Cloud Run, please see [DEPLOYMENT.md](DEPLOYMENT.md).
