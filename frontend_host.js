@@ -1,35 +1,35 @@
 
 import express from 'express';
+import helmet from 'helmet';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import helmet from 'helmet';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Security: Use Helmet with CSP allowing the separate backend domain
+// Basic security headers
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "connect-src": ["'self'", "https://*.googleapis.com", process.env.VITE_BACKEND_URL || "*"],
       "img-src": ["'self'", "data:", "https://*.google.com", "https://*.googleapis.com"],
-      "script-src": ["'self'", "https://cdn.tailwindcss.com", "https://esm.sh"],
-      "connect-src": ["'self'", "https://*.googleapis.com", "*"] // Allows connecting to the backend service
-    },
-  },
+      "script-src": ["'self'", "https://cdn.tailwindcss.com", "https://esm.sh"]
+    }
+  }
 }));
 
-const distPath = path.join(__dirname, 'dist');
+// Serve static files from the Vite build output directory
+app.use(express.static(path.join(__dirname, 'dist')));
 
-// Serve static assets
-app.use(express.static(distPath));
-
-// Handle React SPA Routing
+// SPA fallback: Return index.html for any unknown path
 app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Frontend Static Host listening on port ${PORT}`);
+  console.log(`Frontend Host running on port ${PORT}`);
 });
