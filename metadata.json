@@ -1,5 +1,5 @@
 {
-  "name": "Google Cloud Quest: Escape Room",
-  "description": "An immersive virtual escape room where you solve Google Cloud puzzles, answer certification-style questions, and master role-specific cloud expertise to climb the leaderboard.",
+  "name": "Cloud Quest: Escape Room",
+  "description": "Master Google Cloud Professional roles through a pixel-art escape room experience powered by Gemini 3 Flash.",
   "requestFramePermissions": []
 }

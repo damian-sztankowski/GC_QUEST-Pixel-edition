@@ -11,7 +11,10 @@ export enum GameState {
 }
 
 export enum CloudRole {
-  DIGITAL_LEADER = 'Cloud Digital Leader'
+  DIGITAL_LEADER = 'Cloud Digital Leader',
+  CLOUD_ARCHITECT = 'Professional Cloud Architect',
+  DATA_ENGINEER = 'Professional Data Engineer',
+  SECURITY_ENGINEER = 'Professional Security Engineer'
 }
 
 export enum DifficultyLevel {
@@ -20,14 +23,14 @@ export enum DifficultyLevel {
   HARD = 'HARD'
 }
 
-export type PuzzleType = 'CATCHER' | 'SORTER' | 'DEFENDER';
+export type PuzzleType = 'CATCHER' | 'SORTER' | 'DEFENDER' | 'STACKER' | 'SILO' | 'LAB' | 'SHOOTER' | 'FIREWALL' | 'TRIAGE';
 
 export interface Level {
   id: number;
   title: string;
   description: string;
   topic: string;
-  difficulty: 'Foundational';
+  difficulty: 'Foundational' | 'Professional';
   puzzleType: PuzzleType;
 }
 
@@ -36,6 +39,7 @@ export interface Question {
   options: string[];
   correctIndex: number;
   explanation: string;
+  hint?: string;
 }
 
 export interface RoleConfig {
@@ -43,17 +47,12 @@ export interface RoleConfig {
   icon: string;
   description: string;
   color: string;
+  accent: string;
   avatarPrompt: string;
   avatarBase64?: string;
 }
 
-export interface PuzzleGame {
-  id: string;
-  title: string;
-  instructions: string;
-  type: 'SORTER' | 'CONNECTOR' | 'DEFENDER';
-}
-
+// Added NotificationType export to fix external reference errors
 export type NotificationType = 'INFO' | 'SUCCESS' | 'ERROR' | 'ACHIEVEMENT';
 
 export interface Notification {
@@ -63,7 +62,6 @@ export interface Notification {
   title: string;
 }
 
-// Added missing LeaderboardEntry interface used in leaderboardService.ts
 export interface LeaderboardEntry {
   name: string;
   score: number;

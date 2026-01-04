@@ -73,12 +73,6 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
     } catch (err) {
       console.error(err);
       notificationService.notify('COMM_FAILURE', 'DATA_STREAM_INTERRUPTED', 'ERROR');
-      setQuestion({
-        text: "EMERGENCY FALLBACK: Which computing model offers the most [clue]infrastructure control[/clue]?",
-        options: ["IaaS", "PaaS", "SaaS", "Serverless"],
-        correctIndex: 0,
-        explanation: "Infrastructure as a Service (IaaS) provides maximum control over virtual machines and network resources."
-      });
     } finally {
       setLoading(false);
     }
@@ -92,7 +86,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
     setScore(prev => prev - HINT_COST);
     
     try {
-      const clue = await generateHint(question?.text || '', level.topic);
+      const clue = await generateHint(question, level.topic);
       setHint(clue);
       soundService.playPowerUp();
       notificationService.notify('HINT_ACQUIRED', `-${HINT_COST}_CREDITS_SPENT`, 'INFO');
@@ -255,7 +249,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
         {loading && mode === 'QUESTION' ? (
           <div className="flex flex-col items-center justify-center h-full pixel-font text-center bg-black/50 border-8 border-white">
             <div className="w-16 h-16 border-8 border-white border-t-blue-500 animate-spin mb-6 shadow-[8px_8px_0_#000]"></div>
-            <p className="text-lg animate-pulse text-white uppercase font-black">Syncing_Chapter_Nodes...</p>
+            <p className="text-lg animate-pulse text-white uppercase font-black">Decrypting_Node_Data...</p>
           </div>
         ) : mode === 'MAP' ? (
           <div className="animate-in zoom-in duration-300 h-full overflow-y-auto">
@@ -300,7 +294,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                     
                     {hint && (
                       <div className="border-t-2 border-dashed border-purple-500/50 pt-4 mt-2 animate-in slide-in-from-top-2 duration-300">
-                        <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black uppercase">ANALYZER_HINT:</div>
+                        <div className="pixel-font text-[8px] text-purple-400 mb-2 font-black uppercase">LOCAL_DECODER_HINT:</div>
                         <p className="text-purple-300 text-sm md:text-lg uppercase italic font-bold tracking-wider">"{hint}"</p>
                       </div>
                     )}
@@ -346,6 +340,9 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
                       </div>
                       <div className="text-xs md:text-base text-white leading-relaxed uppercase font-black tracking-wider">
                         {feedback}
+                      </div>
+                      <div className="mt-4 text-[10px] text-slate-400 italic">
+                        {question?.explanation}
                       </div>
                     </div>
                     <div className="flex justify-end">

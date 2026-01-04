@@ -14,17 +14,16 @@ const AboutSection: React.FC = () => {
           <h3 className="pixel-font text-blue-400 text-xl mb-4 font-black">:: THE_MISSION ::</h3>
           <p className="text-slate-200">
             PIXEL_CLOUD:ESCAPE IS AN INTERACTIVE ESCAPE ROOM DESIGNED TO PREPARE YOU FOR THE <span className="text-white font-bold">CLOUD DIGITAL LEADER</span> CERTIFICATION. 
-            YOU MUST NAVIGATE 6 CRITICAL CHAPTERS OF CLOUD ARCHITECTURE, SOLVING QUIZZES AND CHALLENGES TO RESTORE STABILITY TO THE DATA CORE.
+            YOU MUST NAVIGATE 6 CRITICAL CHAPTERS OF CLOUD ARCHITECTURE, SOLVING 100+ CURATED CHALLENGES TO RESTORE STABILITY TO THE DATA CORE.
           </p>
         </section>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <section className="space-y-4">
-            <h3 className="pixel-font text-yellow-500 text-xs mb-4 font-black">:: AI_ORACLE ::</h3>
+            <h3 className="pixel-font text-yellow-500 text-xs mb-4 font-black">:: LOCAL_ORACLE ::</h3>
             <p className="text-lg leading-relaxed text-slate-400">
-              THIS QUEST IS POWERED BY THE <span className="text-white font-bold underline">GEMINI 3 FLASH API</span>. 
-              EVERY QUESTION, FEEDBACK SNIPPET, AND CLUE IS DYNAMICALLY GENERATED TO ENSURE NO TWO RUNS ARE THE SAME. 
-              EVEN YOUR AVATAR IS A UNIQUE NEURAL RECONSTRUCTION.
+              THIS QUEST USES A ROBUST STATIC KNOWLEDGE BASE OF 100 QUESTIONS SOURCED FROM OFFICIAL EXAM GUIDES. 
+              QUESTIONS ARE SHUFFLED EACH SESSION TO ENSURE REPLAYABILITY AND DEPTH OF KNOWLEDGE.
             </p>
           </section>
 
@@ -32,16 +31,16 @@ const AboutSection: React.FC = () => {
             <h3 className="pixel-font text-green-500 text-xs mb-4 font-black">:: MINI_GAMES ::</h3>
             <ul className="text-lg space-y-3 text-slate-400">
               <li className="flex items-start gap-3">
-                <span className="text-white shrink-0">📥</span> 
-                <span><b className="text-white">CATCHER:</b> RECOVER STRAY DATA PACKETS BEFORE THEY ARE LOST TO THE VOID.</span>
+                <span className="text-white shrink-0">🗂️</span> 
+                <span><b className="text-white">TRIAGE:</b> SORT FALLING SECURITY TASKS INTO PROVIDER OR CUSTOMER DOMAINS.</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-white shrink-0">🗂️</span> 
-                <span><b className="text-white">SORTER:</b> VALIDATE AND CATEGORIZE SERVICES INTO THEIR PROPER CLOUD MODELS.</span>
+                <span className="text-white shrink-0">🗄️</span> 
+                <span><b className="text-white">SILO:</b> ROUTE NETWORK DATAGRAMS TO THE CORRECT STORAGE ENGINES.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-white shrink-0">🛡️</span> 
-                <span><b className="text-white">DEFENDER:</b> INTERCEPT MALICIOUS THREATS AND STABILIZE NETWORK INFRASTRUCTURE.</span>
+                <span><b className="text-white">FIREWALL:</b> INTERCEPT MALICIOUS THREATS AND VALIDATE AUTHORIZED ACCESS.</span>
               </li>
             </ul>
           </section>
@@ -55,16 +54,16 @@ const AboutSection: React.FC = () => {
               <div className="text-white text-xl">REACT 19 + TAILWIND</div>
             </div>
             <div>
-              <div className="text-slate-500 mb-2 text-base">BRAIN:</div>
-              <div className="text-white text-xl">GEMINI 3 FLASH</div>
+              <div className="text-slate-500 mb-2 text-base">DATA_BASE:</div>
+              <div className="text-white text-xl">100+ STATIC CHALLENGES</div>
             </div>
             <div>
               <div className="text-slate-500 mb-2 text-base">AUTHOR:</div>
-              <div className="text-white text-xl">DAMIAN SZTANKOWSKI | GDE CLOUD</div>
+              <div className="text-white text-xl">GDE CLOUD COMMUNITY</div>
             </div>
             <div>
               <div className="text-slate-500 mb-2 text-base">VERSION:</div>
-              <div className="text-white text-xl">1.0.5-PIXEL</div>
+              <div className="text-white text-xl">2.0.0-STATIC_CORE</div>
             </div>
           </div>
         </section>

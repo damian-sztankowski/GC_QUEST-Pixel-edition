@@ -5,9 +5,9 @@ class SoundService {
   private bgmEnabled: boolean = true;
   private bgmInterval: number | null = null;
   private currentStep: number = 0;
-  private currentSpeed: number = 150; // Normal tempo
+  private currentSpeed: number = 150; // Normal tempo in ms per step (~100bpm)
 
-  // Retro chords and melodies
+  // Retro frequencies for procedural melody and bass
   private melody = [261.63, 329.63, 392.00, 246.94, 220.00, 261.63, 293.66, 196.00];
   private bassline = [65.41, 65.41, 82.41, 98.00, 55.00, 55.00, 65.41, 49.00];
 
@@ -37,7 +37,7 @@ class SoundService {
   }
 
   public setBGMSpeed(isFast: boolean) {
-    const newSpeed = isFast ? 100 : 150;
+    const newSpeed = isFast ? 100 : 150; // Accelerates to ~150bpm for tension
     if (this.currentSpeed !== newSpeed) {
       this.currentSpeed = newSpeed;
       if (this.bgmEnabled && this.enabled) {
@@ -99,26 +99,26 @@ class SoundService {
       const step = this.currentStep % 16;
       const isFastMode = this.currentSpeed < 150;
       
-      // Melody (every 2 steps)
+      // Melody (Triangle wave for warmth)
       if (step % 2 === 0) {
         const freq = this.melody[(step / 2) % this.melody.length] * (isFastMode ? 1.5 : 1);
-        this.playTone(freq, 'triangle', isFastMode ? 0.2 : 0.4, 0.02);
+        this.playTone(freq, 'triangle', isFastMode ? 0.15 : 0.3, 0.02);
       }
 
-      // Bassline (on every beat)
+      // Bassline (Sawtooth wave for crunchy low-end)
       if (step % 4 === 0) {
         const bFreq = this.bassline[(step / 4) % this.bassline.length];
         this.playTone(bFreq, 'sawtooth', 0.2, 0.03);
       }
 
-      // High Hat (every off-beat)
+      // High Hat (Short noise burst)
       if (step % 2 !== 0) {
-        this.playNoise(0.05, 0.01);
+        this.playNoise(0.05, 0.005);
       }
 
-      // Snare (on 4 and 12)
+      // Snare (Noise burst on backbeat)
       if (step === 4 || step === 12) {
-        this.playNoise(0.1, 0.03);
+        this.playNoise(0.1, 0.02);
       }
       
       this.currentStep++;
@@ -133,17 +133,19 @@ class SoundService {
   }
 
   public playClick() {
-    this.playTone(800, 'square', 0.1, 0.05);
+    this.playTone(800, 'square', 0.05, 0.05);
   }
 
   public playCorrect() {
+    // Ascending major arpeggio
     this.playTone(523.25, 'square', 0.1, 0.1); 
-    setTimeout(() => this.playTone(659.25, 'square', 0.1, 0.1), 100); 
-    setTimeout(() => this.playTone(783.99, 'square', 0.3, 0.1), 200); 
+    setTimeout(() => this.playTone(659.25, 'square', 0.1, 0.1), 80); 
+    setTimeout(() => this.playTone(783.99, 'square', 0.2, 0.1), 160); 
   }
 
   public playIncorrect() {
-    this.playTone(150, 'sawtooth', 0.5, 0.1, 40);
+    // Descending slide
+    this.playTone(150, 'sawtooth', 0.4, 0.1, 40);
   }
 
   public playLevelComplete() {
@@ -167,7 +169,7 @@ class SoundService {
   }
 
   public playSkip() {
-    this.playTone(400, 'sawtooth', 0.3, 0.1, 100);
+    this.playTone(400, 'sawtooth', 0.2, 0.1, 100);
   }
 
   public playPing() {

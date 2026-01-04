@@ -4,10 +4,11 @@ import { CloudRole, Level, RoleConfig, DifficultyLevel } from './types';
 export const ROLES: RoleConfig[] = [
   {
     type: CloudRole.DIGITAL_LEADER,
-    icon: 'HERO',
-    description: 'The young adept of the cloud. Master business value, data, and infrastructure in a retro 16-bit environment.',
+    icon: 'HERO_BLUE',
+    description: 'Master business value and foundational infrastructure. The perfect start for cloud novices.',
     color: 'blue',
-    avatarPrompt: '16-bit pixel art icon of a blue superhero cloud with a digital cape, solid black background, retro video game style, centered, high contrast, vibrant Google blue colors.'
+    accent: '#4285F4',
+    avatarPrompt: '16-bit pixel art of a blue futuristic digital explorer, solid black background, retro video game style.'
   }
 ];
 
@@ -38,50 +39,50 @@ export const DIFFICULTY_SETTINGS = {
 export const LEVELS: Level[] = [
   { 
     id: 1, 
-    title: 'Digital Transformation', 
-    description: 'Why choose Google Cloud for digital transformation? Key concepts: cloud vs on-prem, cloud-native, open source standards. Benefits: scalability, flexibility, agility, security, strategic value. Infrastructure models: public, private, hybrid, and multicloud. Implications of non-adoption. Financials: CapEx to OpEx shift, Total Cost of Ownership (TCO). Networking basics: IP, DNS, regions, zones, latency, and bandwidth. Service models: IaaS, PaaS, SaaS benefits and trade-offs. Shared Responsibility Model for provider vs customer.', 
-    topic: 'Section 1: Digital Transformation with Google Cloud', 
+    title: 'Digital Core', 
+    description: 'Cloud value proposition, on-prem vs cloud, CapEx to OpEx, and shared responsibility.', 
+    topic: 'Digital Transformation & Shared Responsibility', 
     difficulty: 'Foundational',
-    puzzleType: 'CATCHER'
+    puzzleType: 'TRIAGE'
   },
   { 
     id: 2, 
-    title: 'Data Transformation', 
-    description: 'The value of data and its role in digital transformation. Data types: structured vs unstructured. Storage types: Databases, Data Warehouses, and Data Lakes. Google Cloud SQL vs Spanner vs Bigtable. Large scale analytics with BigQuery. Real-time streaming with Pub/Sub and Dataflow. Data visualization and business intelligence with Looker. Benefits of managed data services for agility and cost-efficiency.', 
-    topic: 'Section 2: Exploring Data Transformation with Google Cloud', 
+    title: 'Data Silos', 
+    description: 'Structured vs Unstructured data, Cloud SQL vs Spanner vs Bigtable, and BigQuery analytics.', 
+    topic: 'Data Storage & Analytics', 
     difficulty: 'Foundational',
-    puzzleType: 'SORTER'
+    puzzleType: 'SILO'
   },
   { 
     id: 3, 
-    title: 'AI & Machine Learning', 
-    description: 'AI vs ML fundamentals. Selecting the right solution: Pre-trained APIs (Vision, Translation, Speech) vs AutoML for custom labels vs Vertex AI for custom models. Infrastructure for ML: GPUs and TPUs. Building, deploying, and managing ML models on Vertex AI. The role of BigQuery ML for SQL-based models. Responsible AI principles and ethics in cloud innovation.', 
-    topic: 'Section 3: Innovating with Google Cloud Artificial Intelligence', 
+    title: 'Neural Lab', 
+    description: 'Vertex AI, Pre-trained APIs, AutoML, and the custom model lifecycle.', 
+    topic: 'AI & Machine Learning', 
     difficulty: 'Foundational',
-    puzzleType: 'DEFENDER'
+    puzzleType: 'LAB'
   },
   { 
     id: 4, 
-    title: 'Modernizing Infrastructure', 
-    description: 'Legacy vs Modernized Infrastructure. Compute options: Virtual Machines (Compute Engine), Containers (GKE), and Serverless (Cloud Run, Cloud Functions). Migration strategies: Rehost (Lift & Shift), Replatform, and Rearchitect. Benefits of App Modernization and CI/CD pipelines. Managing hybrid/multicloud with Anthos and GKE Enterprise. API management with Apigee to unlock legacy value.', 
-    topic: 'Section 4: Modernize Infrastructure and Applications with Google Cloud', 
+    title: 'Compute Node', 
+    description: 'VMs, GKE, Cloud Run, and Serverless modernization strategies.', 
+    topic: 'Modernizing Infrastructure', 
     difficulty: 'Foundational',
-    puzzleType: 'CATCHER'
+    puzzleType: 'SHOOTER'
   },
   { 
     id: 5, 
-    title: 'Trust and Security', 
-    description: 'Security in the cloud: Defense in Depth and Zero Trust. Google Trusted Infrastructure: data encryption at rest and in transit. Shared Responsibility for security. IAM (Identity and Access Management) and the Principle of Least Privilege. Cloud Armor for DDoS protection. Compliance standards (GDPR, HIPAA). Data sovereignty and residency. Google’s Trust Principles: your data is yours.', 
-    topic: 'Section 5: Trust and Security with Google Cloud', 
+    title: 'Zero Trust Gate', 
+    description: 'IAM roles, Cloud Armor, Identity-Aware Proxy, and defense in depth.', 
+    topic: 'Trust and Security', 
     difficulty: 'Foundational',
-    puzzleType: 'SORTER'
+    puzzleType: 'FIREWALL'
   },
   { 
     id: 6, 
-    title: 'Scaling & Operations', 
-    description: 'Financial governance and cost management in the cloud. Google Cloud Resource Hierarchy (Org > Folder > Project > Resource). Billing reports, quotas, and budgets. Operational excellence: DevOps and Site Reliability Engineering (SRE). Reliability metrics: SLIs, SLOs, and SLAs. Error budgets and post-mortems. Google Cloud Sustainability: carbon-neutral goals, carbon-free energy, and net-zero emissions.', 
-    topic: 'Section 6: Scaling with Google Cloud Operations', 
+    title: 'Global Hierarchy', 
+    description: 'Org structure, folders, projects, and resource billing governance.', 
+    topic: 'Scaling & Operations Hierarchy', 
     difficulty: 'Foundational',
-    puzzleType: 'DEFENDER'
+    puzzleType: 'STACKER'
   }
 ];

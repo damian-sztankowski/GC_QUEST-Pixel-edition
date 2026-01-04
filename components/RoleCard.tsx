@@ -10,31 +10,39 @@ interface RoleCardProps {
 }
 
 const RoleCard: React.FC<RoleCardProps> = ({ role, onSelect, index }) => {
+  const accentColor = role.accent;
+
   return (
     <div 
       onClick={() => onSelect(role.type)}
-      style={{ animationDelay: `${index * 150}ms` }}
-      className="pixel-box p-12 cursor-pointer group transition-all duration-200 transform hover:-translate-y-3 hover:scale-[1.02] hover:border-blue-400 hover:shadow-[12px_12px_0_rgba(66,133,244,0.3)] flex flex-col items-center text-center h-full border-8 bg-[#111]"
+      style={{ 
+        animationDelay: `${index * 150}ms`,
+        boxShadow: `8px 8px 0px rgba(0, 0, 0, 0.8)`
+      }}
+      className="pixel-box p-6 mb-4 cursor-pointer group transition-all duration-200 transform hover:-translate-y-1 hover:scale-[1.01] flex flex-row items-center gap-6 border-4 bg-[#111] hover:bg-[#1a1a1a]"
     >
-      <div className="mb-10 border-4 border-white bg-black p-5 shadow-[6px_6px_0_#000] group-hover:scale-110 group-hover:border-blue-400 transition-transform duration-200">
-        <Avatar role={role.type} size="xl" base64={role.avatarBase64} animate={true} />
+      <div 
+        className="border-4 border-white bg-black p-2 shadow-[4px_4px_0_#000] group-hover:scale-110 transition-transform duration-200"
+        style={{ borderColor: accentColor }}
+      >
+        <Avatar role={role.type} size="md" base64={role.avatarBase64} animate={true} />
       </div>
       
-      <h3 className="text-3xl font-black pixel-font text-white mb-6 tracking-tight group-hover:text-blue-400 transition-colors duration-200">
-        {role.type.toUpperCase()}
-      </h3>
-      
-      <p className="mono-font text-slate-300 text-xl leading-relaxed mb-12 px-2 uppercase">
-        {role.description}
-      </p>
+      <div className="flex-1 text-left min-w-0">
+        <h3 
+          className="text-lg md:text-xl font-black pixel-font text-white mb-1 tracking-tight truncate"
+          style={{ color: accentColor }}
+        >
+          {role.type.toUpperCase()}
+        </h3>
+        <p className="mono-font text-slate-300 text-sm leading-snug uppercase">
+          {role.description}
+        </p>
+      </div>
 
-      <div className="mt-auto pt-8 border-t-4 border-white/20 w-full flex justify-between items-center px-2">
-        <div className="flex items-center space-x-2">
-           <div className="w-3 h-3 bg-yellow-500 animate-pulse"></div>
-           <span className="pixel-font text-[10px] text-yellow-500">READY</span>
-        </div>
-        <span className="pixel-font text-xs text-white group-hover:translate-x-2 group-hover:text-blue-400 transition-all duration-200">
-          START_QUEST >
+      <div className="hidden sm:flex flex-col items-end shrink-0">
+        <span className="pixel-font text-[10px] text-white group-hover:translate-x-1 transition-transform">
+          SELECT >
         </span>
       </div>
     </div>

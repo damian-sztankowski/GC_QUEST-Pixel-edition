@@ -14,7 +14,7 @@ const Leaderboard: React.FC = () => {
   })), [scores]);
 
   const COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853'];
-  const rolesWithAvatars = JSON.parse(localStorage.getItem('quest_avatars') || '[]');
+  const rolesWithAvatars = JSON.parse(localStorage.getItem('quest_avatars_v2') || '[]');
 
   return (
     <div className="w-full max-w-4xl pixel-box border-8 p-6 md:p-10 bg-black shadow-[16px_16px_0_#000] flex flex-col max-h-[85vh]">

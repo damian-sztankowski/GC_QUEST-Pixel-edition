@@ -1,125 +1,98 @@
 
-import { Type } from "@google/genai";
 import { CloudRole, Level, Question } from "../types";
-
-// Security Handshake - Must match backend_api.js
-const HANDSHAKE_SECRET = "GCP_QUEST_SECURE_PROTO_V1";
+import { STATIC_QUESTION_BASE } from "../data/questions";
 
 /**
- * Access the backend URL.
- * In Vite, this is usually import.meta.env.VITE_BACKEND_URL.
- * We use safe navigation and a type-safe fallback to prevent TypeErrors in non-Vite or misconfigured environments.
+ * UTILITY: Shuffles an array using Fisher-Yates algorithm
  */
-// @ts-ignore
-const BACKEND_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_URL) || '';
-
-const secureFetch = async (endpoint: string, body: any) => {
-  const url = `${BACKEND_URL}${endpoint}`;
-  
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-Handshake-Token': HANDSHAKE_SECRET
-    },
-    body: JSON.stringify(body)
-  });
-
-  if (!response.ok) {
-    const status = response.status;
-    const errorData = await response.json().catch(() => ({}));
-    console.error(`[SECURE_FETCH_FAILED]: ${status} - ${url}`, errorData);
-    throw new Error(errorData.message || `API_ERROR_${status}`);
+function shuffleArray<T>(array: T[]): T[] {
+  const newArr = [...array];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
   }
+  return newArr;
+}
 
-  return response.json();
-};
+/**
+ * Cache for shuffled questions to maintain consistency within a session
+ */
+const shuffledCache: Record<number, Question[]> = {};
 
+/**
+ * REPLACED: No longer uses Gemini API. Retrieves from STATIC_QUESTION_BASE.
+ */
 export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number): Promise<Question> => {
-  const entropy = Math.random().toString(36).substring(7);
-  
-  const prompt = `You are a Lead Google Cloud Certification Architect.
-  TASK: Generate a unique "Escape Room" multiple-choice question for the Cloud Digital Leader (CDL) exam.
-  CHAPTER: "${level.topic}"
-  SYLLABUS FOCUS: "${level.description}"
-  QUESTION_PROGRESS: ${questionIndex} of 10
-  ENTROPY_SEED: ${entropy}
-  
-  STRUCTURE:
-  - Question text: Immersive narrative with [clue] tags.
-  - Options: 4 strings.
-  - correctIndex: 0-3.
-  - Explanation: 1-2 sentences.
-  Return JSON format: { text, options, correctIndex, explanation }`;
-
-  const data = await secureFetch('/api/generate', {
-    prompt,
-    model: "gemini-3-flash-preview",
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          text: { type: Type.STRING },
-          options: { type: Type.ARRAY, items: { type: Type.STRING } },
-          correctIndex: { type: Type.NUMBER },
-          explanation: { type: Type.STRING }
-        },
-        required: ["text", "options", "correctIndex", "explanation"]
-      }
-    }
-  });
-
-  return JSON.parse(data.text);
-};
-
-export const getGeminiFeedback = async (role: CloudRole, question: string, userAnswer: string, isCorrect: boolean): Promise<string> => {
-  const prompt = `Act as an expert Cloud Digital Leader Instructor in a retro 8-bit game.
-  Question: "${question}"
-  User Answer: "${userAnswer}"
-  Result: ${isCorrect ? 'Correct' : 'Incorrect'}.
-  Provide a concise 1-2 sentence technical explanation. Tone: Retro-educational.`;
-
-  const data = await secureFetch('/api/generate', {
-    prompt,
-    model: "gemini-3-flash-preview"
-  });
-
-  return data.text;
-};
-
-export const generateHint = async (question: string, topic: string): Promise<string> => {
-  const prompt = `The user is stuck on a Google Cloud question regarding "${topic}".
-  Question: "${question}"
-  Provide a subtle hint under 20 words. Persona: Retro Debug Console.`;
-
-  const data = await secureFetch('/api/generate', {
-    prompt,
-    model: "gemini-3-flash-preview"
-  });
-
-  return data.text;
-};
-
-export const generateAvatar = async (prompt: string): Promise<string> => {
-  const data = await secureFetch('/api/generate', {
-    contents: { parts: [{ text: prompt }] },
-    model: 'gemini-2.5-flash-image',
-    config: { 
-      imageConfig: { 
-        aspectRatio: "1:1"
-      } 
-    },
-  });
-
-  if (data.parts && Array.isArray(data.parts)) {
-    for (const part of data.parts) {
-      if (part.inlineData) {
-        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-      }
-    }
+  // Check if we already shuffled this level for this session
+  if (!shuffledCache[level.id]) {
+    const baseQuestions = STATIC_QUESTION_BASE[level.id] || [];
+    shuffledCache[level.id] = shuffleArray(baseQuestions);
   }
   
-  throw new Error("AVATAR_EXTRACTION_FAILED: No image part found.");
+  const levelQuestions = shuffledCache[level.id];
+  
+  if (levelQuestions && levelQuestions.length > 0) {
+    // Zero-based index from 1-based questionIndex
+    const idx = (questionIndex - 1) % levelQuestions.length;
+    
+    // Simulate a tiny "network delay" for retro feel, but no API call
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(levelQuestions[idx]), 300);
+    });
+  }
+
+  // Absolute fallback
+  return {
+    text: "SYSTEM_RECOVERY: Which cloud model involves paying only for the [clue]resources consumed[/clue]?",
+    options: ["On-premises", "CapEx", "Pay-as-you-go", "Fixed-tier"],
+    correctIndex: 2,
+    explanation: "The pay-as-you-go model is a hallmark of cloud computing, enabling OpEx flexibility.",
+    hint: "Think about consumption-based pricing."
+  };
+};
+
+/**
+ * REPLACED: Returns static feedback based on correctness.
+ */
+export const getGeminiFeedback = async (role: CloudRole, question: string, userAnswer: string, isCorrect: boolean): Promise<string> => {
+  const positive = [
+    "DATA_FLOW_STABILIZED! ACCESS_GRANTED.",
+    "CRITICAL_SUCCESS. NODE_ONLINE.",
+    "CORE_SYNC_COMPLETE. EXCELLENT_WORK.",
+    "KNOWLEDGE_VERIFIED. PROCEED_TO_NEXT_NODE."
+  ];
+  const negative = [
+    "SYSTEM_BREACH! ACCESS_DENIED.",
+    "LOGIC_ERROR_DETECTED. RECALIBRATING...",
+    "DATA_CORRUPTION_PREVENTED. TRY_AGAIN.",
+    "INCORRECT_INPUT. SECURITY_PERIMETER_ACTIVE."
+  ];
+
+  const pool = isCorrect ? positive : negative;
+  const result = pool[Math.floor(Math.random() * pool.length)];
+
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(result), 200);
+  });
+};
+
+/**
+ * REPLACED: Returns a hint if provided in the question data.
+ */
+export const generateHint = async (question: Question | null, topic: string): Promise<string> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(question?.hint || "SEEK_THE_ROOT_OF_THE_ARCHITECTURE.");
+    }, 400);
+  });
+};
+
+/**
+ * REPLACED: No longer generates images via AI.
+ * Returns a static placeholder or pre-defined pixel art.
+ */
+export const generateAvatar = async (prompt: string): Promise<string> => {
+  // In a real local-only app, you'd use static assets. 
+  // We return a placeholder that triggers the SVG fallback in Avatar component.
+  return ""; 
 };

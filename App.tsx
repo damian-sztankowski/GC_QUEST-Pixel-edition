@@ -9,7 +9,6 @@ import AboutSection from './components/AboutSection';
 import NotificationSystem from './components/NotificationSystem';
 import { GameState, CloudRole, RoleConfig, DifficultyLevel } from './types';
 import { ROLES, LEVELS, DIFFICULTY_SETTINGS } from './constants';
-import { generateAvatar } from './services/geminiService';
 import { soundService } from './services/soundService';
 import { notificationService } from './services/notificationService';
 
@@ -181,9 +180,8 @@ const App: React.FC = () => {
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(DifficultyLevel.NORMAL);
   const [initialLevelIdx, setInitialLevelIdx] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
-  const [rolesWithAvatars, setRolesWithAvatars] = useState<RoleConfig[]>(ROLES);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [initStage, setInitStage] = useState('INSERTING_CARTRIDGE');
+  const [initStage, setInitStage] = useState('BOOT_ROM');
   const [eeStage, setEeStage] = useState<EasterEggStage>(null);
   const [beaconStage, setBeaconStage] = useState<BeaconStage>(null);
   const [bannerClickCount, setBannerClickCount] = useState(0);
@@ -193,40 +191,12 @@ const App: React.FC = () => {
   const [savedBgmState, setSavedBgmState] = useState(true);
 
   useEffect(() => {
-    const initializeAvatars = async () => {
-      try {
-        const cached = localStorage.getItem('quest_avatars');
-        if (cached) {
-          setRolesWithAvatars(JSON.parse(cached));
-          setInitStage('STARTING SYSTEMS');
-          setTimeout(() => setIsInitializing(false), 1200);
-          return;
-        }
-
-        setInitStage('RENDERING_SPRITES');
-        const updatedRoles = await Promise.all(
-          ROLES.map(async (role) => {
-            try {
-              const avatar = await generateAvatar(role.avatarPrompt);
-              return { ...role, avatarBase64: avatar };
-            } catch (err) {
-              console.error(`Avatar gen failed for ${role.type}`, err);
-              return role;
-            }
-          })
-        );
-        setRolesWithAvatars(updatedRoles);
-        localStorage.setItem('quest_avatars', JSON.stringify(updatedRoles));
-        setInitStage('PLAYER_READY');
-        setTimeout(() => setIsInitializing(false), 1000);
-      } catch (err) {
-        console.error("Initialization failed", err);
-        setIsInitializing(false);
-        notificationService.notify('INIT_ERROR', 'SYSTEM_CORE_SYNC_FAILED', 'ERROR');
-      }
-    };
-
-    initializeAvatars();
+    // Instant local initialization
+    setInitStage('LOADING_CHAPTERS');
+    setTimeout(() => {
+      setInitStage('USER_READY');
+      setTimeout(() => setIsInitializing(false), 800);
+    }, 1200);
   }, []);
 
   const triggerGlobalBeacon = useCallback(() => {
@@ -332,7 +302,7 @@ const App: React.FC = () => {
              <div className="h-full bg-blue-500 animate-[text-reveal_2s_ease-in-out_infinite]" />
           </div>
           <div className="text-[10px] text-slate-500 tracking-widest text-center uppercase font-black">
-             (C) 2025 System Stability // OK
+             (C) 2025 Local Stability // OK
           </div>
         </div>
       </div>
@@ -395,7 +365,7 @@ const App: React.FC = () => {
                 <div className="pixel-box p-4 md:p-6 bg-black/90 border-4">
                    <p className="mono-font text-lg md:text-2xl text-slate-200 leading-tight uppercase font-black">
                      COMPLETE_THE_6_STAGES_OF_CLOUDOM.<br/>
-                     MASTER_OFFICIAL_CDL_EXAM_GUIDE.<br/>
+                     MASTER_100_CDL_EXAM_CHALLENGES.<br/>
                      ESCAPE_THE_BIT_MATRIX_DUNGEON.
                    </p>
                 </div>
@@ -438,7 +408,7 @@ const App: React.FC = () => {
               <p className="text-yellow-500 pixel-font text-[10px] animate-pulse uppercase tracking-widest font-black">SYNCING_{playerName}...</p>
             </div>
             <div className="max-w-xl mx-auto w-full px-4 flex flex-col justify-center">
-              {rolesWithAvatars.map((role, idx) => (
+              {ROLES.map((role, idx) => (
                 <RoleCard key={idx} role={role} onSelect={handleRoleSelect} index={idx} />
               ))}
             </div>
