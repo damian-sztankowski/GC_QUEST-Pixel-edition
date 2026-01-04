@@ -1,4 +1,3 @@
-
 import { CloudRole, Level, RoleConfig, DifficultyLevel } from './types';
 
 export const ROLES: RoleConfig[] = [
@@ -33,6 +32,14 @@ export const DIFFICULTY_SETTINGS = {
     speedMultiplier: 1.5,
     timeBonus: 4,
     label: 'SRE_LEGEND'
+  },
+  // Special secret difficulty
+  'SECRET': {
+    timeMultiplier: 0.5,
+    scoreMultiplier: 5.0,
+    speedMultiplier: 2.0,
+    timeBonus: 2,
+    label: 'GDE_INSIDER'
   }
 };
 
@@ -84,5 +91,13 @@ export const LEVELS: Level[] = [
     topic: 'Scaling & Operations Hierarchy', 
     difficulty: 'Foundational',
     puzzleType: 'STACKER'
+  },
+  {
+    id: 99,
+    title: 'Secret Core',
+    description: 'History and Culture of the Bit-Matrix.',
+    topic: 'Google Cloud Insider Trivia',
+    difficulty: 'Professional',
+    puzzleType: 'SILO'
   }
 ];

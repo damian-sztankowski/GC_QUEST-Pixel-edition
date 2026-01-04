@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Layout from './components/Layout';
 import RoleCard from './components/RoleCard';
 import GameSessionUI from './components/GameSessionUI';
@@ -11,6 +10,8 @@ import { GameState, CloudRole, RoleConfig, DifficultyLevel } from './types';
 import { ROLES, LEVELS, DIFFICULTY_SETTINGS } from './constants';
 import { soundService } from './services/soundService';
 import { notificationService } from './services/notificationService';
+
+const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
 const AnimatedScore: React.FC<{ score: number }> = ({ score }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -177,7 +178,7 @@ const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.HOME);
   const [playerName, setPlayerName] = useState('PLAYER_01');
   const [selectedRole, setSelectedRole] = useState<CloudRole | null>(null);
-  const [difficulty, setDifficulty] = useState<DifficultyLevel>(DifficultyLevel.NORMAL);
+  const [difficulty, setDifficulty] = useState<DifficultyLevel | 'SECRET'>(DifficultyLevel.NORMAL);
   const [initialLevelIdx, setInitialLevelIdx] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -190,6 +191,25 @@ const App: React.FC = () => {
   const [bgmEnabled, setBgmEnabled] = useState(true);
   const [savedBgmState, setSavedBgmState] = useState(true);
 
+  // Konami Code Tracking
+  const konamiIdxRef = useRef(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === KONAMI_CODE[konamiIdxRef.current]) {
+        konamiIdxRef.current++;
+        if (konamiIdxRef.current === KONAMI_CODE.length) {
+          triggerSecretLevel();
+          konamiIdxRef.current = 0;
+        }
+      } else {
+        konamiIdxRef.current = 0;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     // Instant local initialization
     setInitStage('LOADING_CHAPTERS');
@@ -198,6 +218,16 @@ const App: React.FC = () => {
       setTimeout(() => setIsInitializing(false), 800);
     }, 1200);
   }, []);
+
+  const triggerSecretLevel = () => {
+    soundService.playPowerUp();
+    notificationService.notify('KONAMI_ACTIVATED', 'SECRET_MISSION_UNLOCKED', 'ACHIEVEMENT');
+    setPlayerName('GDE_INSIDER');
+    setSelectedRole(CloudRole.DIGITAL_LEADER);
+    setDifficulty('SECRET' as any);
+    setInitialLevelIdx(6); // Level 99 is at index 6
+    setGameState(GameState.PLAYING);
+  };
 
   const triggerGlobalBeacon = useCallback(() => {
     setSavedBgmState(bgmEnabled);
@@ -343,7 +373,19 @@ const App: React.FC = () => {
         {gameState === GameState.HOME && (
           <div className="relative w-full h-full flex flex-col items-center py-4 px-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
             <div className="relative z-10 flex flex-col items-center text-center max-w-5xl w-full my-auto space-y-4 md:space-y-6">
-              <div className="border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000] shrink-0">
+              <div 
+                className="border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000] shrink-0 cursor-pointer active:scale-95"
+                onClick={() => {
+                  setBannerClickCount(prev => {
+                    if (prev + 1 >= 10) {
+                      triggerSecretLevel();
+                      return 0;
+                    }
+                    soundService.playBlip();
+                    return prev + 1;
+                  });
+                }}
+              >
                  <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
               </div>
               
@@ -444,10 +486,10 @@ const App: React.FC = () => {
                             <span className={difficulty === DifficultyLevel.HARD ? 'text-white' : ''}>LEGEND</span>
                          </div>
                          <div className="grid grid-cols-2 gap-2 text-[8px] pixel-font text-slate-400 uppercase leading-tight font-black bg-black p-3 border-2 border-slate-700">
-                            <div className="flex justify-between border-b border-slate-800 pb-1"><span>TIME_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty].timeMultiplier}X</span></div>
-                            <div className="flex justify-between border-b border-slate-800 pb-1"><span>SCORE_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty].scoreMultiplier}</span></div>
-                            <div className="flex justify-between"><span>SPEED_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty].speedMultiplier}X</span></div>
-                            <div className="flex justify-between"><span>TIME_BONUS:</span><span className="text-white">+{DIFFICULTY_SETTINGS[difficulty].timeBonus}S</span></div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1"><span>TIME_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty as DifficultyLevel].timeMultiplier}X</span></div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1"><span>SCORE_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty as DifficultyLevel].scoreMultiplier}</span></div>
+                            <div className="flex justify-between"><span>SPEED_MOD:</span><span className="text-white">{DIFFICULTY_SETTINGS[difficulty as DifficultyLevel].speedMultiplier}X</span></div>
+                            <div className="flex justify-between"><span>TIME_BONUS:</span><span className="text-white">+{DIFFICULTY_SETTINGS[difficulty as DifficultyLevel].timeBonus}S</span></div>
                          </div>
                       </div>
                   </div>
@@ -462,7 +504,7 @@ const App: React.FC = () => {
         {gameState === GameState.PLAYING && selectedRole && (
           <GameSessionUI 
             role={selectedRole} 
-            difficulty={difficulty}
+            difficulty={difficulty as DifficultyLevel}
             playerName={playerName}
             onGameEnd={handleGameEnd} 
             initialLevelIdx={initialLevelIdx}
@@ -479,7 +521,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="pixel-font text-blue-400 text-lg md:text-xl uppercase tracking-widest font-black leading-none">{playerName}</div>
                 <div className="mt-2 text-green-500 pixel-font text-[8px] font-black uppercase tracking-widest animate-pulse">
-                   RANK: {difficulty === DifficultyLevel.HARD ? 'SRE_OVERLORD' : difficulty === DifficultyLevel.NORMAL ? 'CDL_EXPERT' : 'FOUNDATIONAL_CLOUD'}
+                   RANK: {difficulty === 'SECRET' ? 'GDE_INSIDER_LEGEND' : difficulty === DifficultyLevel.HARD ? 'SRE_OVERLORD' : difficulty === DifficultyLevel.NORMAL ? 'CDL_EXPERT' : 'FOUNDATIONAL_CLOUD'}
                 </div>
               </div>
               <div className="bg-[#111] p-6 md:p-8 border-4 border-white mb-8 shadow-inner relative overflow-hidden font-black">
@@ -489,7 +531,7 @@ const App: React.FC = () => {
                    <AnimatedScore score={finalScore} />
                 </div>
                 <div className="mt-6 inline-block px-4 py-1.5 bg-green-900 border-2 border-green-500 text-green-400 pixel-font text-[8px] uppercase">
-                   6_STAGES_CLEARED: CERT_READY
+                   {difficulty === 'SECRET' ? 'SECRET_KNOWLEDGE_UNLOCKED' : '6_STAGES_CLEARED: CERT_READY'}
                 </div>
               </div>
               <div className="flex justify-center">
@@ -522,6 +564,7 @@ const App: React.FC = () => {
     setSelectedRole(null);
     setInitialLevelIdx(0);
     setFinalScore(0);
+    setDifficulty(DifficultyLevel.NORMAL);
   }
 };
 

@@ -9,9 +9,12 @@ interface ChapterMapProps {
 }
 
 const ChapterMap: React.FC<ChapterMapProps> = ({ currentLevelIdx, onSelectLevel, compact = false }) => {
+  // Filter out the secret level (ID 99) so it doesn't appear in the standard selector
+  const visibleLevels = LEVELS.filter(level => level.id !== 99);
+
   return (
     <div className={`grid grid-cols-3 md:grid-cols-6 gap-3 w-full ${compact ? '' : 'max-w-5xl px-2'}`}>
-      {LEVELS.map((level, idx) => {
+      {visibleLevels.map((level, idx) => {
         const isCurrent = idx === currentLevelIdx;
         const isPassed = idx < currentLevelIdx;
         const isLocked = idx > currentLevelIdx && !onSelectLevel;
