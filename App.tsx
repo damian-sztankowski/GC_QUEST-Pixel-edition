@@ -221,7 +221,7 @@ const App: React.FC = () => {
 
   const triggerSecretLevel = () => {
     soundService.playPowerUp();
-    notificationService.notify('KONAMI_ACTIVATED', 'SECRET_MISSION_UNLOCKED', 'ACHIEVEMENT');
+    notificationService.notify('YOU FOUND IT!', 'SECRET_MISSION_UNLOCKED', 'ACHIEVEMENT');
     setPlayerName('GDE_INSIDER');
     setSelectedRole(CloudRole.DIGITAL_LEADER);
     setDifficulty('SECRET' as any);
@@ -374,17 +374,7 @@ const App: React.FC = () => {
           <div className="relative w-full h-full flex flex-col items-center py-4 px-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
             <div className="relative z-10 flex flex-col items-center text-center max-w-5xl w-full my-auto space-y-4 md:space-y-6">
               <div 
-                className="border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000] shrink-0 cursor-pointer active:scale-95"
-                onClick={() => {
-                  setBannerClickCount(prev => {
-                    if (prev + 1 >= 10) {
-                      triggerSecretLevel();
-                      return 0;
-                    }
-                    soundService.playBlip();
-                    return prev + 1;
-                  });
-                }}
+                className="border-4 border-white p-1 bg-black animate-in zoom-in duration-500 shadow-[4px_4px_0_#000] shrink-0"
               >
                  <div className="px-4 py-1 bg-yellow-500 text-black text-[10px] pixel-font font-black">CREDIT 01</div>
               </div>
