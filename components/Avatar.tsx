@@ -17,23 +17,39 @@ const GDELogoSVG: React.FC<{ size: string }> = ({ size }) => (
     style={{ imageRendering: 'pixelated' }}
     xmlns="http://www.w3.org/2000/svg"
   >
-    {/* Interlocking Diamond Shape (GDE Branding style) */}
-    {/* Blue - Left */}
-    <path d="M10 32 L26 16 L34 24 L18 40 Z" fill="#4285F4" />
-    
-    {/* Red - Top */}
-    <path d="M32 10 L48 26 L40 34 L24 18 Z" fill="#EA4335" />
-    
-    {/* Green - Right */}
-    <path d="M54 32 L38 48 L30 40 L46 24 Z" fill="#34A853" />
+    {/* Left Side: Blue (Bottom) and Red (Top) forming a '<' shape */}
+    {/* Blue Pill (Bottom Left) */}
+    <rect 
+      x="10" y="34" width="24" height="14" rx="7" 
+      fill="#4285F4" 
+      transform="rotate(-45 22 41)" 
+    />
+    {/* Red Pill (Top Left) */}
+    <rect 
+      x="10" y="16" width="24" height="14" rx="7" 
+      fill="#EA4335" 
+      transform="rotate(45 22 23)" 
+    />
 
-    {/* Yellow - Bottom */}
-    <path d="M32 54 L16 38 L24 30 L40 46 Z" fill="#FBBC05" />
+    {/* Right Side: Yellow (Bottom) and Green (Top) forming a '>' shape */}
+    {/* Green Pill (Top Right) */}
+    <rect 
+      x="30" y="16" width="24" height="14" rx="7" 
+      fill="#34A853" 
+      transform="rotate(-45 42 23)" 
+    />
+    {/* Yellow Pill (Bottom Right) */}
+    <rect 
+      x="30" y="34" width="24" height="14" rx="7" 
+      fill="#FBBC05" 
+      transform="rotate(45 42 41)" 
+    />
 
-    {/* Central Core Highlight */}
-    <rect x="30" y="30" width="4" height="4" fill="#FFF" opacity="0.8">
-      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
-    </rect>
+    {/* Central Core Highlight - Subtle pulse */}
+    <circle cx="32" cy="32" r="2" fill="#FFF" opacity="0.3">
+      <animate attributeName="opacity" values="0.1;0.6;0.1" dur="2s" repeatCount="indefinite" />
+      <animate attributeName="r" values="1;3;1" dur="2s" repeatCount="indefinite" />
+    </circle>
   </svg>
 );
 
