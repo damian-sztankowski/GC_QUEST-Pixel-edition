@@ -68,7 +68,7 @@ const GameSessionUI: React.FC<GameSessionUIProps> = ({ role, difficulty, playerN
     setHint(null);
     setSelectedOption(null);
     try {
-      const q = await generateQuestion(role, level, currentQuestionInLevel);
+      const q = await generateQuestion(role, level, currentQuestionInLevel, difficulty);
       setQuestion(q);
     } catch (err) {
       console.error(err);

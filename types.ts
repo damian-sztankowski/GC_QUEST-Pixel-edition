@@ -11,10 +11,7 @@ export enum GameState {
 }
 
 export enum CloudRole {
-  DIGITAL_LEADER = 'Cloud Digital Leader',
-  CLOUD_ARCHITECT = 'Professional Cloud Architect',
-  DATA_ENGINEER = 'Professional Data Engineer',
-  SECURITY_ENGINEER = 'Professional Security Engineer'
+  DIGITAL_LEADER = 'Cloud Digital Leader'
 }
 
 export enum DifficultyLevel {
@@ -40,6 +37,7 @@ export interface Question {
   correctIndex: number;
   explanation: string;
   hint?: string;
+  difficulty: DifficultyLevel;
 }
 
 export interface RoleConfig {
@@ -52,7 +50,6 @@ export interface RoleConfig {
   avatarBase64?: string;
 }
 
-// Added NotificationType export to fix external reference errors
 export type NotificationType = 'INFO' | 'SUCCESS' | 'ERROR' | 'ACHIEVEMENT';
 
 export interface Notification {

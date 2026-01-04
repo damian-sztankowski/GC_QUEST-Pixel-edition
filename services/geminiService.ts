@@ -1,5 +1,5 @@
 
-import { CloudRole, Level, Question } from "../types";
+import { CloudRole, Level, Question, DifficultyLevel } from "../types";
 import { STATIC_QUESTION_BASE } from "../data/questions";
 
 /**
@@ -16,38 +16,48 @@ function shuffleArray<T>(array: T[]): T[] {
 
 /**
  * Cache for shuffled questions to maintain consistency within a session
+ * Indexed by Difficulty_LevelID
  */
-const shuffledCache: Record<number, Question[]> = {};
+const shuffledCache: Record<string, Question[]> = {};
 
 /**
- * REPLACED: No longer uses Gemini API. Retrieves from STATIC_QUESTION_BASE.
+ * REPLACED: No longer uses Gemini API. 
+ * Pulls from separated static files based on DifficultyLevel.
+ * Ensures 10 unique questions per level by shuffling the specialized pool.
  */
-export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number): Promise<Question> => {
-  // Check if we already shuffled this level for this session
-  if (!shuffledCache[level.id]) {
-    const baseQuestions = STATIC_QUESTION_BASE[level.id] || [];
-    shuffledCache[level.id] = shuffleArray(baseQuestions);
+export const generateQuestion = async (role: CloudRole, level: Level, questionIndex: number, difficulty: DifficultyLevel = DifficultyLevel.NORMAL): Promise<Question> => {
+  const cacheKey = `${difficulty}_${level.id}`;
+  
+  if (!shuffledCache[cacheKey]) {
+    // Get the base pool for the specific difficulty selected
+    const difficultyPool = STATIC_QUESTION_BASE[difficulty] || STATIC_QUESTION_BASE.NORMAL;
+    const chapterQuestions = difficultyPool[level.id] || [];
+    
+    // Shuffle the chapter questions so every 10-question round is unique
+    shuffledCache[cacheKey] = shuffleArray(chapterQuestions);
   }
   
-  const levelQuestions = shuffledCache[level.id];
+  const levelQuestions = shuffledCache[cacheKey];
   
   if (levelQuestions && levelQuestions.length > 0) {
-    // Zero-based index from 1-based questionIndex
+    // Use modulo to cycle if pool is small, but with 10 questions per chapter
+    // in each file, this will now provide a full unique 10-question round.
     const idx = (questionIndex - 1) % levelQuestions.length;
     
-    // Simulate a tiny "network delay" for retro feel, but no API call
     return new Promise((resolve) => {
-      setTimeout(() => resolve(levelQuestions[idx]), 300);
+      // Instant resolution for local-only feel
+      setTimeout(() => resolve(levelQuestions[idx]), 250);
     });
   }
 
-  // Absolute fallback
+  // Final emergency fallback
   return {
     text: "SYSTEM_RECOVERY: Which cloud model involves paying only for the [clue]resources consumed[/clue]?",
     options: ["On-premises", "CapEx", "Pay-as-you-go", "Fixed-tier"],
     correctIndex: 2,
-    explanation: "The pay-as-you-go model is a hallmark of cloud computing, enabling OpEx flexibility.",
-    hint: "Think about consumption-based pricing."
+    explanation: "The pay-as-you-go model is a hallmark of cloud computing.",
+    hint: "Think about consumption-based pricing.",
+    difficulty: DifficultyLevel.EASY
   };
 };
 
@@ -59,13 +69,15 @@ export const getGeminiFeedback = async (role: CloudRole, question: string, userA
     "DATA_FLOW_STABILIZED! ACCESS_GRANTED.",
     "CRITICAL_SUCCESS. NODE_ONLINE.",
     "CORE_SYNC_COMPLETE. EXCELLENT_WORK.",
-    "KNOWLEDGE_VERIFIED. PROCEED_TO_NEXT_NODE."
+    "KNOWLEDGE_VERIFIED. PROCEED_TO_NEXT_NODE.",
+    "BEYOND_CORP_PROTOCOLS_ACTIVE. WELL_DONE."
   ];
   const negative = [
     "SYSTEM_BREACH! ACCESS_DENIED.",
     "LOGIC_ERROR_DETECTED. RECALIBRATING...",
     "DATA_CORRUPTION_PREVENTED. TRY_AGAIN.",
-    "INCORRECT_INPUT. SECURITY_PERIMETER_ACTIVE."
+    "INCORRECT_INPUT. SECURITY_PERIMETER_ACTIVE.",
+    "ZERO_TRUST_VERIFICATION_FAILED."
   ];
 
   const pool = isCorrect ? positive : negative;
@@ -77,7 +89,7 @@ export const getGeminiFeedback = async (role: CloudRole, question: string, userA
 };
 
 /**
- * REPLACED: Returns a hint if provided in the question data.
+ * REPLACED: Returns a hint from the static metadata.
  */
 export const generateHint = async (question: Question | null, topic: string): Promise<string> => {
   return new Promise((resolve) => {
@@ -88,11 +100,8 @@ export const generateHint = async (question: Question | null, topic: string): Pr
 };
 
 /**
- * REPLACED: No longer generates images via AI.
- * Returns a static placeholder or pre-defined pixel art.
+ * REPLACED: Static avatar.
  */
 export const generateAvatar = async (prompt: string): Promise<string> => {
-  // In a real local-only app, you'd use static assets. 
-  // We return a placeholder that triggers the SVG fallback in Avatar component.
   return ""; 
 };
